@@ -27,14 +27,11 @@ import { SearchBarComponent } from './search-bar/search-bar.component';
 import { AnalyzerComponent } from './analyzer/analyzer.component';
 import { AnalyzerHighstockComponent } from './analyzer-highstock/analyzer-highstock.component';
 import { AnalyzerTableComponent } from './analyzer-table/analyzer-table.component';
-import { AnalyzerInteractionsEditorComponent } from './analyzer-interactions-editor/analyzer-interactions-editor.component';
-import { AnalyzerInteractionsRendererComponent } from './analyzer-interactions-renderer/analyzer-interactions-renderer.component';
 import { AnalyzerStatsRendererComponent } from './analyzer-stats-renderer/analyzer-stats-renderer.component';
 import { AnalyzerTableRendererComponent } from './analyzer-table-renderer/analyzer-table-renderer.component';
 import { MeasurementLandingPageComponent } from './measurement-landing-page/measurement-landing-page.component';
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
-import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/analyzer-compare-options.component';
 import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
@@ -57,14 +54,11 @@ import { MatIconModule } from '@angular/material/icon';
     AnalyzerComponent,
     AnalyzerHighstockComponent,
     AnalyzerTableComponent,
-    AnalyzerInteractionsEditorComponent,
-    AnalyzerInteractionsRendererComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
     EmbedGraphComponent,
-    AnalyzerCompareOptionsComponent,
   ],
   imports: [
     CommonModule,
@@ -82,8 +76,6 @@ import { MatIconModule } from '@angular/material/icon';
       CategoryTableRenderComponent,
       AnalyzerTableRendererComponent,
       AnalyzerStatsRendererComponent,
-      AnalyzerInteractionsEditorComponent,
-      AnalyzerInteractionsRendererComponent
     ])
   ],
   exports: [
@@ -103,13 +95,10 @@ import { MatIconModule } from '@angular/material/icon';
     AnalyzerComponent,
     AnalyzerHighstockComponent,
     AnalyzerTableComponent,
-    AnalyzerInteractionsEditorComponent,
-    AnalyzerInteractionsRendererComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
-    AnalyzerCompareOptionsComponent,
     MatIconModule
   ]
 })
