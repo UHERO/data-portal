@@ -32,8 +32,10 @@ export interface HighchartsObject {
     className: string,
     events: {
       render: () => void,
+      load?: () => void
     },
     styledMode: true,
+    margin?: any
   };
   exporting: {
     enabled: boolean,
@@ -98,6 +100,7 @@ export interface HighchartChartData {
 export interface HighstockObject {
   chart: {
     alignTicks: boolean,
+    animation?: boolean,
     events?: {
       render: () => void,
       load?: () => void
@@ -137,6 +140,7 @@ export interface HighstockObject {
   };
   legend?: {
     enabled: boolean,
+    useHTML?: boolean,
     labelFormatter: () => string
   };
   navigator: {
@@ -195,7 +199,9 @@ export interface HighstockObject {
     shadow: false,
     followPointer: boolean,
     shared?: boolean,
-    formatter: (args: any) => any
+    split?: boolean,
+    formatter?: (args: any) => any,
+    pointFormatter?: () => any,
   };
   credits: {
     enabled: boolean
@@ -228,6 +234,7 @@ export interface HighstockObject {
 }
 
 export interface Series {
+  analyze: boolean;
   id: string;
   title?: string;
   name: string;

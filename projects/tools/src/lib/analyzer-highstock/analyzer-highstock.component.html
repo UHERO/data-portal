@@ -1,17 +1,20 @@
-<div *ngIf="alertMessage" class="alert alert-info alert-message" role="alert">
-  <i class="material-icons">&#xE001;</i> {{alertMessage}}
-</div>
-<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
-  [(update)]="updateChart" [callbackFunction]="chartCallback" [oneToOne]="true"></highcharts-chart>
-<div class="customize-tooltip">
-  <p>Tooltip Display:</p>
-  <label class="form-check-inline">
-      <input type="checkbox" (change)="nameActive($event)" [checked]="nameChecked">Series Name
-  </label>
-  <label class="form-check-inline">
-      <input type="checkbox" (change)="unitsActive($event)" [checked]="unitsChecked">Units
-  </label>
-  <label class="form-check-inline">
-      <input type="checkbox" (change)="geoActive($event)" [checked]="geoChecked">Geography
-  </label>
+<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor"
+  [options]="chartOptions" [(update)]="updateChart" [callbackFunction]="chartCallback" [oneToOne]="true">
+</highcharts-chart>
+<div id="customize-yAxis" class="d-flex mt-2 justify-content-center">
+  <ng-template ngFor let-axis [ngForOf]="chartObject?.yAxis">
+    <ng-template ngIf [ngIf]="axis.userOptions.title.text && axis.showAxis">
+      <div class="d-inline-flex flex-column justify-content-center" [style.order]="axis.userOptions.styleOrder">
+        <span class="d-block text-center">Y-Axis ({{axis.userOptions.id}})</span>
+        <div class="d-flex justify-content-center align-items-center flex-row">
+          <label class="mb-0" attr.for="min{{axis.userOptions.id}}">Min:</label>
+          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="min{{axis.userOptions.id}}" [(value)]="axis.userOptions.min"
+            (change)="changeYAxisMin($event, axis)" [placeholder]="Highcharts.numberFormat(axis.getExtremes().min, 2, '.', ',')">
+          <label class="mb-0" attr.for="max{{axis.userOptions.id}}">Max:</label>
+          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="max{{axis.userOptions.id}}" [(value)]="axis.userOptions.max"
+            (change)="changeYAxisMax($event, axis)" [placeholder]="Highcharts.numberFormat(axis.getExtremes().max, 2, '.', ',')">
+        </div>
+      </div>
+    </ng-template>
+  </ng-template>
 </div>

@@ -100,8 +100,8 @@ export class DataPortalSettingsService {
       sliderInteraction: true,
       otherDashboardLinks: [
         {
-          name: `Hawai'i High Frequency Economic Data`,
-          url: `https://data.uhero.hawaii.edu/high-frequency-dashboard/#/`
+          name: `UHERO Dashboard Project`,
+          url: `https://uhero.hawaii.edu/analytics-dashboards/`
         }
       ]
     },

@@ -9,30 +9,29 @@ import { HelperService } from '../helper.service';
 })
 export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
-  @Input() sublist;
   @Input() data;
   @Input() findMinMax;
-  @Input() selectedDataList;
   @Input() freq;
   @Input() noSeries;
   @Input() showSeasonal;
   @Input() hasNonSeasonal;
   @Input() hasSeasonal;
   @Input() nsaActive;
-  @Input() yoyActive;
-  @Input() ytdActive;
-  @Input() params;
-  @Input() chartStart;
-  @Input() chartEnd;
+  @Input() routeStart;
+  @Input() routeEnd;
   @Input() search;
   @Input() dates;
   @Input() dateWrapper;
-  @Input() seriesInAnalyzer;
+  @Input() analyzerView: boolean;
+  @Input() indexChecked;
+  @Input() indexBaseYear;
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;
   noSeriesToDisplay;
   routeSubscription;
+  chartStart;
+  chartEnd;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -43,10 +42,12 @@ export class CategoryChartsComponent implements OnChanges {
   ngOnChanges() {
     if (this.data) {
       this.data.forEach((chartSeries) => {
-        if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
+        if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
-          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);
-          chartSeries.seriesInfo.analyze = this.analyzerService.checkAnalyzer(chartSeries.seriesInfo);
+          chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
+          const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
+          this.chartStart = this.dates[seriesStart].date;
+          this.chartEnd = this.dates[seriesEnd].date;
         }
       });
     }
@@ -65,44 +66,7 @@ export class CategoryChartsComponent implements OnChanges {
     }
   }
 
-  formatCategoryChartData = (observations, dates, portalSettings) => {
-    const transformations = this.helperService.getTransformations(observations);
-    const { series0Name, series1Name } = portalSettings.highcharts;
-    const start = observations.observationStart;
-    const end = observations.observationEnd;
-    const series0 = this.formatSeriesData(transformations[series0Name], dates);
-    const series1 = this.formatSeriesData(transformations[series1Name], dates);
-    const pseudoZones = [];
-    const level = transformations.level;
-    if (level.pseudoHistory) {
-      level.pseudoHistory.forEach((obs, index) => {
-        if (obs && !level.pseudoHistory[index + 1]) {
-          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-        }
-      });
-    }
-    const chartData = { series0, series1, pseudoZones, dates };
-    return { start, end, chartData };
-  }
-
-  formatSeriesData = (transformation, dates: Array<any>) => {
-    if (transformation) {
-      const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
-      const transformationValues = [];
-      if (!dateDiff.length) {
-        return transformation.values.map(Number);
-      }
-      if (dateDiff.length) {
-        dates.forEach((sDate) => {
-          const dateExists = this.helperService.binarySearch(transformation.dates, sDate.date);
-          dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
-        });
-        return transformationValues;
-      }
-    }
-  }
-
-  findMin(displaySeries, start, end) {
+  findMin = (displaySeries, start, end) => {
     let minValue = null;
     displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
@@ -114,7 +78,7 @@ export class CategoryChartsComponent implements OnChanges {
     return minValue;
   }
 
-  findMax(displaySeries, start, end) {
+  findMax = (displaySeries, start, end) => {
     let maxValue = null;
     displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
@@ -126,18 +90,34 @@ export class CategoryChartsComponent implements OnChanges {
     return maxValue;
   }
 
-  getSeriesValues(series, start, end) {
+  getSeriesValues = (series, start, end) => {
     const dateStart = this.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
     const dateEnd = this.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
-    return series.seriesInfo.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
+    return series.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
   }
 
-  updateAnalyze(seriesInfo) {
-    seriesInfo.analyze = !seriesInfo.analyze;
-    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id)
+  addToAnalyzer(series) {
+    series.analyze = true;
+    this.analyzerService.addToAnalyzer(series.id);
+  }
+
+  removeFromAnalyzer(series) {
+    series.analyze = false;
+    this.analyzerService.removeFromAnalyzer(series.id);
+  }
+
+  addCompare(series) {
+    series.compare = true;
+    //this.analyzerService.setCompareChartSeriesObject(series);
+    this.analyzerService.makeCompareSeriesVisible(series.id)
+  }
+
+  removeCompare(series) {
+    series.compare = false;
+    this.analyzerService.removeFromComparisonChart(series.id);
   }
 
   trackBySeries(index, item) {
-    return item.seriesInfo.id;
+    return item.id;
   }
 }

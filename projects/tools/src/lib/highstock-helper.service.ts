@@ -27,7 +27,7 @@ Highcharts.dateFormats = {
 export class HighstockHelperService {
   constructor() { }
 
-  freqInterval = (freq) => {
+  freqInterval = (freq: string) => {
     const interval = {
       'Q': 3,
       'S': 6,
@@ -36,7 +36,7 @@ export class HighstockHelperService {
     return interval[freq] || 1;
   }
 
-  freqIntervalUnit = (freq) => {
+  freqIntervalUnit = (freq: string) => {
     const unit = {
       'A': 'year',
       'W': 'day',
@@ -60,7 +60,7 @@ export class HighstockHelperService {
     }
   }
 
-  getAnalyzerChartExtremes = (chartObject) => {
+  getAnalyzerChartExtremes = chartObject => {
     let selectedRange = null;
     if (chartObject) {
       selectedRange = chartObject.series.find(s => s.name === 'Navigator').points;

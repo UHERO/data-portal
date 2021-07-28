@@ -12,7 +12,6 @@ import { Subscription } from 'rxjs';
 })
 export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() data;
-  @Input() sublist;
   @Input() selectedCategory;
   @Input() selectedDataList;
   @Input() tableId;
@@ -26,7 +25,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() tableStart;
   @Input() tableEnd;
   @Input() portalSettings;
-  @Input() seriesInAnalyzer;
   @Input() showSeasonal: boolean;
   @Input() hasNonSeasonal: boolean;
   @Input() hasSeasonal;
@@ -34,13 +32,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   columnDefs;
   rows;
   frameworkComponents;
-  paginationSizeOptions: number[] = [];
-  selectedPaginationSize;
-  totalPages: number;
   totalRows: number;
-  paginationSize: number;
-  disablePrevious: boolean;
-  disableNext: boolean;
   noSeriesToDisplay;
   gridOptions;
   freqSub: Subscription;
@@ -72,12 +64,12 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       }
     };
     if (this.data) {
-      this.columnDefs = this.setTableColumns(this.dates, this.selectedFreq.freq, this.defaultRange, this.tableStart, this.tableEnd);
+      this.columnDefs = this.setTableColumns(this.dates, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
-        if (series.seriesInfo !== 'No data available' && this.dates) {
+        if (series !== 'No data available' && this.dates) {
           series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasSeasonal);
-          series.seriesInfo.analyze = this.analyzerService.checkAnalyzer(series.seriesInfo);
-          const transformations = this.helperService.getTransformations(series.seriesInfo.seriesObservations);
+          series.analyze = this.analyzerService.checkAnalyzer(series);
+          const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
           const { level, yoy, ytd, c5ma } = transformations;
           const seriesData = this.selectedDataList ?
             this.formatLvlData(series, level, this.selectedDataList.id) :
@@ -106,7 +98,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     this.geoSub.unsubscribe();
   }
 
-  setTableColumns = (dates, freq, defaultRange, tableStart, tableEnd) => {
+  setTableColumns = (dates, tableStart, tableEnd) => {
     const columns: Array<any> = [];
     columns.push({
       field: 'series',
@@ -119,27 +111,27 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
         return params.value;
       }
     });
-    const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, tableStart, tableEnd, freq, defaultRange);
-    const tableDates = dates.slice(seriesStart, seriesEnd + 1);
+    const tableDates = dates//.slice(seriesStart, seriesEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
-    for (let i = tableDates.length - 1; i >= 0; i--) {
-      columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125, colId: i });
+    for (let i = dates.length - 1; i >= 0; i--) {
+      const hideColumn = dates[i].date < tableStart || dates[i].date > tableEnd
+      columns.push({ field: dates[i].date, headerName: dates[i].tableDate, width: 125, colId: i, hide: hideColumn });
     }
     return columns;
   }
 
   formatLvlData = (series, level, parentId) => {
     const { dates, values } = level;
-    const units = series.seriesInfo.unitsLabelShort ? series.seriesInfo.unitsLabelShort : series.seriesInfo.unitsLabel;
+    const units = series.unitsLabelShort || series.unitsLabel;
     const seriesData = {
-      series: `${series.seriesInfo.tablePrefix || ''} ${series.seriesInfo.displayName} ${series.seriesInfo.tablePostfix || ''} (${units})`,
-      saParam: series.seriesInfo.saParam,
-      seriesInfo: series.seriesInfo,
+      series: `${series.tablePrefix || ''} ${series.displayName} ${series.tablePostfix || ''} (${units})`,
+      saParam: series.saParam,
+      seriesInfo: series,
       lvlData: true,
       categoryId: parentId
     };
     dates.forEach((d, index) => {
-      seriesData[d] = this.helperService.formatNum(+values[index], series.seriesInfo.decimals);
+      seriesData[d] = this.helperService.formatNum(+values[index], series.decimals);
     });
     return seriesData;
   }
@@ -147,19 +139,19 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   formatTransformationData = (series, transformation, transformationName) => {
     const data = {
       series: '',
-      seriesInfo: series.seriesInfo,
+      seriesInfo: series,
       lvlData: false
     };
     if (transformation) {
       const { dates, values } = transformation;
-      const disName = this.formatTransformationName(transformation.transformation, series.seriesInfo.percent);
+      const disName = this.formatTransformationName(transformation.transformation, series.percent);
       data.series = disName;
       dates.forEach((d, index) => {
         data[d] = values[index];
       });
       return data;
     }
-    const displayName = this.formatTransformationName(transformationName, series.seriesInfo.percent);
+    const displayName = this.formatTransformationName(transformationName, series.percent);
     data.series = displayName;
     return data;
   }
@@ -174,8 +166,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   }
 
   onExport = () => {
-    const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
-    const exportColumns = [];
     const parentName = `${(this.selectedCategory && this.selectedCategory.name)}: ` || '';
     const sublistName = `${(this.selectedDataList && this.selectedDataList.name)}` || '';
     const geoName = (this.selectedGeo && this.selectedGeo.name) || '';
@@ -183,11 +173,9 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     const fileName = `${sublistName}_${geoName}-${freqLabel}`
     const catId = (this.selectedCategory && this.selectedCategory.id) || '';
     const dataListId = `&data_list_id=${(this.selectedDataList && this.selectedDataList.id)}` || '';
-    for (let i = allColumns.length - 1; i >= 0; i--) {
-      exportColumns.push(allColumns[i]);
-    }
+    const displayedColumns = this.gridApi.csvCreator.columnController.getAllDisplayedColumns()
     const params = {
-      columnKeys: exportColumns,
+      columnKeys: ['series'].concat(displayedColumns.flatMap(col => col.userProvidedColDef.field === 'series' ? [] : col).reverse()),
       suppressQuotes: false,
       fileName,
       customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoName}-${freqLabel} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`

@@ -36,9 +36,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   seriesStart = null;
   seriesEnd = null;
   portalSettings;
+  seriesRange;
   private displaySeries;
-  seriesInAnalyzer;
-  private toggleSeriesInAnalyzer;
 
   // Variables for geo and freq selectors
   public categoryData;
@@ -57,9 +56,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) {
-    this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
-      this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
-    });
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
       this.selectedFreq = freq;
     });
@@ -80,8 +76,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.routeYoy = params[`yoy`];
       this.routeYtd = params[`ytd`];
       this.routeSa = params[`sa`];
-      this.routeStart = params[`start`];
-      this.routeEnd = params[`end`];
+      this.routeStart = params[`start`] || null;
+      this.routeEnd = params[`end`] || null;
       this.noCache = params[`nocache`] === 'true';
       if (this.id) { this.queryParams.id = this.id; }
       if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
@@ -102,7 +98,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
-    this.toggleSeriesInAnalyzer.unsubscribe();
   }
 
   getIdParam(id) {
@@ -120,16 +115,9 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   getData(id, noCache, dataListId, geo, freq) {
-    if (geo && freq) {
-      return (typeof id === 'number' || id === null) ?
-        this.catHelper.initContent(id, noCache, dataListId, geo, freq) :
-        this.catHelper.initSearch(id, noCache, geo, freq);
-    }
-    if (!geo && !freq) {
-      return (typeof id === 'number' || id === null) ?
-        this.catHelper.initContent(id, noCache, dataListId) :
-        this.catHelper.initSearch(id, noCache);
-    }
+    return (typeof id === 'number' || id === null) ?
+      this.catHelper.initContent(id, noCache, { dataListId, geo, freq }) :
+      this.catHelper.initSearch(id, noCache, { geo, freq });
   }
 
   // Redraw series when a new region is selected
@@ -181,6 +169,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   changeRange(e) {
     this.routeStart = e.seriesStart;
     this.routeEnd = e.endOfSample ? null : e.seriesEnd;
+    this.seriesRange = e;
     this.displaySeries = true;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;

@@ -30,7 +30,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private category;
   seriesId;
   seriesShareLink: string;
-  seriesEmbedCode: string;
   freqSub: Subscription;
   geoSub: Subscription;
   selectedGeo: Geography;
@@ -117,7 +116,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId);
       this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
-      this.seriesEmbedCode = this.formatSeriesEmbedSnippet(this.startDate, this.endDate);
     });
     this.cdRef.detectChanges();
   }
@@ -149,16 +147,20 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateAnalyze(seriesInfo) {
-    seriesInfo.analyze = !seriesInfo.analyze;
-    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id)
+  addToAnalyzer(series) {
+    series.analyze = true;
+    this.analyzerService.addToAnalyzer(series.id);
   }
 
+  removeFromAnalyzer(series) {
+    series.analyze = false;
+    this.analyzerService.removeFromAnalyzer(series.id);
+  }
+  
   updateChartExtremes(e) {
     this.chartStart = e.minDate;
     this.chartEnd = e.endOfSample ? null : e.maxDate;
     this.seriesShareLink = this.formatSeriesShareLink(this.chartStart, this.chartEnd);
-    this.seriesEmbedCode = this.formatSeriesEmbedSnippet(this.chartStart, this.chartEnd);
   }
 
   // Update table when selecting new ranges in the chart
@@ -180,7 +182,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
     seriesDetail.observations = seriesDetail.seriesObservations;
-    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate, false);
+    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate, false, null);
   }
 
   createTableColumns = (portalSettings, seriesDetail) => {
@@ -216,16 +218,5 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       seriesUrl += `&end=${end}`;
     }
     return seriesUrl;
-  }
-
-  formatSeriesEmbedSnippet(start: string, end: string) {
-    let params = `?id=${this.seriesId}`;
-    if (start) {
-      params += `&start=${start}`;
-    }
-    if (end) {
-      params += `&end=${end}`;
-    }
-    return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}/graph${params}" scrolling="no"></iframe></div>`;
   }
 }

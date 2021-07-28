@@ -1,12 +1,10 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, OnDestroy, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
 import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
-import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
-import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
 import { GridOptions } from 'ag-grid-community';
 
 @Component({
@@ -15,20 +13,18 @@ import { GridOptions } from 'ag-grid-community';
   styleUrls: ['./analyzer-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
+export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
-  @Input() allTableDates;
   @Output() tableTransform = new EventEmitter();
   @Input() yoyChecked;
   @Input() ytdChecked;
   @Input() c5maChecked;
-  @Input() indexChecked;
+  @Input() indexChecked: boolean;
+  @Input() indexBaseYear: string;
   portalSettings;
   missingSummaryStat = false;
-  tableDates;
-  toggleSeries;
   private gridApi;
   columnDefs;
   rows;
@@ -48,8 +44,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     this.frameworkComponents = {
       analyzerTableRenderer: AnalyzerTableRendererComponent,
       analyzerStatsRenderer: AnalyzerStatsRendererComponent,
-      analyzerInteractionsEditor: AnalyzerInteractionsEditorComponent,
-      analyzerInteractionsRenderer: AnalyzerInteractionsRendererComponent
     };
     this.gridOptions = {
       context: {
@@ -61,19 +55,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
         componentParent: this
       } as GridOptions
     };
-    this.toggleSeries = this.analyzerService.toggleSeriesInChart.subscribe((data: any) => {
-      const chartSeries = this.series.filter(s => s.showInChart);
-      const toggleDisplay = this.analyzerService.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
-      if (toggleDisplay) {
-        const matchingValueSeries = this.rows.find(r => r.interactionSettings.seriesInfo.id === data.seriesInfo.id);
-        const matchingStatSeries = this.summaryRows.find(r => r.seriesInfo.id === data.seriesInfo.id);
-        matchingValueSeries.interactionSettings.showInChart = !matchingValueSeries.interactionSettings.showInChart;
-        const seriesInChart = $('.highcharts-series.' + data.seriesInfo.id);
-        matchingValueSeries.interactionSettings.color = seriesInChart.css('stroke');
-        matchingStatSeries.interactionSettings.showInChart = !matchingStatSeries.interactionSettings.showInChart;
-        matchingStatSeries.interactionSettings.color = seriesInChart.css('stroke');
-      }
-    });
   }
 
   ngOnInit() {
@@ -81,26 +62,20 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    if (this.minDate && this.maxDate) {
-      const newTableDates = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
-      this.columnDefs = this.setTableColumns(newTableDates);
-    }
+    const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
+    this.columnDefs = this.setTableColumns(tableDateCols);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
-    if (this.minDate && this.maxDate) {
-      this.summaryRows = this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate, this.indexChecked);
-      this.summaryRows.forEach((statRow) => {
-        const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
-        statRow.interactionSettings.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
-      });
-      // Check if the summary statistics for a series has NA values
-      this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
-    }
+    this.summaryRows = [];
+    // Check if the summary statistics for a series has NA values
+    this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
-      const transformations = this.helperService.getTransformations(series.observations);
+      const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level, this.minDate);
+      const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
+      this.summaryRows.push(summaryStats)
       this.rows.push(seriesData);
       if (this.yoyChecked && yoy) {
         const yoyData = this.formatTransformationData(series, yoy);
@@ -117,21 +92,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.toggleSeries.unsubscribe();
+  calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
+    const { observationStart, observationEnd } = series.seriesObservations;
+    series.seriesStartDate = (observationStart > startDate || !startDate) ?
+      observationStart : startDate;
+    series.seriesEndDate = (observationEnd > endDate || !endDate) ?
+      observationEnd : endDate;
+    const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, series.seriesStartDate, series.seriesEndDate, indexed, indexBase);
+    stats.series = this.indexChecked ? series.indexDisplayName : series.displayName;
+    return stats
   }
 
   setSummaryStatColumns = () => {
     return [{
-      field: 'interactionSettings',
-      headerName: 'Actions',
-      pinned: 'left',
-      width: 25,
-      editable: true,
-      cellRenderer: 'analyzerInteractionsRenderer',
-      cellEditor: 'analyzerInteractionsEditor',
-      cellClass: 'action-column',
-    }, {
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
@@ -167,7 +140,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     }];
   }
 
-  setTableColumns = (dates) => {
+  setTableColumns = dates => {
     const columns: Array<any> = [];
     columns.push({
       field: 'series',
@@ -179,16 +152,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
         return params.value;
       }
     });
-    columns.push({
-      field: 'interactionSettings',
-      headerName: 'Actions',
-      pinned: 'left',
-      width: 25,
-      editable: true,
-      cellRenderer: 'analyzerInteractionsRenderer',
-      cellEditor: 'analyzerInteractionsEditor',
-      cellClass: 'action-column',
-    });
     const tableDates = dates;
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
@@ -198,84 +161,65 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   formatLvlData = (series, level, minDate) => {
-    const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
+    const seriesInChart = $('.highcharts-series.' + series.id);
     const { dates, values } = level;
-    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
-    const indexedValues = this.getIndexedValues(values, dates, minDate);
+    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
+    const baseYear = this.indexBaseYear
+    const indexedValues = this.analyzerService.getIndexedValues(values, dates, baseYear);
+    const indexBaseYearNotAvailable = !indexedValues.some(v => v !== Infinity);
+    const indexDisplayName = indexBaseYearNotAvailable ? series.naIndex : series.indexDisplayName;
     const seriesData = {
-      series: this.indexChecked ? series.indexDisplayName : series.displayName,
+      series: this.indexChecked ? indexDisplayName : series.displayName,
       lockPosition: true,
       saParam: series.saParam,
-      seriesInfo: series.seriesDetail,
-      interactionSettings: {
-        showInChart: series.showInChart,
-        color: seriesInChart.length ? seriesInChart.css('stroke') : '#000000',
-        seriesInfo: series.seriesDetail
-      },
+      seriesInfo: series,
       lvlData: true,
     };
     formattedDates.forEach((d, index) => {
-      seriesData[d] = this.indexChecked ? this.helperService.formatNum(indexedValues[index], series.seriesDetail.decimals) : this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
+      seriesData[d] = this.indexChecked ? this.helperService.formatNum(indexedValues[index], series.decimals) : this.helperService.formatNum(+values[index], series.decimals);
     });
     return seriesData;
   }
 
-  getIndexedValues(values, dates, start) {
-    return values.map((curr, ind, arr) => {
-      const dateIndex = dates.findIndex(date => date === start);
-      return dateIndex > -1 ? curr / arr[dateIndex] * 100 : curr / arr[0] * 100;
-    });
-  }
-
   formatTransformationData = (series, transformation) => {
     const { dates, values } = transformation;
-    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
-    const displayName = this.formatTransformationName(transformation.transformation, series.seriesDetail.percent);
+    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
+    const displayName = this.formatTransformationName(transformation.transformation, series.percent);
     const data = {
       series: displayName,
-      seriesInfo: series.seriesDetail,
+      seriesInfo: series,
       lvlData: false
     };
     formattedDates.forEach((d, index) => {
-      data[d] = this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
+      data[d] = this.helperService.formatNum(+values[index], series.decimals);
     });
     return data;
   }
 
   formatTransformationName = (transformation, percent) => {
-    if (transformation === 'pc1') {
-      return percent ? 'YOY (ch.)' : 'YOY (%)';
-    }
-    if (transformation === 'ytd') {
-      return percent ? 'YTD (ch.)' : 'YTD (%)';
-    }
-    if (transformation === 'c5ma') {
-      return percent ? 'Annual (ch.)' : 'Annual (%)';
-    }
+    const transformationLabel = {
+      pc1: 'YOY',
+      ytd: 'YTD',
+      c5ma: 'Annual'
+    };
+    return `${transformationLabel[transformation]} (${percent ? 'ch.' : '%'})`;
   }
 
-  onGridReady = (params) => {
+  onGridReady(params) {
     this.gridApi = params.api;
   }
 
   onExport = () => {
-    const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
-    const exportColumns = [];
-    for (let i = allColumns.length - 2; i >= 0; i--) {
-      exportColumns.push(allColumns[i]);
-    }
+    const { columnDefs } = this.gridApi.csvCreator.columnController;
     const params = {
-      columnKeys: exportColumns,
+      columnKeys: ['series'].concat(columnDefs.flatMap(col => col.field === 'series' ? [] : col.field).reverse()),
       fileName: 'analyzer',
-      customHeader: this.portalSettings.catTable.portalSource + '\n\n'
+      customHeader: `${this.portalSettings.catTable.portalSource} \n\n`
     };
     this.gridApi.exportDataAsCsv(params);
   }
 
-
-  isSummaryStatMissing = (series) => {
-    return series.some((s) => s ? s.missing : null);
-  }
+  isSummaryStatMissing = series => series.some(s => s ? s.missing : null);
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;
@@ -296,12 +240,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     this.analyzerService.switchYAxes.emit(series);
   }
 
-  toggleSeriesInChart(series) {
-    this.analyzerService.toggleSeriesInChart.emit(series);
-    this.analyzerService.createAnalyzerTableDates(this.analyzerService.analyzerData.analyzerSeries);
-  }
-
   removeFromAnalyzer(series) {
-    this.analyzerService.toggleAnalyzerSeries(series.seriesInfo.id);
+    this.analyzerService.removeFromAnalyzer(series.id);
   }
 }

@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 })
 export class FreqSelectorComponent implements OnDestroy {
   @Input() freqs: Array<Frequency>;
+  @Input() analyzerView: boolean;
   selectedFreq: Frequency;
   @Output() selectedFreqChange = new EventEmitter();
   freqSubscription: Subscription;

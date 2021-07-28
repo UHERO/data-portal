@@ -1,7 +1,19 @@
-h3 {
+h2#analyzer-header {
   display: inline-block;
-  margin-bottom: 0;
-  vertical-align: middle;
+  font-size: 1.4em;
+  text-transform: capitalize;
+  margin: 0;
+}
+
+div#view-toggle-share {
+  //display: inline-block;
+  //vertical-align: middle;
+}
+
+div#analyzer-customizations {
+  //display: block;
+  flex-basis: 100%;
+  padding-top: .5em;
 }
 
 .chart-warning {
@@ -29,10 +41,16 @@ h3 {
     margin-top: 50px;
   }
 
-  .rm-analyzer-series-btn {
+  .rm-analyzer-series-btn, .compare-btn {
     height: calc(1.75rem - 2px);
     margin-left: 0.5em;
     margin-right: 0.5em;
-    padding: 0.175rem 0.75rem 0.175rem 0.75rem;  
+    padding: 0.175rem 0.75rem 0.175rem 0.75rem;
+
+    .material-icons {
+      font-size: 1em;
+      line-height: unset;
+      vertical-align: bottom;
+    }
   }
 }

@@ -45,8 +45,9 @@ export class DateSliderComponent implements OnInit {
       // If start/end exist in values array, position handles at start/end; otherwise, use default range
       this.start = defaultRanges.seriesStart;
       this.end = defaultRanges.seriesEnd;
-      this.sliderDates = this.dates.map(d => d.tableDate);
+      this.sliderDates = this.dates.map(d => d.date);
       this.sliderSelectedRange = [this.start, this.end];
+      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
       /* Date picker inputs */
       this.displayMonthNavigator = this.freq === 'W' || this.freq === 'D';
       this.calendarView = this.setCalendarView(this.freq);
@@ -157,14 +158,14 @@ export class DateSliderComponent implements OnInit {
     };
     calendar === 'calendar-start' ? this.setCalendarStartVars(newDate[freq], freq) : this.setCalendarEndVars(newDate[freq], freq);
     this.sliderSelectedRange = [this.start, this.end];
-    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], freq);
+    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
   }
 
   onCalendarSelect(e: any, calendar: string, freq: string) {
     const date = e.toISOString().substr(0, 10);
     calendar === 'calendar-start' ? this.setCalendarStartVars(date, freq) : this.setCalendarEndVars(date, freq);
     this.sliderSelectedRange = [this.start, this.end];
-    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], freq);
+    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
   }
 
   setCalendarStartVars(date: string, freq: string) {
@@ -229,7 +230,7 @@ export class DateSliderComponent implements OnInit {
     this.end = e.values[1];
     // workaround for onSlideEnd not firing when not using the slide handles
     this.sliderSelectedRange = [this.start, this.end];
-    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
+    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
     const startDate = this.dates[this.start].date;
     const endDate = this.dates[this.end].date;
     this.calendarStartDate = new Date(startDate.replace(/-/g, '/'));
@@ -240,31 +241,10 @@ export class DateSliderComponent implements OnInit {
     this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
   }
 
-  updateChartsAndTables(from, to, freq: string) {
-    const seriesStart = this.formatChartDate(from, freq);
-    const seriesEnd = this.formatChartDate(to, freq);
+  updateChartsAndTables(from, to) {
+    const seriesStart = from;
+    const seriesEnd = to;
     const endOfSample = this.dates[this.dates.length - 1].date === seriesEnd;
     this.updateRange.emit({ seriesStart, seriesEnd, endOfSample });
-  }
-
-  updateRanges(from, to, freq: string) {
-    this.updateChartsAndTables(from, to, freq);
-  }
-
-  formatChartDate = (value, freq) => {
-    const quarters = { Q1: '01', Q2: '04', Q3: '07', Q4: '10' };
-    if (freq === 'A') {
-      return `${value.toString()}-01-01`;
-    }
-    if (freq === 'Q') {
-      const q = value.substring(5, 7);
-      return `${value.substring(0, 4)}-${quarters[q]}-01`;
-    }
-    if (freq === 'M' || freq === 'S') {
-      return `${value}-01`;
-    }
-    if (freq === 'W' || freq === 'D') {
-      return value;
-    }
   }
 }

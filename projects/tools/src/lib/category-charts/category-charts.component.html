@@ -1,22 +1,24 @@
 <div class="multi-charts-row">
-	<ng-template ngIf [ngIf]="noSeriesToDisplay">
-		<p *ngIf="noSeriesToDisplay" class="no-data">No data available for current selection.</p>
-	</ng-template>
 	<ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
 		<div *ngIf="serie.display" class="multi-charts">
-			<a href="#" [routerLink]="['/series']"
-				[queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}"
-				queryParamsHandling='merge' *ngIf="serie.seriesInfo.id">
-				<lib-highchart [minValue]="minValue" [maxValue]="maxValue"
-					[portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd"
-					[seriesData]="serie" [categoryDates]="dates" [currentFreq]="freq"></lib-highchart>
+			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.id, sa: serie.saParam}"
+				queryParamsHandling='merge' *ngIf="serie.id">
+				<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
+					[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [indexChecked]="indexChecked" [baseYear]="indexBaseYear">
+				</lib-highchart>
 			</a>
-			<i *ngIf="!serie.seriesInfo.analyze" title="Add to Analyzer"
-				[class.add-analyze-button]="!serie.seriesInfo.analyze" class="material-icons analyzer-toggle"
-				(click)="updateAnalyze(serie.seriesInfo)">star_border</i>
-			<i *ngIf="serie.seriesInfo.analyze" title="Remove from Analyzer"
-				[class.remove-analyze-button]="serie.seriesInfo.analyze"
-				class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(serie.seriesInfo)">star</i>
+			<ng-template ngIf [ngIf]="!analyzerView">
+				<i *ngIf="!serie.analyze" title="Add to Analyzer" [class.add-analyze-button]="!serie.analyze"
+					class="bi bi-star analyzer-toggle" (click)="addToAnalyzer(serie)"></i>
+				<i *ngIf="serie.analyze" title="Remove from Analyzer" [class.remove-analyze-button]="serie.analyze"
+					class="bi bi-star-fill analyzer-toggle remove-button" (click)="removeFromAnalyzer(serie)"></i>
+			</ng-template>
+			<ng-template ngIf [ngIf]="analyzerView">
+				<i *ngIf="!serie.compare" title="Add to Comparison" [class.add-compare-button]="!serie.compare"
+					class="bi bi-bar-chart analyzer-toggle" (click)="addCompare(serie)"></i>
+				<i *ngIf="serie.compare" title="Remove from Compaison" [class.remove-compare-button]="serie.compare"
+					class="bi bi-bar-chart-fill analyzer-toggle remove-button" (click)="removeCompare(serie)"></i>
+			</ng-template>
 		</div>
 	</ng-template>
 </div>

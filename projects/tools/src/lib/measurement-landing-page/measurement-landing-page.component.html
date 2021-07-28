@@ -1,10 +1,12 @@
 <div class="multi-series-container">
 	<ng-template ngFor let-data [ngForOf]="categoryData | async">
-		<h2 *ngIf="data.requestComplete" class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory.name}}</h2>
+		<h2 *ngIf="data.requestComplete" class="selected-category" [class.search-term]="search" id="id_top">
+			{{data.selectedCategory.name}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
 		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">{{data.selectedDataList.name}}</h3>
+		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">
+			{{data.selectedDataList.name}}</h3>
 		<div class="filters">
 			<lib-measurement-selector *ngIf="data.measurements" [measurements]="data.measurements"
 				[selectedMeasurement]="data.currentMeasurement" (selectedMeasurementChange)="redrawSeries($event)"
@@ -27,17 +29,17 @@
 				(updateRange)="changeRange($event, data)"></lib-date-slider>
 		</div>
 		<i *ngIf="!search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<lib-category-table-view *ngIf="routeView === 'table' && data.requestComplete" [portalSettings]="portalSettings"
-			[dates]="data.dateArray" [tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd"
-			[data]="data.displaySeries" [tableId]="data.selectedDataList" [selectedCategory]="data.selectedCategory" [c5maActive]="queryParams.c5ma === 'true'"
-			[noSeries]="data.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer">
-		</lib-category-table-view>
-		<lib-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [search]="search"
-			[portalSettings]="portalSettings" [chartStart]="data.seriesStart" [selectedDataList]="data.selectedDataList"
-			[chartEnd]="data.seriesEnd" [dates]="data.dateArray" [data]="data.displaySeries"
-			[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [params]="queryParams"
-			[findMinMax]="data.findMinMax" [seriesInAnalyzer]="seriesInAnalyzer"
-			(updateURLFragment)="updateRoute()">
-		</lib-category-charts>
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && data.seriesStart && data.seriesEnd">
+			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings" [dates]="data.dateArray"
+				[tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd" [data]="data.displaySeries"
+				[tableId]="data.selectedDataList" [selectedCategory]="data.selectedCategory"
+				[c5maActive]="queryParams.c5ma === 'true'" [noSeries]="data.noData" [params]="queryParams">
+			</lib-category-table-view>
+			<lib-category-charts *ngIf="routeView !== 'table'" [search]="search" [portalSettings]="portalSettings"
+				[routeStart]="data.seriesStart" [routeEnd]="data.seriesEnd" [dates]="data.dateArray" [data]="data.displaySeries"
+				[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [findMinMax]="data.findMinMax"
+				(updateURLFragment)="updateRoute()">
+			</lib-category-charts>
+		</ng-template>
 	</ng-template>
 </div>

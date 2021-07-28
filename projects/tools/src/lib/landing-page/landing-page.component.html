@@ -1,11 +1,13 @@
 <div class="multi-series-container">
 	<ng-template ngFor let-data [ngForOf]="categoryData | async">
-		<h2 *ngIf="data.requestComplete" class="selected-category" [class.search-term]="search" id="id_top">
+		<h2 *ngIf="data.requestComplete && !data.invalid" class="selected-category" [class.search-term]="search"
+			id="id_top">
 			{{data.selectedCategory.name}}</h2>
-		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
-		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<ng-template ngIf [ngIf]="search || data.requestComplete">
+		<ng-template ngIf [ngIf]="data.invalid">
+			<p>{{search ? 'No results found for "' + data.invalid + '"' : data.invalid}}</p>
+		</ng-template>
+		<i *ngIf="!data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.invalid">
 			<ng-template ngIf [ngIf]="portal.categoryTabs">
 				<ul class="content-links" *ngIf="data.subcategories && data.subcategories.length > 1">
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
@@ -19,24 +21,24 @@
 				<h3 *ngIf="data.requestComplete" class="selected-data-list" [class.search-term]="search">
 					{{data.selectedDataList.dataListName}}</h3>
 			</ng-template>
-			<div class="filters" *ngIf="data.requestComplete">
+			<div class="filters">
 				<lib-geo-selector [regions]="data.regions" (selectedGeoChange)="redrawSeriesGeo($event, selectedFreq)"
 					class="selector">
 				</lib-geo-selector>
 				<lib-freq-selector [freqs]="data.frequencies" (selectedFreqChange)="redrawSeriesFreq($event, selectedGeo)"
 					class="selector">
 				</lib-freq-selector>
-				<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View
-					<i class="material-icons md-18">show_chart</i>
+				<a *ngIf="routeView === 'table'" (click)="switchView()" class="btn btn-sm switch-view">Chart View
+					<i class="bi bi-graph-up"></i>
 				</a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="switch-view">Table
+				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="btn btn-sm switch-view">Table
 					View
-					<i class="material-icons md-18">view_list</i>
+					<i class="bi bi-table"></i>
 				</a>
-				<label *ngIf="routeView === 'table'" class="form-check-inline">
+				<label *ngIf="routeView === 'table'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year/Year
 				</label>
-				<label *ngIf="routeView === 'table' && selectedFreq?.freq !== 'A'" class="form-check-inline">
+				<label *ngIf="routeView === 'table' && selectedFreq?.freq !== 'A'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">Year-to-Date
 				</label>
 				<label *ngIf="data.hasSeasonal" class="form-check-inline">
@@ -44,23 +46,27 @@
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
 				<lib-date-slider *ngIf="data.displaySeries" class="sliders" [portalSettings]="portalSettings"
-					[dates]="data.categoryDates" [dateFrom]="routeStart ? routeStart : null" [dateTo]="routeEnd ? routeEnd: null"
+					[dates]="data.categoryDates" [dateFrom]="routeStart ? routeStart : null" [dateTo]="routeEnd ? routeEnd : null"
 					[freq]="selectedFreq?.freq" (updateRange)="changeRange($event)"></lib-date-slider>
 			</div>
 		</ng-template>
-		<i *ngIf="!search && !data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<lib-category-table-view *ngIf="routeView === 'table' && data.requestComplete" [portalSettings]="portalSettings"
-			[dates]="data.categoryDates" [tableStart]="routeStart" [tableEnd]="routeEnd"
-			[selectedCategory]="data.selectedCategory" [selectedDataList]="data.selectedDataList" [data]="data.displaySeries"
-			[yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="data.noData"
-			[params]="queryParams" [showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal"
-			[seriesInAnalyzer]="seriesInAnalyzer">
-		</lib-category-table-view>
-		<lib-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings"
-			[chartStart]="routeStart" [chartEnd]="routeEnd" [data]="data.displaySeries"
-			[selectedDataList]="data.selectedDataList" [dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
-			[freq]="selectedFreq?.freq" [noSeries]="data.noData" [seriesInAnalyzer]="seriesInAnalyzer"
-			[showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" (updateURLFragment)="updateRoute()">
-		</lib-category-charts>
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && seriesRange">
+			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings"
+				[dates]="data.categoryDates" [tableStart]="routeStart" [tableEnd]="routeEnd"
+				[selectedCategory]="data.selectedCategory" [selectedDataList]="data.selectedDataList"
+				[data]="data.displaySeries" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'"
+				[noSeries]="data.noData" [params]="queryParams" [showSeasonal]="queryParams.sa === 'true'"
+				[hasSeasonal]="data.hasSeasonal">
+			</lib-category-table-view>
+			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [routeStart]="routeStart"
+				[routeEnd]="routeEnd" [data]="data.displaySeries" [dates]="data.categoryDates"
+				[dateWrapper]="data.categoryDateWrapper" [freq]="selectedFreq?.freq" [noSeries]="data.noData"
+				[showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" [analyzerView]="false"
+				(updateURLFragment)="updateRoute()">
+			</lib-category-charts>
+		</ng-template>
+		<ng-template ngIf [ngIf]="data.requestComplete && data.noData">
+			<p *ngIf="data.noData" class="no-data">No data available for current selection.</p>
+		</ng-template>
 	</ng-template>
 </div>

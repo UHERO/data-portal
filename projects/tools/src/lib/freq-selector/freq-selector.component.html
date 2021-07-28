@@ -1,4 +1,5 @@
-<select [ngModel]="selectedFreq?.freq" (ngModelChange)="onChange($event)" class="custom-select" aria-label="frequency-selector">
+<select [ngModel]="selectedFreq?.freq" (ngModelChange)="onChange($event)" class="form-select" aria-label="frequency-selector">
+  <option *ngIf="selectedFreq?.freq === null && analyzerView" disabled selected value="null">Index: Switch to a single frequency</option>
   <option [ngValue]="freq?.freq" *ngFor="let freq of freqs">
      {{freq.label || freq.freq}}
   </option>

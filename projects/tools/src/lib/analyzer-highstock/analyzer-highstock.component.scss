@@ -27,7 +27,9 @@
     }
 }
 
-
+#customize-yAxis {
+  font-size: 0.9em;
+}
 
 #single-stock-chart, #stock-chart {
   box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
@@ -36,6 +38,33 @@
   display: block;
   margin-top: 2%;
   width: 100%;
+}
+
+#single-stock-chart {
+  .analyzer-toggle.bi-star, .analyzer-toggle.bi-star-fill {
+    cursor: pointer;
+    font-size: 1.2em;
+
+    &:hover::after {
+      color: #505050;
+      font-family: 'Lucida Sans', sans-serif;
+      font-style: normal;
+      font-weight: bold;
+      text-shadow: none;
+    }
+  }
+
+  .analyzer-toggle.bi-star {
+    &:hover::after {
+      content: ' Add to Analyzer';
+    }
+  }
+
+  .analyzer-toggle.bi-star-fill {
+    &:hover::after {
+      content: ' Remove From Analyzer';
+    }
+  }
 }
 
 .highcharts-button, .highcharts-button-hover {
@@ -93,6 +122,14 @@ input.highcharts-range-selector {
 
 .highcharts-credits {
   font-size: 0.5em;
+}
+
+.highcharts-legend-item .dropdown svg {
+  cursor: pointer;
+}
+
+.highcharts-legend-item .dropdown-menu {
+  background-color: #FAFAFB;
 }
 
 #single-stock-chart {

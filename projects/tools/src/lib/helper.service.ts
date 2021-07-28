@@ -14,6 +14,14 @@ export class HelperService {
 
   constructor() { }
 
+  setCacheId(category: any, routeParams: any) {
+    let id = `category${category}`;
+    Object.keys(routeParams).forEach((param) => {
+      id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
+    });
+    return id;
+  }
+
   updateCurrentFrequency = (newFreq: Frequency) => {
     this.currentFreqChange.next(newFreq);
     return newFreq;
@@ -32,7 +40,7 @@ export class HelperService {
   }
 
   toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean) => {
-    const seasonalAdjustment = series.seriesInfo.seasonalAdjustment;
+    const seasonalAdjustment = series.seasonalAdjustment;
     if (!hasSeasonal) {
       return true;
     }
@@ -76,28 +84,23 @@ export class HelperService {
     }
   }
 
-  createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+  findDateWrapperStart = series => series.reduce((start: string, s) => (s.seriesObservations.observationStart < start || start === '') ? s.seriesObservations.observationStart : start, '');
+  
+  fineDateWrapperEnd = series => series.reduce((end: string, s) => (s.seriesObservations.observationEnd > end || end === '') ? s.seriesObservations.observationEnd : end, '');
+
+  createDateArray = (dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) => {
     const start = new Date(dateStart.replace(/-/g, '\/'));
     const end = new Date(dateEnd.replace(/-/g, '\/'));
-    if (currentFreq === 'A') {
-      return this.addToDateArray(start, end, dateArray, currentFreq);
-    }
-    if (currentFreq === 'S') {
-      return this.addToDateArray(start, end, dateArray, currentFreq, 6);
-    }
-    if (currentFreq === 'Q') {
-      return this.addToDateArray(start, end, dateArray, currentFreq, 3);
-    }
-    if (currentFreq === 'M') {
-      return this.addToDateArray(start, end, dateArray, currentFreq, 1);
-    }
-    if (currentFreq === 'W' || currentFreq === 'D') {
-      return this.addToDateArray(start, end, dateArray, currentFreq);
-    }
-    return dateArray;
+    return this.addToDateArray(start, end, dateArray, currentFreq);
   }
 
-  addToDateArray(start: Date, end: Date, dateArray: Array<any>, currentFreq: string, monthIncrease?: number) {
+  addToDateArray = (start: Date, end: Date, dateArray: Array<any>, currentFreq: string) => {
+    const monthIncreases = {
+      S: 6,
+      Q: 3,
+      M: 1
+    };
+    const monthIncrease = monthIncreases[currentFreq] || null;
     while (start <= end) {
       const month = start.toISOString().substr(5, 2);
       const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
@@ -105,6 +108,8 @@ export class HelperService {
       dateArray.push({ date: start.toISOString().substr(0, 10), tableDate });
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
+        start.setMonth(0);
+        start.setDate(1);
       }
       if (currentFreq === 'M' || currentFreq === 'S' || currentFreq === 'Q') {
         start.setMonth(start.getMonth() + monthIncrease);
@@ -129,26 +134,14 @@ export class HelperService {
     return dateStr[currentFreq] || start.toISOString().substr(0, 7);
   }
 
-  getTransformations(observations) {
-    let level;
-    let yoy;
-    let ytd;
-    let c5ma;
-    observations.transformationResults.forEach((obj) => {
-      if (obj.transformation === 'lvl') {
-        level = obj.dates ? obj : level;
-      }
-      if (obj.transformation === 'pc1') {
-        yoy = obj.dates ? obj : yoy;
-      }
-      if (obj.transformation === 'ytd') {
-        ytd = obj.dates ? obj : ytd;
-      }
-      if (obj.transformation === 'c5ma') {
-        c5ma = obj.dates ? obj : c5ma;
-      }
-    });
-    return { level, yoy, ytd, c5ma };
+  getTransformations = (transformations: Array<any>) => {
+    //possible transformations available
+    return {
+      level: transformations.find(obj => obj.transformation === 'lvl'),
+      yoy: transformations.find(obj => obj.transformation === 'pc1'),
+      ytd: transformations.find(obj => obj.transformation === 'ytd'),
+      c5ma: transformations.find(obj => obj.transformation === 'c5ma')
+    };
   }
 
   binarySearch = (valueList, date) => {
@@ -171,10 +164,7 @@ export class HelperService {
   }
 
   createSeriesChart(dateRange, transformations) {
-    const level = transformations.level;
-    const yoy = transformations.yoy;
-    const ytd = transformations.ytd;
-    const c5ma = transformations.c5ma;
+    const { level, yoy, ytd, c5ma } = transformations;
     const levelValue = [];
     let yoyValue = [];
     let ytdValue = [];
@@ -203,8 +193,10 @@ export class HelperService {
   }
 
   createDateValuePairs = (transformationDates: Array<any>, date: string, values: Array<any>) => {
-    const transformationIndex = this.binarySearch(transformationDates, date);
-    return [ Date.parse(date), transformationIndex > -1 ? +values[transformationIndex] : null ];
+    if (transformationDates) {
+      const transformationIndex = this.binarySearch(transformationDates, date);
+      return [ Date.parse(date), transformationIndex > -1 ? +values[transformationIndex] : null ];  
+    }
   }
 
   addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
@@ -212,6 +204,81 @@ export class HelperService {
     if (tableEntry > -1) {
       tableObj[value] = +valueArray.values[tableEntry];
       tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
+    }
+  }
+
+  formatSeriesForCharts = (series: any) => {
+    let dateArray = [];
+    const { observationStart, observationEnd, transformationResults } = series.seriesObservations;
+    this.createDateArray(observationStart, observationEnd, series.frequencyShort, dateArray);
+    return transformationResults.map((t) => {
+      const pseudoZones = this.getPseudoZones(t);
+      const dateValuePairs = [];
+      dateArray.forEach((date) => {
+        dateValuePairs.push(this.createDateValuePairs(t.dates, date.date, t.values));
+      })
+      return { name: t.transformation, values: dateValuePairs, pseudoZones, start: observationStart, end: observationEnd, dates: dateArray };
+    }, {});
+  }
+
+  getPseudoZones = (transformation: any) => {
+    const pseudoZones = [];
+    if (transformation.pseudoHistory) {
+      transformation.pseudoHistory.forEach((obs, index) => {
+        if (obs && !transformation.pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(transformation.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+        }
+      });
+    }
+    return pseudoZones;
+  }
+
+  formatGridDisplay = (serie: any, series0: string, series1: string) => {
+    const { observationStart, observationEnd } = serie.seriesObservations;
+    const s0 = serie.observations.find(obs => obs.name === series0);
+    const s1 = serie.observations.find(obs => obs.name === series1);
+    return {
+      chartData: {
+        series0: s0,
+        series1: s1,
+        pseudoZones: s0.pseudoZones
+      },
+      start: observationStart,
+      end: observationEnd
+    };
+  }
+
+  getIndexedTransformation = (transformation: any, baseYear: string) => {
+    const { name, start, end, pseudoZones, values, dates } = transformation;
+    return {
+      name,
+      start,
+      end,
+      pseudoZones,
+      dates,
+      values: this.formatSeriesIndexData(values, dates, baseYear)
+    }
+  }
+
+  formatSeriesIndexData = (transformation, dates: Array<any>, baseYear: string) => {
+    if (transformation) {
+      const indexDateExists = this.binarySearch(dates.map(d => d.date), baseYear);
+      return dates.map((curr, ind, arr) => {
+        return indexDateExists > -1 ? [Date.parse(curr.date), +transformation[ind][1] / +transformation[indexDateExists][1] * 100] : [Date.parse(curr.date), null];
+      });
+    } 
+  }
+
+  createSeriesChartData = (transformation, dates) => {
+    if (transformation) {
+      const transformationValues = [];
+      dates.forEach((sDate) => {
+        const dateExists = this.binarySearch(transformation.dates, sDate.date);
+        dateExists > -1 ?
+          transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) :
+          transformationValues.push([Date.parse(sDate.date), null]);
+      });
+      return transformationValues;
     }
   }
 
@@ -285,7 +352,7 @@ export class HelperService {
 
   setDefaultCategoryRange(freq, dateArray, defaults) {
     const defaultSettings = defaults.find(ranges => ranges.freq === freq);
-    const defaultEnd = defaultSettings.end ? defaultSettings.end : new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
+    const defaultEnd = defaultSettings.end || new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
     let counter = dateArray.length - 1;
     while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
@@ -360,7 +427,5 @@ export class HelperService {
     return index < 0 ? 0 : index;
   }
 
-  getTableDates(dateArray: Array<any>) {
-    return dateArray.map(date => date.tableDate);
-  }
+  getTableDates = (dateArray: Array<any>) => dateArray.map(date => date.tableDate);
 }

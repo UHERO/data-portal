@@ -11,7 +11,7 @@
 </div>
 <ng-template ngIf [ngIf]="series && series.length">
   <button class="csv-export-button" type="button" (click)="onExport()">Download CSV
-    <i class="far fa-file-excel"></i>
+    <i class="bi bi-file-earmark-excel"></i>
   </button>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" domLayout="autoHeight"
     [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true" [suppressDragLeaveHidesColumns]="true"

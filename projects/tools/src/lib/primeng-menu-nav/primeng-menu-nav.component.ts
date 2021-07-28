@@ -166,20 +166,16 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       const catQParams = {
         id: catId,
         data_list_id: subId,
-        start: null,
-        end: null,
         analyzerSeries: null,
         chartSeries: null,
+        start: null,
+        end: null,
         name: null,
         units: null,
         geography: null
       };
-      if (subId) {
         this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
-      }
-      if (!subId) {
-        this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
-      }
+
       this.loading = false;
     }, 15);
   }
@@ -187,10 +183,10 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   onSearch(event) {
     const searchQParams = {
       id: event,
-      start: null,
-      end: null,
       analyzerSeries: null,
       chartSeries: null,
+      start: null,
+      end: null,
       name: null,
       units: null,
       geography: null

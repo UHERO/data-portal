@@ -4,12 +4,13 @@
       queryParamsHandling='merge'>{{params.value}}</a>
   </span>
   <div class="th-buttons">
-    <i *ngIf="!params.data.seriesInfo.analyze" title="Add to Analyzer" [class.add-button]="params.data.seriesInfo.analyze" class="material-icons analyzer-toggle" (click)="updateAnalyze(params.data.seriesInfo)">star_border</i>
-    <i *ngIf="params.data.seriesInfo.analyze" title="Remove from Analyzer" [class.remove-button]="params.data.seriesInfo.analyze" class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(params.data.seriesInfo)">star</i>
+    <i *ngIf="!params.data.seriesInfo.analyze" title="Add to Analyzer" [class.add-button]="params.data.seriesInfo.analyze" class="px-1 bi bi-star analyzer-toggle" (click)="addToAnalyzer(params.data.seriesInfo)"></i>
+    <i *ngIf="params.data.seriesInfo.analyze" title="Remove from Analyzer" [class.remove-button]="params.data.seriesInfo.analyze" class="px-1 bi bi-star-fill analyzer-toggle remove-button" (click)="removeFromAnalyzer(params.data.seriesInfo)"></i>
     <a tabindex="0" id="{{params.data.seriesInfo.id}}" class="info" (click)="showPopover(params.data.seriesInfo, params.data.subcatIndex)"
       role="button" data-animation='false' data-toggle="popover">
-      <i class="material-icons info-icon">&#xE88F;</i>
+      <i class="bi bi-info-circle"></i>
     </a>
+    <!-- <a type="button" tabindex="0" id="{{params.data.seriesInfo.id}}" class="info" data-bs-toggle="popover" data-container="body" title="test" data-bs-content="test"><i class="material-icons info-icon">&#xE88F;</i></a>-->
   </div>
 
 </ng-template>

@@ -2,12 +2,6 @@
   display: block;
   margin-bottom: 40px;
 
-  .no-data {
-    margin-bottom: 0;
-    margin-top: 10px;
-    font-size: 0.9em;
-  }
-
   ul.available-geos, ul.available-freqs {
     li {
       font-size: 0.9em;
@@ -32,6 +26,14 @@
   a:hover {
     text-decoration: none;
   }
+
+  button.analyzer-dropdown {
+    padding: 0;
+
+    .material-icons {
+      font-size: 1em;
+    }
+  }
     
   .analyzer-toggle {
     color: #505050;
@@ -40,34 +42,46 @@
     top: -25px;
     vertical-align: middle;
     left: 10px;
-    font-size: 1em;
+    font-size: 0.8em;
   }
 
-  .add-analyze-button {
+  .add-analyze-button, .add-compare-button {
     text-shadow: 1px 2px 6px #E5E5E5, 0 0 0 #000, 1px 2px 6px #E5E5E5;
 
     &:hover::after {
-      color: #9E9E9E;
+      color: #505050;
       content: ' Add to Analyzer';
-      vertical-align: text-bottom;
+      font-family: 'Lucida Sans', sans-serif;
+      font-size: 1em;
+      font-style: normal;
       font-weight: bold;
-      font-size: 0.8em;
+      text-shadow: none;
+    }
+  }
+
+  .add-compare-button {
+    &:hover::after {
+      content: ' Add to Comparison';
+    }
+  }
+
+  .remove-analyze-button, .remove-compare-button {
+    color: #505050;
+
+    &:hover::after {
+      color: #505050;
+      content: ' Remove from Analyzer';
+      font-weight: bold;
+      font-size: 1em;
+      font-style: normal;
       font-family: 'Lucida Sans', sans-serif;
       text-shadow: none;
     }
   }
 
-  .remove-analyze-button {
-    color: #505050;
-
+  .remove-compare-button {
     &:hover::after {
-      color: #9E9E9E;
-      content: ' Remove from Analyzer';
-      vertical-align: text-bottom;
-      font-weight: bold;
-      font-size: 0.8em;
-      font-family: 'Lucida Sans', sans-serif;
-      text-shadow: none;
+      content: ' Remove from Comparison';
     }
   }
 }

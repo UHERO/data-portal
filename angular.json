@@ -44,7 +44,8 @@
             },
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           },
           "configurations": {
@@ -68,7 +69,9 @@
                   "replace": "projects/uhero/src/environments/environment.ts",
                   "with": "projects/uhero/src/environments/environment.staging.ts"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/uhero/ngsw-config.json"
             },
             "production": {
               "fileReplacements": [
@@ -141,7 +144,8 @@
             "karmaConfig": "projects/uhero/karma.conf.js",
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
             "assets": [
               "projects/uhero/src/manoa.jpg",
@@ -226,8 +230,7 @@
               "projects/coh/src/styles.scss"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/jquery/dist/jquery.js"
             ]
           },
           "configurations": {
@@ -403,8 +406,7 @@
               "projects/nta/src/styles.scss"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/jquery/dist/jquery.js"
             ]
           },
           "configurations": {
@@ -570,8 +572,7 @@
             "tsConfig": "projects/tools/tsconfig.spec.json",
             "karmaConfig": "projects/tools/karma.conf.js",
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/jquery/dist/jquery.js"
             ]
           }
         },
@@ -630,8 +631,7 @@
               ]
             },
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/jquery/dist/jquery.js"
             ]
           },
           "configurations": {

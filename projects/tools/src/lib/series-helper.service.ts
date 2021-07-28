@@ -40,11 +40,8 @@ export class SeriesHelperService {
       requestComplete: false
     };
     const dateArray = [];
-    const analyzerSeries = this.analyzerService.analyzerSeries;
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
-      // Check if series is in the analyzer
-      // const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
       this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const geos = data.series.geos;
@@ -91,8 +88,8 @@ export class SeriesHelperService {
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const transformations = this.helperService.getTransformations(observations);
-    const level = transformations.level;
+    const transformations = this.helperService.getTransformations(observations.transformationResults);
+    const { level } = transformations;
     const pseudoZones = [];
     if (level.pseudoHistory) {
       level.pseudoHistory.forEach((obs, index) => {
@@ -128,29 +125,7 @@ export class SeriesHelperService {
     return false;
   }
 
-  calculateAnalyzerSummaryStats = (series: Array<any>, startDate: string, endDate: string, indexed) => {
-    series.forEach((s) => {
-      s.seriesStartDate = s.observations.observationStart > startDate ? s.observations.observationStart : startDate;
-      s.seriesEndDate = s.observations.observationEnd > endDate ? s.observations.observationEnd : endDate;
-    });
-    const tableRows = [];
-    series.forEach((s) => {
-      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, startDate, endDate, indexed);
-      stats.series = s.displayName;
-      stats.interactionSettings.showInChart = s.showInChart;
-      tableRows.push(stats);
-    });
-    return tableRows;
-  }
-
-  getIndexedValues(values, start) {
-    return values.map((curr, ind, arr) => {
-      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === start);
-      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
-    });
-  }
-
-  calculateSeriesSummaryStats = (seriesDetail, chartData, startDate: string, endDate: string, indexed: boolean) => {
+  calculateSeriesSummaryStats = (seriesDetail, chartData, startDate: string, endDate: string, indexed: boolean, indexBase) => {
     const freq = seriesDetail.frequencyShort;
     const formattedStats = {
       series: '',
@@ -174,7 +149,7 @@ export class SeriesHelperService {
     formattedStats.range = `${this.helperService.formatDate(startDate, freq)} - ${this.helperService.formatDate(endDate, freq)}`;
     const decimals = seriesDetail.decimals;
     const { dates, level } = chartData;
-    const values = indexed ? this.getIndexedValues(level, startDate) : level;
+    const values = indexed ? this.analyzerService.getChartIndexedValues(level, indexBase) : level;
     const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
     const valuesInRange = values.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
     if (valuesInRange.includes(null) || !datesInRange.length || !valuesInRange.length) {
@@ -183,19 +158,19 @@ export class SeriesHelperService {
     }
     const minValue = Math.min(...valuesInRange);
     const minValueIndex = valuesInRange.indexOf(minValue);
-    formattedStats.minValue = `${this.helperService.formatNum(Math.min(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[minValueIndex].date, freq)})`;
     const maxValue = Math.max(...valuesInRange);
     const maxValueIndex = valuesInRange.indexOf(maxValue);
-    formattedStats.maxValue = `${this.helperService.formatNum(Math.max(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[maxValueIndex].date, freq)})`;
     const diff = valuesInRange[valuesInRange.length - 1] - valuesInRange[0];
     const percChange = this.helperService.formatNum((diff / valuesInRange[0]) * 100, decimals);
-    formattedStats.percChange = seriesDetail.percent ? null : percChange;
-    formattedStats.levelChange = this.helperService.formatNum(diff, decimals);
     const sum = valuesInRange.reduce((a, b) => a + b, 0);
-    formattedStats.total = this.helperService.formatNum(sum, decimals);
-    formattedStats.avg = this.helperService.formatNum(sum / valuesInRange.length, decimals);
     const periods = valuesInRange.length - 1;
     const cagr = this.calculateCAGR(valuesInRange[0], valuesInRange[valuesInRange.length - 1], freq, periods);
+    formattedStats.minValue = `${this.helperService.formatNum(Math.min(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[minValueIndex].date, freq)})`;
+    formattedStats.maxValue = `${this.helperService.formatNum(Math.max(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[maxValueIndex].date, freq)})`;
+    formattedStats.percChange = seriesDetail.percent ? null : percChange;
+    formattedStats.levelChange = this.helperService.formatNum(diff, decimals);
+    formattedStats.total = this.helperService.formatNum(sum, decimals);
+    formattedStats.avg = this.helperService.formatNum(sum / valuesInRange.length, decimals);
     formattedStats.cagr = this.helperService.formatNum(cagr, decimals);
     return formattedStats;
   }

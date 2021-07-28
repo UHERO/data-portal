@@ -1,4 +1,4 @@
-<select [ngModel]="selectedMeasurement?.name" (ngModelChange)="onChange($event)" class="custom-select">
+<select [ngModel]="selectedMeasurement?.name" (ngModelChange)="onChange($event)" class="form-select">
   <option [ngValue]="measurement?.name" *ngFor="let measurement of measurements">
       {{measurement.indent ? '- ' + measurement.name : measurement.name}}
   </option>
