@@ -2,12 +2,12 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
-    <i *ngIf="data.seriesDetail && !data.seriesDetail.analyze" title="Add to Analyzer"
+    <!-- <i *ngIf="data.seriesDetail && !data.seriesDetail.analyze" title="Add to Analyzer"
       [class.add-button]="!data.seriesDetail.analyze" class="material-icons analyzer-toggle"
       (click)="addToAnalyzer(data.seriesDetail)">star_border</i>
     <i *ngIf="data.seriesDetail && data.seriesDetail.analyze" title="Remove from Analyzer"
       [class.remove-button]="data.seriesDetail.analyze" class="material-icons analyzer-toggle remove-button"
-      (click)="removeFromAnalyzer(data.seriesDetail)">star</i>
+      (click)="removeFromAnalyzer(data.seriesDetail)">star</i> -->
     <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
       (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
       class="geo-selector"></lib-geo-selector>

@@ -149,7 +149,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   addToAnalyzer(series) {
     series.analyze = true;
-    this.analyzerService.addToAnalzyer(series.id);
+    this.analyzerService.addToAnalyzer(series.id);
   }
 
   removeFromAnalyzer(series) {

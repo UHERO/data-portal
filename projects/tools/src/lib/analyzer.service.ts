@@ -206,7 +206,7 @@ export class AnalyzerService {
     });
   }
 
-  addToAnalzyer(seriesID: number) {
+  addToAnalyzer(seriesID: number) {
     let currentValue = this.analyzerSeriesTrackerSource.value;
     currentValue = [...currentValue, { id: seriesID }];
     this.analyzerSeriesTrackerSource.next(currentValue);

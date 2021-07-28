@@ -40,6 +40,33 @@
   width: 100%;
 }
 
+#single-stock-chart {
+  .analyzer-toggle.bi-star, .analyzer-toggle.bi-star-fill {
+    cursor: pointer;
+    font-size: 1.2em;
+
+    &:hover::after {
+      color: #505050;
+      font-family: 'Lucida Sans', sans-serif;
+      font-style: normal;
+      font-weight: bold;
+      text-shadow: none;
+    }
+  }
+
+  .analyzer-toggle.bi-star {
+    &:hover::after {
+      content: ' Add to Analyzer';
+    }
+  }
+
+  .analyzer-toggle.bi-star-fill {
+    &:hover::after {
+      content: ' Remove From Analyzer';
+    }
+  }
+}
+
 .highcharts-button, .highcharts-button-hover {
   stroke: none;
 }

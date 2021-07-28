@@ -234,6 +234,7 @@ export interface HighstockObject {
 }
 
 export interface Series {
+  analyze: boolean;
   id: string;
   title?: string;
   name: string;

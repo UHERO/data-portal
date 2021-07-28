@@ -46,7 +46,7 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
 
   addToAnalyzer(series) {
     series.analyze = true;
-    this.analyzerService.addToAnalzyer(series.id);
+    this.analyzerService.addToAnalyzer(series.id);
   }
 
   removeFromAnalyzer(series) {

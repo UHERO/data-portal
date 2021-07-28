@@ -5,12 +5,14 @@ h2#analyzer-header {
   margin: 0;
 }
 
-div#share-remove {
-  display: inline-block;
+div#view-toggle-share {
+  //display: inline-block;
+  //vertical-align: middle;
 }
 
 div#analyzer-customizations {
-  display: block;
+  //display: block;
+  flex-basis: 100%;
   padding-top: .5em;
 }
 

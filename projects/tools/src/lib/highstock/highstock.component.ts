@@ -3,6 +3,7 @@ import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsul
 import { HighchartChartData, Series, HighstockObject, Geography, Frequency } from '../tools.models';
 import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
+import { AnalyzerService } from '../analyzer.service';
 declare var $: any;
 import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
@@ -36,7 +37,8 @@ export class HighstockComponent implements OnChanges {
   constructor(
     @Inject('defaultRange') private defaultRange,
     @Inject('logo') private logo,
-    private highstockHelper: HighstockHelperService
+    private highstockHelper: HighstockHelperService,
+    private analyzerService: AnalyzerService,
   ) {
     // workaround to include exporting module in production build
     exporting(this.Highcharts);
@@ -51,7 +53,7 @@ export class HighstockComponent implements OnChanges {
           seriesMetaData += label.html ? `${label.html} \n` : '';
         }
       });
-      return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
+      return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
     });
   }
 
@@ -199,6 +201,8 @@ export class HighstockComponent implements OnChanges {
     const setInputDateParser = (value, frequency) => this.highstockHelper.inputDateParserFormatter(value, frequency);
     const setDateToFirstOfMonth = (frequency, date) => this.highstockHelper.setDateToFirstOfMonth(frequency, date);
     const logo = this.logo;
+    const addToAnalyzer = (seriesId: number) => this.analyzerService.addToAnalyzer(seriesId);
+    const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId);
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -209,6 +213,18 @@ export class HighstockComponent implements OnChanges {
           if (!this.chartObject || this.chartObject.series.length < 4) {
             this.chartObject = Object.assign({}, this);
           }
+          if (this.analyzerBtn) {
+            this.analyzerBtn.destroy();
+          }
+          const btnIcon = `<i class="analyzer-toggle bi ${!seriesDetail.analyze ? 'bi-star' : 'bi-star-fill'}"></i>`;
+          this.analyzerBtn = this.renderer.text(btnIcon, 10, this.renderer.height - 10, true)
+            .on('click', function() {
+            const btn = document.querySelector('.analyzer-toggle');
+            seriesDetail.analyze ? rmvFromAnalyzer(+seriesDetail.id) : addToAnalyzer(+seriesDetail.id);
+            seriesDetail.analyze = !seriesDetail.analyze;
+            btn.classList.toggle('bi-star');
+            btn.classList.toggle('bi-star-fill'); 
+          }).add();
         },
         load() {
           if (logo.analyticsLogoSrc) {
