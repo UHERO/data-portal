@@ -49,8 +49,13 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     const saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
     const nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted');
     const naSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable');
+    console.log('geoFreqSib', geoFreqSiblings)
+    console.log('naSeries', naSeries)
     // If more than one sibling exists (i.e. seasonal & non-seasonal)
     // Select series where seasonalAdjustment matches sa setting
+    if (geoFreqSiblings.length === 1) {
+      return geoFreqSiblings[0].id;
+    }
     if (freq === 'A') {
       return geoFreqSiblings[0].id;
     }
@@ -123,6 +128,15 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ngOnDestroy() {
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
+  }
+
+  updateSelectedForecast(siblings: Array<any>, geo: string, sa: boolean, forecasts: Array<any>, newFc: string) {
+    this.helperService.updateCurrentForecast(newFc);
+    console.log(forecasts)
+    const selectedFc = forecasts.find(f => f.forecast === newFc);
+    const { freq, label } = selectedFc;
+    this.helperService.updateCurrentFrequency({ freq, label });
+    this.goToSeries(siblings, freq, geo, sa);
   }
 
   // Redraw chart when selecting a new region or frequency

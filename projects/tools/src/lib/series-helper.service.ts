@@ -24,6 +24,7 @@ export class SeriesHelperService {
   getSeriesData(id: number, noCache: boolean, catId?: number): Observable<any> {
     let currentFreq;
     let currentGeo;
+    let currentForecast;
     let decimals;
     this.seriesData = {
       seriesDetail: {},
@@ -41,6 +42,7 @@ export class SeriesHelperService {
     };
     const dateArray = [];
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
+      console.log('data', data)
       this.seriesData.seriesDetail = data.series;
       this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
@@ -52,6 +54,11 @@ export class SeriesHelperService {
       this.helperService.updateCurrentFrequency(currentFreq);
       this.helperService.updateCurrentGeography(currentGeo);
       this.seriesData.regions = geos || [data.series.geography];
+      this.seriesData.forecasts = data.forecasts;
+      this.seriesData.forecastList = data.forecasts.map(f => f.forecast);
+      currentForecast = data.forecasts.find(f => f.freq === currentFreq.freq).forecast;
+      this.helperService.updateCurrentForecast(currentForecast);
+      console.log(currentForecast)
       this.seriesData.frequencies = freqs || [{ freq: data.series.frequencyShort, label: data.series.frequency }];
       this.seriesData.yoyChange = data.series.percent ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = data.series.percent ? 'Year-to-Date Change' : 'Year-to-Date % Change';
