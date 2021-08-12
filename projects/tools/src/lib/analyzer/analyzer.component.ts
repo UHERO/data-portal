@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { forkJoin, Subscription } from 'rxjs';
 import { ApiService } from '../api.service';
+import { SeriesHelperService } from '../series-helper.service';
 
 @Component({
   selector: 'lib-analyzer',
@@ -38,6 +39,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private dataPortalSettingsServ: DataPortalSettingsService,
     private route: ActivatedRoute,
     private apiService: ApiService,
+    private seriesHelperService: SeriesHelperService
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
@@ -125,17 +127,17 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     const siblingIds = [];
     this.analyzerService.analyzerSeriesCompareSource.next([]);
     const siblingsList = analyzerSeries.map((serie) => {
-      const nonSeasonal = serie.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
-      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, nonSeasonal);
+      //const seasonal = serie.seasonalAdjustment === 'seasonally_adjusted' || serie.seasonalAdjustment === 'not_applicable';
+      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, serie.seasonalAdjustment, freq);
     });
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
-        siblings.forEach((series) => {
-          if (series.frequencyShort === freq && !siblingIds.some(serie => serie.id === series.id)) {
-            const drawInCompare = analyzerSeries.find(s => s.title === series.title).compare === true;
-            siblingIds.push({ id: series.id, compare: drawInCompare });
+        siblings.forEach((sib) => {
+          if (!siblingIds.some(s => s.id === sib.id) && sib.frequencyShort === freq) {
+            const drawInCompare = analyzerSeries.find(s => s.title === sib.title).compare === true;
+            siblingIds.push({ id: sib.id, compare: drawInCompare });  
           }
-        });
+        })
       });
       this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
