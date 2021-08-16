@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { forkJoin, Subscription } from 'rxjs';
 import { ApiService } from '../api.service';
-import { SeriesHelperService } from '../series-helper.service';
 
 @Component({
   selector: 'lib-analyzer',
@@ -39,7 +38,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private dataPortalSettingsServ: DataPortalSettingsService,
     private route: ActivatedRoute,
     private apiService: ApiService,
-    private seriesHelperService: SeriesHelperService
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
