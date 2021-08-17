@@ -131,7 +131,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this.seriesHelper.findGeoFreqSibling(siblings, geo, freq);
-    const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
+    //const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
+    const id = geoFreqSib.length ? this.seriesHelper.selectSibling(geoFreqSib, sa, freq) : null;
     if (id) {
       const queryParams = {
         id,

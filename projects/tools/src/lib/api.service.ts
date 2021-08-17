@@ -147,14 +147,14 @@ export class ApiService {
     }
   }
 
-  fetchSiblingSeriesByIdAndGeo(id: number, geo: string, nonSeasonal: boolean) {
-    const cacheId = nonSeasonal ? `${id + geo}NS` : id + geo;
+  fetchSiblingSeriesByIdAndGeo(id: number, geo: string, seasonal: string, freq: string) {
+    const cacheId = seasonal ? `${id + geo + freq}SA` : id + geo + freq;
     if (this.cachedSibSeriesByIdAndGeo[cacheId]) {
       return observableOf(this.cachedSibSeriesByIdAndGeo[cacheId]);
     } else {
       let seriesSiblings$ = this.http.get(`${this.baseUrl}/series/siblings?id=${id}&geo=${geo}&u=${this.portal.universe}`, this.httpOptions).pipe(
         map(mapData),
-        map(data => nonSeasonal ? data.filter(s => s.seasonalAdjustment === 'not_seasonally_adjusted') : data.filter(s => s.seasonalAdjustment !== 'not_seasonally_adjusted')),
+        map(data => analyzerSiblingsFilter(data, seasonal, freq)),
         tap(val => {
           this.cachedSibSeriesByIdAndGeo[cacheId] = val;
           seriesSiblings$ = null;
@@ -268,4 +268,21 @@ function mapCategories(response): Array<Category> {
 
 function mapData(response): any {
   return response.data;
+}
+
+const analyzerSiblingsFilter = (data: any, seasonal: string, freq: string) => {
+  if (freq === 'A') {
+    return data.filter(s => s.frequencyShort === freq);
+  }
+  const seasonalSeries = data.filter(s => s.seasonalAdjustment === 'seasonally_adjusted');
+  // nonSeasonalSeries includes series where seasonality is not applicable
+  const nonSeasonalSeries = data.filter(s => s.seasonalAdjustment !== 'seasonally_adjusted');
+  if (seasonal === 'seasonally_adjusted') {
+    return seasonalSeries;
+  }
+  if (seasonal === 'not_seasonally_adjusted') {
+    return nonSeasonalSeries
+  }
+  // when seasonality is not applicable, return seasonal series if they exist
+  return seasonalSeries.length ? seasonalSeries : nonSeasonalSeries;
 }
