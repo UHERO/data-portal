@@ -107,6 +107,7 @@ export class CategoryHelperService {
           serie.observations = this.helperService.formatSeriesForCharts(serie);
           serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
         });
+        console.log('series', series)
         const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
         this.categoryData[cacheId].series = series;

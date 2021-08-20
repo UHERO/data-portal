@@ -89,8 +89,8 @@ export class HelperService {
   fineDateWrapperEnd = series => series.reduce((end: string, s) => (s.seriesObservations.observationEnd > end || end === '') ? s.seriesObservations.observationEnd : end, '');
 
   createDateArray = (dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) => {
-    const start = new Date(dateStart.replace(/-/g, '\/'));
-    const end = new Date(dateEnd.replace(/-/g, '\/'));
+    const start = new Date(dateStart/*.replace(/-/g, '\/')*/);
+    const end = new Date(dateEnd/*.replace(/-/g, '\/')*/);
     return this.addToDateArray(start, end, dateArray, currentFreq);
   }
 
@@ -104,8 +104,9 @@ export class HelperService {
     while (start <= end) {
       const month = start.toISOString().substr(5, 2);
       const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
-      const tableDate = this.getTableDate(start, currentFreq, q);
-      dateArray.push({ date: start.toISOString().substr(0, 10), tableDate });
+      const dateStrFormat = `${start.getFullYear()}-${this.paddedMonthDateString(start.getMonth() + 1)}-${this.paddedMonthDateString(start.getDate())}`;
+      const tableDate = this.getTableDate(start, currentFreq, q, dateStrFormat);
+      dateArray.push({ date: dateStrFormat , tableDate });
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
         start.setMonth(0);
@@ -124,14 +125,18 @@ export class HelperService {
     return dateArray;
   }
 
-  getTableDate(start: Date, currentFreq: string, q: string) {
+  getTableDate = (start: Date, currentFreq: string, q: string, fullDateStr: string) => {
     const dateStr = {
-      A: start.toISOString().substr(0, 4),
-      Q: `${start.toISOString().substr(0, 4)} ${q}`,
-      W: start.toISOString().substr(0, 10),
-      D: start.toISOString().substr(0, 10)
-    }
-    return dateStr[currentFreq] || start.toISOString().substr(0, 7);
+      A: `${start.getFullYear()}`,
+      Q: `${start.getFullYear()} ${q}`,
+      W: fullDateStr,
+      D: fullDateStr
+    };
+    return dateStr[currentFreq] || `${start.getFullYear()}-${this.paddedMonthDateString(start.getMonth() + 1)}`;
+  }
+
+  paddedMonthDateString = (partialDate: number) => {
+    return `0${partialDate}`.slice(-2);
   }
 
   getTransformations = (transformations: Array<any>) => {

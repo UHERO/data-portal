@@ -56,7 +56,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
   formatShareLink = (start: string, end: string) => {
     const params = {
       analyzer: `/analyzer${this.addAnalyzerParams(start, end)}`,
-      series: `/sereis${this.addQueryParams(start, end)}`
+      series: `/series${this.addQueryParams(start, end)}`
     };
     return `${this.environment['portalUrl']}${params[this.view]}`;
   }
