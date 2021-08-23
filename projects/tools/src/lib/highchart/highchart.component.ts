@@ -154,7 +154,7 @@ export class HighchartComponent implements OnChanges {
     const decimals = seriesData.decimals || 1;
     let { series0, series1, pseudoZones } = seriesData.gridDisplay.chartData;
     series0 = this.indexChecked ? this.helperService.getIndexedTransformation(seriesData.observations[0], this._analyzerService.analyzerData.baseYear) : series0;
-    const startDate = Date.parse(chartStart) || Date.parse(seriesData.gridDisplay.start)
+    const startDate = Date.parse(chartStart) || Date.parse(seriesData.gridDisplay.start);
     const endDate = Date.parse(chartEnd) || Date.parse(seriesData.gridDisplay.end);
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));

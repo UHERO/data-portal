@@ -40,6 +40,9 @@ export interface HighchartsObject {
   exporting: {
     enabled: boolean,
   };
+  time?: {
+    timezone: string
+  };
   title: {
     text: string,
     useHTML: boolean,
