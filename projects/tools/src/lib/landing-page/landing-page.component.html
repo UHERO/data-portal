@@ -7,7 +7,7 @@
 			<p>{{search ? 'No results found for "' + data.invalid + '"' : data.invalid}}</p>
 		</ng-template>
 		<i *ngIf="!data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<ng-template ngIf [ngIf]="data.requestComplete && !data.invalid">
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.invalid && !search">
 			<ng-template ngIf [ngIf]="portal.categoryTabs">
 				<ul class="content-links" *ngIf="data.subcategories && data.subcategories.length > 1">
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
@@ -50,7 +50,7 @@
 					[freq]="selectedFreq?.freq" (updateRange)="changeRange($event)"></lib-date-slider>
 			</div>
 		</ng-template>
-		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && seriesRange">
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && seriesRange && !search">
 			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings"
 				[dates]="data.categoryDates" [tableStart]="routeStart" [tableEnd]="routeEnd"
 				[selectedCategory]="data.selectedCategory" [selectedDataList]="data.selectedDataList"
@@ -67,6 +67,9 @@
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && data.noData">
 			<p *ngIf="data.noData" class="no-data">No data available for current selection.</p>
+		</ng-template>
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && search">
+			<lib-search-results [searchData]="data"></lib-search-results>
 		</ng-template>
 	</ng-template>
 </div>

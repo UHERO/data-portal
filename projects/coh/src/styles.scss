@@ -1,7 +1,7 @@
 @import './assets/app_colors';
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-balham.css';
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css");
+@import "~bootstrap-icons/font/bootstrap-icons.css";
 /* You can add global styles to this file, and also import other style files */
 body {
   position: relative;
@@ -442,4 +442,73 @@ body {
       vertical-align: middle;
     }
   }
+}
+
+lib-search-results, lib-single-series {
+  .p-datatable {
+    background-color: transparent;
+    text-align: right;
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: 0.9em;
+    border: 0;
+    border-right: 1px solid #E5E5E5;
+
+    .p-sortable-column.p-highlight {
+      background: #F4F4F4;
+      color: #333;
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover {
+        background: #F4F4F4;
+        color: #333;
+
+        .p-sortable-column-icon {
+          color: #848484;
+        }
+      }
+
+      .p-sortable-column-icon {
+        color: #848484;
+        vertical-align: middle;
+      }
+    }
+
+    .p-datatable-thead tr th{
+      padding: .25em .5em;
+    }
+
+    .p-datatable-tbody tr td {
+      padding: .25em .5em;
+      text-transform: capitalize;
+    }
+
+    .fa-spinner {
+      display: block;
+      font-size: 1.3em;
+      margin-top: 20px;    
+    }
+
+    .p-widget-overlay {
+      background-color: transparent;
+    }
+  
+    tr.p-widget-content {
+      border-top-color: transparent;
+      border-bottom-color: transparent;
+      border-left: 1px solid #E5E5E5;
+      border-right: 1px solid #E5E5E5;
+    }
+  
+    tr:last-child {
+      border-bottom: 1px solid #E5E5E5;
+    }
+  }
+}
+
+lib-single-series .p-datatable .p-datatable-thead tr th, 
+lib-single-series .p-datatable .p-datatable-tbody tr td {
+  text-align: right;
 }

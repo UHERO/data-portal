@@ -33,6 +33,7 @@ import { MeasurementLandingPageComponent } from './measurement-landing-page/meas
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
 import { MatIconModule } from '@angular/material/icon';
+import { SearchResultsComponent } from './search-results/search-results.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { MatIconModule } from '@angular/material/icon';
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
     EmbedGraphComponent,
+    SearchResultsComponent,
   ],
   imports: [
     CommonModule,

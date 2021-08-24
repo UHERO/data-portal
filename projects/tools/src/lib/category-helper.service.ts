@@ -149,8 +149,14 @@ export class CategoryHelperService {
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
       return observableOf([this.categoryData[cacheId]]);
     } else {
-      this.categoryData[cacheId] = {} as CategoryData;
-      const { geo, freq } = routeParams;
+      this.categoryData[cacheId] = {} //as CategoryData;
+      this.apiService.fetchSearchSeries(search, noCache).subscribe((results) => {
+        console.log('SEARCH RESULTS', results)
+        this.categoryData[cacheId].searchResults = results;
+        this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
+        this.categoryData[cacheId].requestComplete = true;
+      })
+      /*const { geo, freq } = routeParams;
       if (geo && freq) {
         this.apiService.fetchPackageSearch(search, geo, freq, noCache).subscribe((results) => {
           const routeGeoExists = results.geos.find(g => g.handle === geo);
@@ -165,7 +171,7 @@ export class CategoryHelperService {
       }
       if (!geo || !freq) {
         this.getSearchWithDefaults(search, noCache, cacheId);
-      }
+      } */
       return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
   }
