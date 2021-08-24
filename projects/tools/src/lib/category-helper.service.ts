@@ -155,7 +155,8 @@ export class CategoryHelperService {
         this.categoryData[cacheId].searchResults = results;
         this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
         this.categoryData[cacheId].requestComplete = true;
-      })
+        this.categoryData[cacheId].noData = !results ? true : false;
+      });
       /*const { geo, freq } = routeParams;
       if (geo && freq) {
         this.apiService.fetchPackageSearch(search, geo, freq, noCache).subscribe((results) => {

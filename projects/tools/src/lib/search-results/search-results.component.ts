@@ -14,7 +14,7 @@ export class SearchResultsComponent implements OnInit {
 
   ngOnInit(): void {
     this.resultsTableCols = this.createTableColumns();
-    this.resultsTableData = this.createTableData(this.searchData.searchResults);
+    this.resultsTableData = this.createTableData(this.searchData.searchResults);  
   }
 
   createTableColumns = () => {
