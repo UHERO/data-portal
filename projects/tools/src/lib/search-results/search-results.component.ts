@@ -7,8 +7,8 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class SearchResultsComponent implements OnInit {
   @Input() searchData;
-  resultsTableCols;
-  resultsTableData;
+  resultsTableCols: Array<any>;
+  resultsTableData: Array<any>;
 
   constructor() { }
 
@@ -26,7 +26,7 @@ export class SearchResultsComponent implements OnInit {
     ];
   }
 
-  createTableData = (searchResults) => {
+  createTableData = (searchResults: Array<any>) => {
     return searchResults.map(seriesData => ({
       series: seriesData.title,
       region: seriesData.geography.shortName,

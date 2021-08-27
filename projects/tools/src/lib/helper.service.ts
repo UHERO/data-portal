@@ -51,6 +51,7 @@ export class HelperService {
   }
 
   checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
+    console.log('data', data)
     return noData || !data.some(s => s.display);
   }
 

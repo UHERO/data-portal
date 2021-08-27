@@ -1,8 +1,6 @@
 // Component for multi-chart view
 import { Inject, Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-
-import { AnalyzerService } from '../analyzer.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -49,7 +47,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject('portal') public portal,
-    private analyzerService: AnalyzerService,
     private dataPortalSettingsServ: DataPortalSettingsService,
     private catHelper: CategoryHelperService,
     private helperService: HelperService,
