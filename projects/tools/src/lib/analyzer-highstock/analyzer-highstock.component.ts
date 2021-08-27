@@ -377,6 +377,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       filename: 'chart',
       chartOptions: {
         events: null,
+        legend: {
+          labelFormatter() {
+            return `${this.name} (${this.userOptions.yAxis})`
+          }
+        },
         chart: {
           events: {
             load() {
