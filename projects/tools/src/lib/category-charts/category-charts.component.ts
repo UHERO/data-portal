@@ -41,6 +41,7 @@ export class CategoryChartsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.data) {
+      console.log('charts data', this.data)
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
@@ -108,7 +109,6 @@ export class CategoryChartsComponent implements OnChanges {
 
   addCompare(series) {
     series.compare = true;
-    //this.analyzerService.setCompareChartSeriesObject(series);
     this.analyzerService.makeCompareSeriesVisible(series.id)
   }
 
