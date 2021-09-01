@@ -128,6 +128,16 @@ input.highcharts-range-selector {
   cursor: pointer;
 }
 
+.highcharts-legend-item-hidden .series-name {
+  opacity: 50%;
+}
+
+.highcharts-legend-item .series-name,
+.highcharts-legend-item-hidden .series-name {
+  margin-left: 0.25em;
+  margin-bottom: 0;
+}
+
 .highcharts-legend-item .dropdown-menu {
   background-color: #FAFAFB;
 }

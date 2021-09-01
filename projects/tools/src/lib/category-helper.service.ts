@@ -136,7 +136,6 @@ export class CategoryHelperService {
     } else {
       this.categoryData[cacheId] = {} //as CategoryData;
       this.apiService.fetchSearchSeries(search, noCache).subscribe((results) => {
-        console.log('SEARCH RESULTS', results)
         this.categoryData[cacheId].searchResults = results;
         this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
         this.categoryData[cacheId].requestComplete = true;
