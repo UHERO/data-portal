@@ -168,6 +168,9 @@ export interface HighstockObject {
     },
     filename: string,
     chartOptions: {
+      legend?: {
+        labelFormatter: () => string
+      },
       events: any,
       chart: any,
       navigator: {

@@ -170,6 +170,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   updateChartData(series: Array<any>) {
+    series.sort(this.sortVisible); //visible series should be listed first
     const chartSeries = [...series, {
       className: 'navigator',
       data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
@@ -234,6 +235,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.chartObject.redraw();
     }
   }
+
+  sortVisible = (a, b) => b.visible - a.visible;
 
   createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator').map(s => s.yAxisText))].join(', ');
 
@@ -331,7 +334,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             <i class="bi bi-trash-fill"></i> Remove From Analyzer
           </p>
         </ul>
-      </div> ${this.name} (${this.userOptions.yAxis})`
+        <p class="series-name">${this.name} (${this.userOptions.yAxis})</p>
+      </div>`
       }
     };
     // incorrect indexing when using range selector
@@ -377,6 +381,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       filename: 'chart',
       chartOptions: {
         events: null,
+        legend: {
+          labelFormatter() {
+            return `${this.name} (${this.userOptions.yAxis})`
+          }
+        },
         chart: {
           events: {
             load() {

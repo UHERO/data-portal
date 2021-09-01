@@ -1,0 +1,18 @@
+<p-table styleClass="p-datatable-striped" [columns]="resultsTableCols" [value]="resultsTableData">
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th [pSortableColumn]="col.field" *ngFor="let col of columns">
+        {{col.header}} <p-sortIcon [field]="col.field"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-columns="columns">
+    <tr>
+      <td *ngFor="let col of columns">
+        <span *ngIf="col.header === 'Series'"><a routerLink="/series" [queryParams]="{id: rowData.id, sa: rowData.seasonality === 'seasonally adjusted'}"
+            queryParamsHandling="merge">{{rowData[col.field]}}</a></span>
+        <span *ngIf="col.header !== 'Series'">{{rowData[col.field]}}</span>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

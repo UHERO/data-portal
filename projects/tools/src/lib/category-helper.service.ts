@@ -1,9 +1,10 @@
-import { forkJoin as observableForkJoin, of as observableOf, Observable } from 'rxjs';
+import { forkJoin as observableForkJoin, of as observableOf, Observable, forkJoin } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
-import { CategoryData, DateWrapper } from './tools.models';
+import { CategoryData, DateWrapper, Geography, Frequency } from './tools.models';
+import { switchMap, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -25,99 +26,83 @@ export class CategoryHelperService {
       return observableOf([this.categoryData[cacheId]]);
     } else {
       this.categoryData[cacheId] = {} as CategoryData;
-      this.apiService.fetchCategories().subscribe((categories) => {
-        catId = catId || categories[0].id;
-        const cat = categories.find(category => category.id === catId);
-        if (cat) {
-          const { dataListId, geo, freq } = routeParams;
-          const categoryDataLists = cat.children;
-          const selectedDataList = dataListId ?
-            this.helperService.findSelectedDataList(categoryDataLists, dataListId, '') :
-            this.helperService.getCategoryDataLists(categoryDataLists[0], '');
-          this.categoryData[cacheId].selectedDataList = selectedDataList;
-          this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
-          this.categoryData[cacheId].selectedCategoryId = cat.id;
-          this.categoryData[cacheId].selectedCategory = cat;
-          this.categoryData[cacheId].subcategories = categoryDataLists;
-          if (dataListId === null) {
-            this.categoryData[cacheId].defaultDataList = selectedDataList.id;
+      this.apiService.fetchCategories().pipe(
+        tap(categories => {
+          catId = catId || categories[0].id;
+          const cat = categories.find(category => category.id === catId);
+          if (cat) {
+            const { dataListId } = routeParams;
+            this.setCategoryDataList(cat, dataListId, cacheId);
+          } else {
+            this.categoryData[cacheId].invalid = 'Category does not exist.';
+            this.categoryData[cacheId].requestComplete = true;
           }
-          this.getDataListGeos(noCache, selectedDataList, cacheId, geo, freq);
-        } else {
-          this.categoryData[cacheId].invalid = 'Category does not exist.';
+        }),
+        switchMap(() => forkJoin([
+          this.apiService.fetchCategoryGeos(this.categoryData[cacheId].selectedDataList.id),
+          this.apiService.fetchCategoryFreqs(this.categoryData[cacheId].selectedDataList.id)
+        ])),
+        switchMap(([geos, freqs]) => {
+          const { defaults } = this.categoryData[cacheId].selectedDataList;
+          const { geo, freq } = routeParams;
+          this.categoryData[cacheId].regions = geos || [defaults.geo];
+          this.categoryData[cacheId].frequencies = freqs || [defaults.freq];
+          const { regions, frequencies } = this.categoryData[cacheId];
+          const useRouteGeoAndFreq = this.checkRouteGeoAndFreqExist(regions, frequencies, geo, freq);
+          const defaultFreq = defaults?.freq || frequencies[0];
+          const defaultGeo = defaults?.geo || regions[0];
+          const categoryGeo = useRouteGeoAndFreq ? geo : defaultGeo.handle;
+          const categoryFreq = useRouteGeoAndFreq ? freq : defaultFreq.freq;
+          this.categoryData[cacheId].currentFreq = frequencies.find(frequency => frequency.freq === categoryFreq);
+          this.categoryData[cacheId].currentGeo = regions.find(region => region.handle === categoryGeo);
+          this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
+          this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);  
+          return this.apiService.fetchExpanded(this.categoryData[cacheId].selectedDataList.id, categoryGeo, categoryFreq, noCache);
+        }),
+      ).subscribe((data: any) => {
+        if (data) {
+          const series = data;
+          const dates = this.setCategoryDates(series, this.categoryData[cacheId].currentFreq.freq);
+          const { categoryDates, categoryDateWrapper } = dates;
+          this.categoryData[cacheId].sliderDates = this.helperService.getTableDates(categoryDates);
+          this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
+          this.categoryData[cacheId].categoryDates = categoryDates;
+          series.forEach((serie) => {
+            serie.observations = this.helperService.formatSeriesForCharts(serie);
+            serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
+          });
+          const displaySeries = this.filterSeriesResults(series);
+          this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
+          this.categoryData[cacheId].series = series;
+          this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
           this.categoryData[cacheId].requestComplete = true;
         }
+        if (!data || !data.length) {
+          this.categoryData[cacheId].requestComplete = true;
+          this.categoryData[cacheId].noData = true;
+        }
       });
-      return observableForkJoin([observableOf(this.categoryData[cacheId])]);
+      return observableOf([this.categoryData[cacheId]]);
     }
   }
 
-  getDataListGeos(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
-    this.apiService.fetchCategoryGeos(dataList.id).subscribe((geos) => {
-      this.categoryData[cacheId].regions = geos || [dataList.defaults.geo];
-    },
-      (error) => {
-        console.log('check category geos error', error);
-      },
-      () => {
-        this.getDataListFreqs(noCache, dataList, cacheId, routeGeo, routeFreq);
-      });
+  checkRouteGeoAndFreqExist = (regions: Array<Geography>, freqs: Array<Frequency>, routeGeo: string, routeFreq: string) => {
+    return regions.find(region => region.handle === routeGeo) && freqs.find(frequency => frequency.freq === routeFreq) ? true : false;
   }
 
-  getDataListFreqs(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
-    this.apiService.fetchCategoryFreqs(dataList.id).subscribe((freqs) => {
-      this.categoryData[cacheId].frequencies = freqs || [dataList.defaults.freq];
-    },
-      (error) => {
-        console.log('check category freqs error', error);
-      },
-      () => {
-        let routeGeoExists;
-        let routeFreqExists;
-        if (routeGeo && routeFreq) {
-          routeGeoExists = this.categoryData[cacheId].regions.find(region => region.handle === routeGeo);
-          routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
-        }
-        if (routeGeoExists && routeFreqExists) {
-          this.getData(noCache, dataList.id, routeGeo, routeFreq, cacheId);
-        }
-        if (!routeGeoExists || !routeFreqExists) {
-          const defaultFreq = (dataList.defaults && dataList.defaults.freq) || this.categoryData[cacheId].frequencies[0];
-          const defaultGeo = (dataList.defaults && dataList.defaults.geo) || this.categoryData[cacheId].regions[0];
-          this.getData(noCache, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId);
-        }
-      });
-  }
-
-  getData(noCache: boolean, subId: number, geo: string, freq: string, cacheId: string) {
-    this.apiService.fetchExpanded(subId, geo, freq, noCache).subscribe((expandedCategory) => {
-      const currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
-      const currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
-      this.helperService.updateCurrentFrequency(currentFreq);
-      this.helperService.updateCurrentGeography(currentGeo);
-      this.categoryData[cacheId].currentFreq = currentFreq;
-      this.categoryData[cacheId].currentGeo = currentGeo;
-      if (expandedCategory) {
-        const series = expandedCategory;
-        const dates = this.setCategoryDates(series, freq);
-        this.categoryData[cacheId].sliderDates = this.helperService.getTableDates(dates.categoryDates);
-        this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
-        this.categoryData[cacheId].categoryDates = dates.categoryDates;
-        series.forEach((serie) => {
-          serie.observations = this.helperService.formatSeriesForCharts(serie);
-          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
-        });
-        const displaySeries = this.filterSeriesResults(series);
-        this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
-        this.categoryData[cacheId].series = series;
-        this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
-        this.categoryData[cacheId].requestComplete = true;
-      }
-      if (!expandedCategory) {
-        this.categoryData[cacheId].requestComplete = true;
-        this.categoryData[cacheId].noData = true;
-      }
-    });
+  setCategoryDataList (category: any, dataListId: number, cacheId: string) {
+    const categoryDataLists = category.children;
+    const selectedDataList = dataListId ?
+      this.helperService.findSelectedDataList(categoryDataLists, dataListId, '') :
+      this.helperService.getCategoryDataLists(categoryDataLists[0], ''); 
+    this.categoryData[cacheId].selectedDataList = selectedDataList;
+    this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
+    this.categoryData[cacheId].selectedCategoryId = category.id;
+    this.categoryData[cacheId].selectedCategory = category;
+    this.categoryData[cacheId].subcategories = categoryDataLists;
+    if (dataListId === null) {
+      this.categoryData[cacheId].defaultDataList = selectedDataList.id;
+    }
   }
 
   setCategoryDates = (series: Array<any>, currentFreq: string) => {
@@ -149,8 +134,15 @@ export class CategoryHelperService {
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
       return observableOf([this.categoryData[cacheId]]);
     } else {
-      this.categoryData[cacheId] = {} as CategoryData;
-      const { geo, freq } = routeParams;
+      this.categoryData[cacheId] = {} //as CategoryData;
+      this.apiService.fetchSearchSeries(search, noCache).subscribe((results) => {
+        this.categoryData[cacheId].searchResults = results;
+        this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
+        this.categoryData[cacheId].requestComplete = true;
+        this.categoryData[cacheId].noData = !results ? true : false;
+        this.categoryData[cacheId].invalid = !results ? `No results found for ${search}` : false;
+      });
+      /*const { geo, freq } = routeParams;
       if (geo && freq) {
         this.apiService.fetchPackageSearch(search, geo, freq, noCache).subscribe((results) => {
           const routeGeoExists = results.geos.find(g => g.handle === geo);
@@ -165,7 +157,7 @@ export class CategoryHelperService {
       }
       if (!geo || !freq) {
         this.getSearchWithDefaults(search, noCache, cacheId);
-      }
+      } */
       return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
   }

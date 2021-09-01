@@ -11,7 +11,7 @@ export class AnalyzerService {
   // Keep track of series in the analyzer
   analyzerSeriesTrackerSource: BehaviorSubject<any> = new BehaviorSubject([]);
   analyzerSeriesTracker = this.analyzerSeriesTrackerSource.asObservable();
-  private analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesTrackerSource.value.length);
+  analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesTrackerSource.value.length);
   analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
   analyzerSeriesCompareSource: BehaviorSubject<any> = new BehaviorSubject([]);
   analyzerSeriesCompare = this.analyzerSeriesCompareSource.asObservable();
@@ -39,12 +39,6 @@ export class AnalyzerService {
   };
 
   @Output() public switchYAxes: EventEmitter<any> = new EventEmitter();
-
-  @Output() public toggleSeriesInChart: EventEmitter<any> = new EventEmitter();
-
-  @Output() public toggleIndexedData: EventEmitter<any> = new EventEmitter();
-
-  @Output() public updateAnalyzerCount: EventEmitter<any> = new EventEmitter();
 
   constructor(private apiService: ApiService, private helperService: HelperService) { }
 
@@ -109,6 +103,7 @@ export class AnalyzerService {
   makeCompareSeriesVisible(seriesId: number) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const compareSeries = currentCompare.find(c => c.className === seriesId);
+    this.analyzerData.analyzerSeries.find(s => s.id === seriesId).compare = true
     compareSeries.visible = true;
     // base year should be determined by series visible in the 'Compare' chart
     // if none are visible, use all series
@@ -207,25 +202,24 @@ export class AnalyzerService {
   }
 
   addToAnalyzer(seriesID: number) {
-    let currentValue = this.analyzerSeriesTrackerSource.value;
-    currentValue = [...currentValue, { id: seriesID }];
-    this.analyzerSeriesTrackerSource.next(currentValue);
+    let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
+    currentAnalyzerTracker = [...currentAnalyzerTracker, { id: seriesID }];
+    this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker);
     this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
   }
 
   removeFromAnalyzer(seriesID: number) {
-    let currentValue = this.analyzerSeriesTrackerSource.value;
+    let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
     const compareSeries = this.analyzerSeriesCompareSource.value.find(s => s.className === seriesID);
     if (compareSeries) {
       this.analyzerSeriesCompareSource.next(this.analyzerSeriesCompareSource.value.filter(s => s.className !== seriesID));
     }
-    this.analyzerData.analyzerSeries.filter(s => s.id !== seriesID)
-    this.analyzerSeriesTrackerSource.next(currentValue.filter(s => s.id !== seriesID));
+    this.analyzerData.analyzerSeries = this.analyzerData.analyzerSeries.filter(s => s.id !== seriesID);
+    this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker.filter(s => s.id !== seriesID));
     this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
   }
 
   getAnalyzerData(aSeriesTracker: Array<any>, noCache: boolean, rightY: string) {
-    this.analyzerData.analyzerSeries = [];
     this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
@@ -265,7 +259,7 @@ export class AnalyzerService {
   isVisible = (aSeriesTracker: Array<any>, series: any, analyzerSeries: Array<any>) => {
     // On load, analyzer should add 1 (or 2 if available) series to comparison chart
     // if user has not already added/removed series for comparison
-    return aSeriesTracker.find(s => s.id === series.id && s.compare) || analyzerSeries.filter(series => series.compare).length < 2;
+    return analyzerSeries.filter(series => series.compare).length < 2;
   }
 
   addToCompareChart(compareSource: Array<any>, seriesData: any) {

@@ -4,21 +4,21 @@
 			id="id_top">
 			{{data.selectedCategory.name}}</h2>
 		<ng-template ngIf [ngIf]="data.invalid">
-			<p>{{search ? 'No results found for "' + data.invalid + '"' : data.invalid}}</p>
+			<p>{{data.invalid}}</p>
 		</ng-template>
 		<i *ngIf="!data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<ng-template ngIf [ngIf]="data.requestComplete && !data.invalid">
-			<ng-template ngIf [ngIf]="portal.categoryTabs">
-				<ul class="content-links" *ngIf="data.subcategories && data.subcategories.length > 1">
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.invalid && !search">
+			<ng-template ngIf [ngIf]="portal.categoryTabs && data.subcategories?.length > 1">
+				<ul class="content-links">
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
 						<a [routerLink]="['/category']" [queryParams]="{data_list_id: sub.id}" queryParamsHandling="merge"
 							[class.current-sub]="sub.id === data.selectedDataList.id">{{sub.name}}</a>
 					</li>
 				</ul>
-				<hr class="sublist-separator" *ngIf="data.subcategories && data.subcategories.length > 1">
+				<hr class="sublist-separator">
 			</ng-template>
-			<ng-template ngIf [ngIf]="!portal.categoryTabs && !search">
-				<h3 *ngIf="data.requestComplete" class="selected-data-list" [class.search-term]="search">
+			<ng-template ngIf [ngIf]="!portal.categoryTabs">
+				<h3 class="selected-data-list" [class.search-term]="search">
 					{{data.selectedDataList.dataListName}}</h3>
 			</ng-template>
 			<div class="filters">
@@ -28,12 +28,8 @@
 				<lib-freq-selector [freqs]="data.frequencies" (selectedFreqChange)="redrawSeriesFreq($event, selectedGeo)"
 					class="selector">
 				</lib-freq-selector>
-				<a *ngIf="routeView === 'table'" (click)="switchView()" class="btn btn-sm switch-view">Chart View
-					<i class="bi bi-graph-up"></i>
-				</a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="btn btn-sm switch-view">Table
-					View
-					<i class="bi bi-table"></i>
+				<a (click)="switchView()" class="btn btn-sm switch-view">{{routeView === 'table' ? 'Chart View' : 'Table View'}} 
+					<i class="bi" [class.bi-graph-up]="routeView === 'table'" [class.bi-table]="routeView === 'chart' || !routeView"></i>
 				</a>
 				<label *ngIf="routeView === 'table'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year/Year
@@ -46,11 +42,11 @@
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
 				<lib-date-slider *ngIf="data.displaySeries" class="sliders" [portalSettings]="portalSettings"
-					[dates]="data.categoryDates" [dateFrom]="routeStart ? routeStart : null" [dateTo]="routeEnd ? routeEnd : null"
+					[dates]="data.categoryDates" [dateFrom]="routeStart || null" [dateTo]="routeEnd || null"
 					[freq]="selectedFreq?.freq" (updateRange)="changeRange($event)"></lib-date-slider>
 			</div>
 		</ng-template>
-		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && seriesRange">
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && seriesRange && !search">
 			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings"
 				[dates]="data.categoryDates" [tableStart]="routeStart" [tableEnd]="routeEnd"
 				[selectedCategory]="data.selectedCategory" [selectedDataList]="data.selectedDataList"
@@ -65,8 +61,11 @@
 				(updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>
-		<ng-template ngIf [ngIf]="data.requestComplete && data.noData">
-			<p *ngIf="data.noData" class="no-data">No data available for current selection.</p>
+		<ng-template ngIf [ngIf]="data.requestComplete && data.noData && !search">
+			<p class="no-data">No data available for current selection.</p>
+		</ng-template>
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && search">
+			<lib-search-results [searchData]="data"></lib-search-results>
 		</ng-template>
 	</ng-template>
 </div>

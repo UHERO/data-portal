@@ -22,7 +22,6 @@
             "main": "projects/uhero/src/main.ts",
             "polyfills": "projects/uhero/src/polyfills.ts",
             "tsConfig": "projects/uhero/tsconfig.app.json",
-            "aot": true,
             "assets": [
               "projects/uhero/src/manoa.jpg",
               "projects/uhero/src/assets",
@@ -46,7 +45,13 @@
               "node_modules/jquery/dist/jquery.js",
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ]
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "staging": {
@@ -60,9 +65,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
@@ -110,7 +113,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -209,7 +213,6 @@
             "main": "projects/coh/src/main.ts",
             "polyfills": "projects/coh/src/polyfills.ts",
             "tsConfig": "projects/coh/tsconfig.app.json",
-            "aot": true,
             "assets": [
               "projects/coh/src/hawaii-county-seal.png",
               "projects/coh/src/assets",
@@ -231,7 +234,13 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js"
-            ]
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "staging": {
@@ -245,9 +254,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
@@ -295,7 +302,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -390,7 +398,6 @@
             "main": "projects/nta/src/main.ts",
             "polyfills": "projects/nta/src/polyfills.ts",
             "tsConfig": "projects/nta/tsconfig.app.json",
-            "aot": true,
             "assets": [
               "projects/nta/src/nta-logo.png",
               "projects/nta/src/assets",
@@ -407,7 +414,13 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js"
-            ]
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "staging": {
@@ -421,9 +434,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
@@ -471,7 +482,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -609,7 +621,6 @@
             "main": "projects/ccom/src/main.ts",
             "polyfills": "projects/ccom/src/polyfills.ts",
             "tsConfig": "projects/ccom/tsconfig.app.json",
-            "aot": true,
             "assets": [
               "projects/ccom/src/favicon.ico",
               "projects/ccom/src/assets",
@@ -632,7 +643,13 @@
             },
             "scripts": [
               "node_modules/jquery/dist/jquery.js"
-            ]
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "staging": {
@@ -646,9 +663,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
@@ -696,7 +711,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
