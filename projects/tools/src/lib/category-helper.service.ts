@@ -10,7 +10,6 @@ import { switchMap, tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class CategoryHelperService {
-  private errorMessage: string;
   // Variables for geo and freq selectors
   private categoryData = {};
 
@@ -142,27 +141,11 @@ export class CategoryHelperService {
         this.categoryData[cacheId].noData = !results ? true : false;
         this.categoryData[cacheId].invalid = !results ? `No results found for ${search}` : false;
       });
-      /*const { geo, freq } = routeParams;
-      if (geo && freq) {
-        this.apiService.fetchPackageSearch(search, geo, freq, noCache).subscribe((results) => {
-          const routeGeoExists = results.geos.find(g => g.handle === geo);
-          const routeFreqExists = results.freqs.find(f => f.freq === freq);
-          if (routeFreqExists && routeGeoExists) {
-            this.getSearchData(results, cacheId, search, geo, freq);
-          }
-          if (!routeFreqExists || !routeGeoExists) {
-            this.getSearchWithDefaults(search, noCache, cacheId);
-          }
-        });
-      }
-      if (!geo || !freq) {
-        this.getSearchWithDefaults(search, noCache, cacheId);
-      } */
       return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
   }
 
-  getSearchWithDefaults(search, noCache: boolean, cacheId) {
+  /*getSearchWithDefaults(search, noCache: boolean, cacheId) {
     this.apiService.fetchPackageSearch(search, '', '', noCache).subscribe((results) => {
       const geo = results.defaultGeo.handle;
       const freq = results.defaultFreq.freq;
@@ -213,7 +196,7 @@ export class CategoryHelperService {
     categoryDateWrapper.firstDate = this.helperService.findDateWrapperStart(displaySeries);
     categoryDateWrapper.endDate = this.helperService.fineDateWrapperEnd(displaySeries);
     return categoryDateWrapper;
-  }
+  }*/
 
   filterSeriesResults(results: Array<any>) {
     return results.map((res) => {

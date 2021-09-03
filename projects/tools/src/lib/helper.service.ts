@@ -374,11 +374,12 @@ export class HelperService {
 
   setDefaultCategoryRange(freq, dateArray, defaults) {
     const defaultSettings = defaults.find(ranges => ranges.freq === freq);
-    const lastYearInArray = `${this.parseISOString(dateArray[dateArray.length - 1].date).getUTCFullYear()}`
+    let lastYearInArray = +`${this.parseISOString(dateArray[dateArray.length - 1].date).getUTCFullYear()}`
     const defaultEnd = defaultSettings.end || lastYearInArray;
     let counter = dateArray.length - 1;
     while (lastYearInArray > defaultEnd) {
       counter--;
+      lastYearInArray--
     }
     return this.getRanges(freq, counter, defaultSettings.range);
   }

@@ -5,6 +5,7 @@ import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { CategoryData } from './tools.models';
 import { DateWrapper } from './tools.models';
+import { switchMap, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class NtaHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, noCache: boolean, routeParams): Observable<any> {
+  initContent(catId: any, noCache: boolean, routeParams)/*: Observable<any>*/ {
     const { dataListId, selectedMeasure } = routeParams;
     const cacheId = this.helperService.setCacheId(catId, routeParams);
     if (this.categoryData[cacheId]) {
@@ -38,47 +39,60 @@ export class NtaHelperService {
 
   getCategory(cacheId: string, noCache: boolean, catId: any, dataListId, selectedMeasure?: string) {
     this.categoryData[cacheId] = {} as CategoryData;
-    this.apiService.fetchCategories().subscribe((categories) => {
-      catId = catId || categories[0].id;
-      const cat = categories.find(category => category.id === catId);
-      if (cat) {
-        const categoryDataLists = cat.children;
-        const selectedDataList = dataListId ?
-          this.helperService.findSelectedDataList(categoryDataLists, dataListId, '') :
-          this.helperService.getCategoryDataLists(categoryDataLists[0], '');
-        this.categoryData[cacheId].selectedDataList = selectedDataList;
-        this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
-        this.categoryData[cacheId].selectedCategory = cat;
-        this.categoryData[cacheId].categoryId = cat.id;
-        this.categoryData[cacheId].currentFreq = { freq: 'A', label: 'Annual' };
-        if (dataListId == null) {
-          dataListId = cat.children[0].id;
-          this.categoryData[cacheId].defaultDataList = dataListId;
+    this.apiService.fetchCategories().pipe(
+      tap(categories => {
+        catId = catId || categories[0].id;
+        const cat = categories.find(category => category.id === catId);
+        if (cat) {
+          const categoryDataLists = cat.children;
+          const selectedDataList = dataListId ?
+            this.helperService.findSelectedDataList(categoryDataLists, dataListId, '') :
+            this.helperService.getCategoryDataLists(categoryDataLists[0], '');
+          this.categoryData[cacheId].selectedDataList = selectedDataList;
+          this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
+          this.categoryData[cacheId].selectedCategory = cat;
+          this.categoryData[cacheId].categoryId = cat.id;
+          this.categoryData[cacheId].currentFreq = { freq: 'A', label: 'Annual' };
+          if (dataListId == null) {
+            dataListId = cat.children[0].id;
+            this.categoryData[cacheId].defaultDataList = dataListId;
+          }
+          const sublistCopy = [];
+          categoryDataLists.forEach((sub) => {
+            sub.parentName = cat.name;
+            sublistCopy.push(Object.assign({}, sub));
+          });
+          this.categoryData[cacheId].sublist = sublistCopy;
+        } else {
+          this.categoryData[cacheId].invalid = 'Category does not exist.';
         }
-        const sublistCopy = [];
-        categoryDataLists.forEach((sub) => {
-          sub.parentName = cat.name;
-          sublistCopy.push(Object.assign({}, sub));
+      }),
+      switchMap(() => {
+        return this.apiService.fetchCategoryMeasurements(this.categoryData[cacheId].selectedDataList.id, noCache);
+      }),
+      tap((measurements) => {
+        this.categoryData[cacheId].measurements = measurements;
+        this.findSelectedMeasurement(this.categoryData[cacheId], selectedMeasure);
+      }),
+      switchMap(() => {
+        return this.apiService.fetchMeasurementSeries(this.categoryData[cacheId].currentMeasurement.id, noCache)
+      })
+    ).subscribe((data: any) => {
+      const categoryDataArray = [];
+      this.categoryData[cacheId].dateWrapper = { firstDate: '', endDate: '' };
+      if (data) {
+        data.forEach((serie) => {
+          serie.observations = this.helperService.formatSeriesForCharts(serie);
+          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'c5ma');
         });
-        this.categoryData[cacheId].sublist = sublistCopy;
-        this.getSubcategoryData(this.categoryData[cacheId], noCache, selectedMeasure);
-      } else {
-        this.categoryData[cacheId].invalid = 'Category does not exist.';
+        this.categoryData[cacheId].series = data;
+        this.formatCategoryData(this.categoryData[cacheId], categoryDataArray, false);
+      }
+      if (!data) {
+        this.categoryData[cacheId].noData = true;
+        this.categoryData[cacheId].requestComplete = true;
       }
     });
-  }
-
-  getSubcategoryData(category, noCache: boolean, selectedMeasure?: string) {
-    this.apiService.fetchCategoryMeasurements(category.selectedDataList.id, noCache).subscribe((measures) => {
-      category.measurements = measures;
-    },
-      (error) => {
-        console.log('error fetching category measurements', error);
-      },
-      () => {
-        this.findSelectedMeasurement(category, selectedMeasure);
-        this.getSeriesData(category, noCache);
-      });
   }
 
   findSelectedMeasurement(sublist, selectedMeasure) {
@@ -89,31 +103,8 @@ export class NtaHelperService {
     });
   }
 
-  // Get list of series belonging to each measurement
-  getSeriesData(category, noCache: boolean) {
-    const categoryDataArray = [];
-    category.dateWrapper = { firstDate: '', endDate: '' };
-    this.apiService.fetchMeasurementSeries(category.currentMeasurement.id, noCache).subscribe((series) => {
-      if (series) {
-        series.forEach((serie) => {
-          serie.observations = this.helperService.formatSeriesForCharts(serie);
-          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
-        });
-        category.series = series;
-        this.formatCategoryData(category, categoryDataArray, false);
-      }
-      if (!series) {
-        category.noData = true;
-        category.requestComplete = true;
-      }
-    },
-      (error) => {
-        console.log('error fetching measurement series', error);
-      });
-  }
-
-  getSearch(cacheId, noCache: boolean, catId) {
-    this.categoryData[cacheId] = {} as CategoryData;
+  getSearch(cacheId, noCache: boolean, search) {
+    /*this.categoryData[cacheId] = {} as CategoryData;
     let freqGeos;
     let freqs;
     let obsEnd;
@@ -137,10 +128,18 @@ export class NtaHelperService {
         } else {
           this.categoryData[cacheId].invalid = catId;
         }
+      });*/
+      this.categoryData[cacheId] = {};
+      this.apiService.fetchSearchSeries(search, noCache).subscribe((results) => {
+        this.categoryData[cacheId].searchResults = results;
+        this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
+        this.categoryData[cacheId].requestComplete = true;
+        this.categoryData[cacheId].noData = !results ? true : false;
+        this.categoryData[cacheId].invalid = !results ? `No results found for ${search}` : false;
       });
   }
 
-  getSearchData(search: string, noCache: boolean, cacheId, dateWrapper: DateWrapper) {
+  /*getSearchData(search: string, noCache: boolean, cacheId, dateWrapper: DateWrapper) {
     let searchResults;
     // Get series for a requested search term
     this.apiService.fetchSearchSeries(search, noCache).subscribe((searchRes) => {
@@ -201,7 +200,7 @@ export class NtaHelperService {
       }
     });
     return measurements;
-  }
+  }*/
 
   // Format series data for chart and table displays
   formatCategoryData(category, subcategoryDateArray: Array<any>, search: boolean) {
