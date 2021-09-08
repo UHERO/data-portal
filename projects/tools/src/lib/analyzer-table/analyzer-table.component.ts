@@ -67,8 +67,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = [];
-    // Check if the summary statistics for a series has NA values
-    this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
@@ -90,6 +88,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         this.rows.push(c5maData);
       }
     });
+    // Check if the summary statistics for a series has NA values
+    this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
   }
 
   calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
@@ -219,7 +219,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.gridApi.exportDataAsCsv(params);
   }
 
-  isSummaryStatMissing = series => series.some(s => s ? s.missing : null);
+  isSummaryStatMissing = series => series.some(s => s?.missing || null);
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;

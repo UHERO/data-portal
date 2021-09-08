@@ -144,7 +144,6 @@ export class HighchartComponent implements OnChanges {
         },
       });
     }
-    console.log('chartSeries', chartSeries)
     return chartSeries;
   }
 
