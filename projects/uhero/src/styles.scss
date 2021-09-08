@@ -24,7 +24,7 @@ body {
     width: unset;
   }
 
-  .fa-spinner {
+  .spinner-border {
     color: $primary;
   }
 
@@ -139,8 +139,9 @@ body {
     }
 
     .p-datatable {
-      .fa-spinner {
+      .spinner-border {
         color: $primary;
+        font-size: unset;
       }
     }
   }
@@ -507,12 +508,6 @@ lib-search-results, lib-single-series {
       a {
         color: $primary-text;
       }
-    }
-
-    .fa-spinner {
-      display: block;
-      font-size: 1.3em;
-      margin-top: 20px;    
     }
 
     .p-widget-overlay {

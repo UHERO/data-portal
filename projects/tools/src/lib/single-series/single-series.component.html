@@ -47,7 +47,7 @@
     </div>
     <div class="series-table">
       <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
-        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'fas fa-spinner'">
+        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'">
         <ng-template pTemplate="header" let-columns>
           <tr>
             <th *ngFor="let col of columns" [pSortableColumn]="col.field"

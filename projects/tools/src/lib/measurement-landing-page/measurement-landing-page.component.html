@@ -4,7 +4,11 @@
 			{{data.selectedCategory.name}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
+		<div *ngIf="search && !data.requestComplete && !data.invalid" class="d-flex justify-content-center">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
 		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">
 			{{data.selectedDataList.name}}</h3>
 		<div *ngIf="data.requestComplete && !search" class="filters">
@@ -24,7 +28,11 @@
 				[dateTo]="data?.seriesEnd || null" [freq]="data.currentFreq?.freq"
 				(updateRange)="changeRange($event, data)"></lib-date-slider>
 		</div>
-		<i *ngIf="!search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
+		<div *ngIf="!search && !data.requestComplete && !data.invalid" class="d-flex justify-content-center">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && data.seriesStart && data.seriesEnd">
 			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings" [dates]="data.dateArray"
 				[tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd" [data]="data.displaySeries"
