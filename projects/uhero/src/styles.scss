@@ -48,10 +48,6 @@ body {
     background-color: $primary;
   }
 
-  .material-icons.md-18 {
-    color: $secondary;
-  }
-
   .switch-view {
     color: $primary;
   }
@@ -187,12 +183,6 @@ body {
   }
 
   lib-landing-page, lib-analyzer {
-    .multi-series-container {
-      .material-icons.md-18 {
-        color: $secondary;
-      }
-    }
-
     .content-links:before {
       display: block;
       content: ' ';

@@ -20,7 +20,6 @@ export class TableHelperService {
         let title = seriesInfo.title;
         title += ` (${seriesInfo.geography.shortName}; ${seriesInfo.frequency})`;
         title += ` (${seriesInfo.unitsLabel || seriesInfo.unitsLabelShort})`;
-        title += '<i class="material-icons close-info">&#xE14C;</i>';
         return title;
       },
       content() {

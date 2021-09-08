@@ -32,7 +32,6 @@ import { AnalyzerTableRendererComponent } from './analyzer-table-renderer/analyz
 import { MeasurementLandingPageComponent } from './measurement-landing-page/measurement-landing-page.component';
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
-import { MatIconModule } from '@angular/material/icon';
 import { SearchResultsComponent } from './search-results/search-results.component';
 
 @NgModule({
@@ -73,7 +72,6 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     PanelMenuModule,
     CalendarModule,
     HighchartsChartModule,
-    MatIconModule,
     AgGridModule.withComponents([
       CategoryTableRenderComponent,
       AnalyzerTableRendererComponent,
@@ -101,7 +99,6 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
-    MatIconModule
   ]
 })
 export class ToolsModule { }
