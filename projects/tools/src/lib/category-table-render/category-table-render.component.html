@@ -6,8 +6,12 @@
   <div class="th-buttons">
     <i *ngIf="!params.data.seriesInfo.analyze" title="Add to Analyzer" [class.add-button]="params.data.seriesInfo.analyze" class="px-1 bi bi-star analyzer-toggle" (click)="addToAnalyzer(params.data.seriesInfo)"></i>
     <i *ngIf="params.data.seriesInfo.analyze" title="Remove from Analyzer" [class.remove-button]="params.data.seriesInfo.analyze" class="px-1 bi bi-star-fill analyzer-toggle remove-button" (click)="removeFromAnalyzer(params.data.seriesInfo)"></i>
-    <a tabindex="0" id="{{params.data.seriesInfo.id}}" class="info" (click)="showPopover(params.data.seriesInfo, params.data.subcatIndex)"
+    <!--<a tabindex="0" id="{{params.data.seriesInfo.id}}" class="info" (click)="showPopover(params.data.seriesInfo, params.data.subcatIndex)"
       role="button" data-animation='false' data-toggle="popover">
+      <i class="bi bi-info-circle"></i>
+    </a>-->
+    <a tabindex="0" id="series-{{params.data.seriesInfo.id}}" class="info" (click)="showPopover($event, params.data.seriesInfo, params.data.subcatIndex)"
+      role="button" data-bs-animation='false' data-bs-toggle="popover">
       <i class="bi bi-info-circle"></i>
     </a>
   </div>

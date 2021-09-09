@@ -3,7 +3,7 @@ import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { TableHelperService } from '../table-helper.service';
 import { AnalyzerService } from '../analyzer.service';
 import 'jquery';
-//import { Popover } from 'bootstrap/dist/js/bootstrap.esm.min.js';
+import { Popover } from 'bootstrap/dist/js/bootstrap.esm.min.js';
 declare var $: any;
 
 @Component({
@@ -40,8 +40,84 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
     return false;
   }
 
-  showPopover = (seriesInfo, subcatIndex) => {
+  /*showPopover = (seriesInfo, subcatIndex) => {
     return this.tableHelper.showPopover(seriesInfo, subcatIndex);
+  }*/
+
+  showPopover(e, seriesInfo, subcatIndex) {
+    console.log('e', e)
+    const {
+      id,
+      title,
+      geography,
+      frequency,
+      unitsLabel,
+      unitsLabelShort,
+      seasonalAdjustment,
+      sourceDescription,
+      sourceLink,
+      sourceDetails
+    } = seriesInfo;
+    const content = this.getPopoverContent(seasonalAdjustment, sourceDescription, sourceLink, sourceDetails);
+    const popoverTitle = this.getPopoverTitle(title, geography.shortName, frequency, unitsLabel, unitsLabelShort);
+    const popover = new Popover(document.querySelector(`#series-${id}`), {
+      container: 'body',
+      html: true,
+      title: popoverTitle,
+      content: content,
+      trigger: 'manual'
+    });
+    //const otherPopovers = Array.from(document.querySelectorAll('.popover')).filter(element => element !== e.target);
+    /* otherPopovers.forEach((pop) => {
+      pop.dispose()
+    }) */
+    const myPopover = document.getElementById(`series-${id}`).addEventListener('show.bs.popover', function() {
+      const otherPopovers = Array.from(document.querySelectorAll('.info')).filter(element => element.id !== `series-${id}`)//.filter(element => element !== e.target);
+      otherPopovers.forEach((pop) => {
+        const triggerEl = document.getElementById(pop.id)
+        Popover.getInstance(triggerEl)?.dispose();
+      });
+    });
+    /*document.body.addEventListener('click', () => {
+      const otherPopovers = Array.from(document.querySelectorAll('.info'))//.filter(element => element.id !== `series-${id}`)//.filter(element => element !== e.target);
+      otherPopovers.forEach((pop) => {
+        const triggerEl = document.getElementById(pop.id)
+        Popover.getInstance(triggerEl)?.dispose();
+      });
+    })*/
+    //const diffPopover = document.getE
+    popover.show();
+    /* .on('show.bs.popover', (e) => {
+      // Display only one popover at a time
+      $('.popover').not(e.target).popover('dispose');
+      setTimeout(() => {
+        // Close popover on next click (source link in popover is still clickable)
+        $('body').one('click', () => {
+          popover.popover('dispose');
+        });
+      }, 1);
+    }); */
+  }
+
+  getPopoverTitle = (title: string, geo: string, freq: string, units: string, unitsShort: string) => {
+    return `${title} (${geo}; ${freq}) (${units || unitsShort})`;
+  }
+
+  getPopoverContent = (seasonal: string, description: string, link: string, details: string) => {
+    let content = '';
+    if (seasonal === 'seasonally_adjusted') {
+      content += 'Seasonally Adjusted<br />';
+    }
+    if (description) {
+      content += `Source: ${description}<br />`;
+    }
+    if (link) {
+      content += `<a target="_blank" href="${link}">${link}</a><br />`
+    }
+    if (details) {
+      content += details;
+    }
+    return content;
   }
 
   addToAnalyzer(series) {
