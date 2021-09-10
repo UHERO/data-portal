@@ -44,8 +44,7 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
     return this.tableHelper.showPopover(seriesInfo, subcatIndex);
   }*/
 
-  showPopover(e, seriesInfo, subcatIndex) {
-    console.log('e', e)
+  showPopover(seriesInfo, subcatIndex) {
     const {
       id,
       title,
@@ -67,36 +66,19 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
       content: content,
       trigger: 'manual'
     });
-    //const otherPopovers = Array.from(document.querySelectorAll('.popover')).filter(element => element !== e.target);
-    /* otherPopovers.forEach((pop) => {
-      pop.dispose()
-    }) */
-    const myPopover = document.getElementById(`series-${id}`).addEventListener('show.bs.popover', function() {
-      const otherPopovers = Array.from(document.querySelectorAll('.info')).filter(element => element.id !== `series-${id}`)//.filter(element => element !== e.target);
-      otherPopovers.forEach((pop) => {
-        const triggerEl = document.getElementById(pop.id)
-        Popover.getInstance(triggerEl)?.dispose();
-      });
-    });
-    /*document.body.addEventListener('click', () => {
-      const otherPopovers = Array.from(document.querySelectorAll('.info'))//.filter(element => element.id !== `series-${id}`)//.filter(element => element !== e.target);
-      otherPopovers.forEach((pop) => {
-        const triggerEl = document.getElementById(pop.id)
-        Popover.getInstance(triggerEl)?.dispose();
-      });
-    })*/
-    //const diffPopover = document.getE
-    popover.show();
-    /* .on('show.bs.popover', (e) => {
-      // Display only one popover at a time
-      $('.popover').not(e.target).popover('dispose');
+    const myPopover = document.getElementById(`series-${id}`).addEventListener('show.bs.popover', (e) => {
+      const existingPopover = document.querySelector('.popover');
+      Popover.getInstance(document.getElementById(existingPopover?.id))?.dispose();
       setTimeout(() => {
-        // Close popover on next click (source link in popover is still clickable)
-        $('body').one('click', () => {
-          popover.popover('dispose');
-        });
-      }, 1);
-    }); */
+        document.addEventListener('click', () => {
+          if (popover !== null) {
+            console.log('popover', popover)
+            popover?.dispose();
+          }
+        })
+      }, 1)
+    });
+    popover.toggle();
   }
 
   getPopoverTitle = (title: string, geo: string, freq: string, units: string, unitsShort: string) => {
