@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import 'jquery';
-declare var $: any;
+import { Popover } from 'bootstrap/dist/js/bootstrap.esm.min.js';
 
 @Injectable({
   providedIn: 'root'
@@ -9,45 +8,64 @@ export class TableHelperService {
 
   constructor() { }
 
-  showPopover(seriesInfo, subcatIndex?) {
-    $('[data-toggle="tooltip"]').tooltip('hide');
-    const popoverId = subcatIndex ? `#${subcatIndex}${seriesInfo.id}` : `#${seriesInfo.id}`;
-    const popover = $(popoverId).popover({
-      trigger: 'manual',
+  showPopover (seriesInfo) {
+    const {
+      id,
+      title,
+      geography,
+      frequency,
+      unitsLabel,
+      unitsLabelShort,
+      seasonalAdjustment,
+      sourceDescription,
+      sourceLink,
+      sourceDetails
+    } = seriesInfo;
+    const popoverId = `popover-${id}`;
+    const content = this.getPopoverContent(seasonalAdjustment, sourceDescription, sourceLink, sourceDetails);
+    const popoverTitle = this.getPopoverTitle(title, geography.shortName, frequency, unitsLabel, unitsLabelShort);
+    const popover = new Popover(document.querySelector(`#${popoverId}`), {
+      container: 'body',
       html: true,
+      title: popoverTitle,
       placement: 'left',
-      title() {
-        let title = seriesInfo.title;
-        title += ` (${seriesInfo.geography.shortName}; ${seriesInfo.frequency})`;
-        title += ` (${seriesInfo.unitsLabel || seriesInfo.unitsLabelShort})`;
-        return title;
-      },
-      content() {
-        let info = '';
-        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
-          info += 'Seasonally Adjusted<br>';
-        }
-        if (seriesInfo.sourceDescription) {
-          info += `Source: ${seriesInfo.sourceDescription}<br />`;
-        }
-        if (seriesInfo.sourceLink) {
-          info += `<a target="_blank" href="${seriesInfo.sourceLink}">${seriesInfo.sourceLink}</a><br />`;
-        }
-        if (seriesInfo.sourceDetails) {
-          info += seriesInfo.sourceDetails;
-        }
-        return info;
-      }
-    }).on('show.bs.popover', (e) => {
-      // Display only one popover at a time
-      $('.popover').not(e.target).popover('dispose');
+      content: content,
+      trigger: 'manual'
+    });
+    // display only one popover at a time
+    document.getElementById(popoverId).addEventListener('show.bs.popover', (e) => {
+      const existingPopover = document.querySelector('.popover');
+      Popover.getInstance(document.getElementById(existingPopover?.id))?.dispose();
+      // clicking anywhere closes the popover
       setTimeout(() => {
-        // Close popover on next click (source link in popover is still clickable)
-        $('body').one('click', () => {
-          popover.popover('dispose');
+        document.addEventListener('click', () => {
+          if (Object.values(popover).some(v => v !== null)) {
+            popover.dispose();
+          }
         });
       }, 1);
     });
-    popover.popover('toggle');
+    popover.toggle();
+  }
+
+  getPopoverTitle = (title: string, geo: string, freq: string, units: string, unitsShort: string) => {
+    return `${title} (${geo}; ${freq}) (${units || unitsShort})`;
+  }
+
+  getPopoverContent = (seasonal: string, description: string, link: string, details: string) => {
+    let content = '';
+    if (seasonal === 'seasonally_adjusted') {
+      content += 'Seasonally Adjusted<br />';
+    }
+    if (description) {
+      content += `Source: ${description}<br />`;
+    }
+    if (link) {
+      content += `<a target="_blank" href="${link}">${link}</a><br />`
+    }
+    if (details) {
+      content += details;
+    }
+    return content;
   }
 }

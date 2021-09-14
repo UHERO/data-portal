@@ -7,9 +7,6 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
 
-import 'jquery';
-declare var $: any;
-
 @Component({
   selector: 'lib-landing-page',
   templateUrl: './landing-page.component.html',

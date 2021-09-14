@@ -8,8 +8,6 @@ import { Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
 import { HelperService } from '../helper.service';
 
-declare var $: any;
-
 @Component({
   selector: 'lib-single-series',
   templateUrl: './single-series.component.html',

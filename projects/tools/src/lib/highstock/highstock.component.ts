@@ -1,10 +1,8 @@
 // Highstock chart component used for single-series view
 import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
 import { HighchartChartData, Series, HighstockObject, Geography, Frequency } from '../tools.models';
-import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
 import { AnalyzerService } from '../analyzer.service';
-declare var $: any;
 import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';

@@ -145,59 +145,6 @@ export class CategoryHelperService {
     }
   }
 
-  /*getSearchWithDefaults(search, noCache: boolean, cacheId) {
-    this.apiService.fetchPackageSearch(search, '', '', noCache).subscribe((results) => {
-      const geo = results.defaultGeo.handle;
-      const freq = results.defaultFreq.freq;
-      this.getSearchData(results, cacheId, search, geo, freq);
-    });
-  }
-
-  getSearchData(results, cacheId, search, geo, freq) {
-    const categoryDateWrapper = { firstDate: '', endDate: '' };
-    const { observationStart, observationEnd, series } = results;
-    if (!observationStart && !observationEnd) {
-      this.categoryData[cacheId].invalid = search;
-    }
-    if (observationStart && observationEnd) {
-      this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
-      this.categoryData[cacheId].regions = results.geos;
-      this.categoryData[cacheId].frequencies = results.freqs;
-      const currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
-      const currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
-      this.helperService.updateCurrentFrequency(currentFreq);
-      this.helperService.updateCurrentGeography(currentGeo);
-      this.categoryData[cacheId].currentFreq = currentFreq;
-      this.categoryData[cacheId].currentGeo = currentGeo;
-    }
-    if (series) {
-      series.forEach((serie) => {
-        serie.observations = this.helperService.formatSeriesForCharts(serie);
-        serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
-      });
-      const displaySeries = this.filterSeriesResults(series);
-      this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
-      this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
-      const catWrapper = this.getSearchDates(displaySeries);
-      const categoryDateArray = [];
-      this.helperService.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
-      this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
-      this.categoryData[cacheId].categoryDates = categoryDateArray;
-      this.categoryData[cacheId].requestComplete = true;
-    }
-    if (observationStart && observationEnd && !series) {
-      this.categoryData[cacheId].noData = true;
-      this.categoryData[cacheId].requestComplete = true;
-    }
-  }
-
-  getSearchDates(displaySeries) {
-    const categoryDateWrapper: DateWrapper = { firstDate: '', endDate: '' };
-    categoryDateWrapper.firstDate = this.helperService.findDateWrapperStart(displaySeries);
-    categoryDateWrapper.endDate = this.helperService.fineDateWrapperEnd(displaySeries);
-    return categoryDateWrapper;
-  }*/
-
   filterSeriesResults(results: Array<any>) {
     return results.map((res) => {
       const levelData = res.seriesObservations.transformationResults[0].dates;
