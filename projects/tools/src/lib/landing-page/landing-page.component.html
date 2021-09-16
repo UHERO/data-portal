@@ -6,7 +6,11 @@
 		<ng-template ngIf [ngIf]="data.invalid">
 			<p>{{data.invalid}}</p>
 		</ng-template>
-		<i *ngIf="!data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
+		<div *ngIf="!data.requestComplete && !data.invalid" class="d-flex justify-content-center">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.invalid && !search">
 			<ng-template ngIf [ngIf]="portal.categoryTabs && data.subcategories?.length > 1">
 				<ul class="content-links">

@@ -4,31 +4,35 @@
 			{{data.selectedCategory.name}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
+		<div *ngIf="search && !data.requestComplete && !data.invalid" class="d-flex justify-content-center">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
 		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">
 			{{data.selectedDataList.name}}</h3>
-		<div class="filters">
+		<div *ngIf="data.requestComplete && !search" class="filters">
 			<lib-measurement-selector *ngIf="data.measurements" [measurements]="data.measurements"
 				[selectedMeasurement]="data.currentMeasurement" (selectedMeasurementChange)="redrawSeries($event)"
 				class="selector">
 			</lib-measurement-selector>
-			<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View
-				<i class="material-icons md-18">show_chart</i>
-			</a>
-			<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="switch-view">Table
-				View
-				<i class="material-icons md-18">view_list</i>
+			<a (click)="switchView()" class="switch-view">{{routeView === 'table' ? 'Chart View' : 'Table View'}}
+				<i class="bi" [class.bi-graph-up]="routeView === 'table'" [class.bi-table]="routeView === 'chart' || !routeView"></i>
 			</a>
 			<label *ngIf="routeView === 'table'" class="form-check-inline">
 				<input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event)">Annual
 				Change
 			</label>
-			<lib-date-slider class="sliders" *ngIf="data.requestComplete" [portalSettings]="portalSettings"
-				[dates]="data.dateArray" [dateFrom]="data.seriesStart ? data.seriesStart : null"
-				[dateTo]="data.seriesEnd ? data.seriesEnd: null" [freq]="data.currentFreq?.freq"
+			<lib-date-slider class="sliders" *ngIf="data.displaySeries" [portalSettings]="portalSettings"
+				[dates]="data.dateArray" [dateFrom]="data?.seriesStart || null"
+				[dateTo]="data?.seriesEnd || null" [freq]="data.currentFreq?.freq"
 				(updateRange)="changeRange($event, data)"></lib-date-slider>
 		</div>
-		<i *ngIf="!search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
+		<div *ngIf="!search && !data.requestComplete && !data.invalid" class="d-flex justify-content-center">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && data.seriesStart && data.seriesEnd">
 			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings" [dates]="data.dateArray"
 				[tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd" [data]="data.displaySeries"
@@ -40,6 +44,12 @@
 				[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [findMinMax]="data.findMinMax"
 				(updateURLFragment)="updateRoute()">
 			</lib-category-charts>
+		</ng-template>
+		<ng-template ngIf [ngIf]="data.requestComplete && data.noData && !search">
+			<p class="no-data">No data available for current selection.</p>
+		</ng-template>
+		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && search">
+			<lib-search-results [searchData]="data"></lib-search-results>
 		</ng-template>
 	</ng-template>
 </div>

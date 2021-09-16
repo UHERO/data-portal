@@ -64,11 +64,11 @@ export class DateSliderComponent implements OnInit {
 
   setInvalidDates = (year: number, freq: string, month?: number) => {
     const datesToDisable = {
-      'A': [],
-      'S': this.getInvalidMonths(year, freq),
-      'Q': this.getInvalidMonths(year, freq),
-      'M': [],
-      'W': this.getInvalidWeeklyDates(year, month)
+      A: [],
+      S: this.getInvalidMonths(year, freq),
+      Q: this.getInvalidMonths(year, freq),
+      M: [],
+      W: this.getInvalidWeeklyDates(year, month)
     };
     return datesToDisable[freq] || [];
   }
@@ -107,12 +107,12 @@ export class DateSliderComponent implements OnInit {
   setCalendarDateFormat = (freq: string, value: Date) => {
     const quarters = { 0: 'Q1', 3: 'Q2', 6: 'Q3', 9: 'Q4' };
     const format = {
-      'A': 'yy',
-      'S': 'yy-mm',
-      'Q': `yy ${quarters[value.getMonth()]}`,
-      'M': 'yy-mm',
-      'W': 'yy-mm-dd',
-      'D': 'yy-mm-dd'
+      A: 'yy',
+      S: 'yy-mm',
+      Q: `yy ${quarters[value.getMonth()]}`,
+      M: 'yy-mm',
+      W: 'yy-mm-dd',
+      D: 'yy-mm-dd'
     }
     return format[freq] || 'yy-mm-dd';
   }
@@ -126,12 +126,12 @@ export class DateSliderComponent implements OnInit {
 
   checkValidCalendarInput = (value: string, freq: string) => {
     const valueLength = {
-      'A': 4,
-      'S': 7,
-      'Q': 7,
-      'M': 7,
-      'W': 10,
-      'D': 10
+      A: 4,
+      S: 7,
+      Q: 7,
+      M: 7,
+      W: 10,
+      D: 10
     };
     return valueLength[freq] === value.length && this.sliderDates.indexOf(value) > -1;
   }
@@ -149,12 +149,12 @@ export class DateSliderComponent implements OnInit {
   updateCalendarDate(value: string, calendar: string, freq: string) {
     const qMonths = { 'Q1': '01', 'Q2': '04', 'Q3': '07', 'Q4': '10' };
     const newDate = {
-      'A': `${value}/01/01`,
-      'S': `${value}/01`,
-      'Q': `${value.slice(0, 4)}/${qMonths[value.slice(5, 7)]}/01`,
-      'M': `${value}/01`,
-      'W':  value,
-      'D':  value
+      A: `${value}/01/01`,
+      S: `${value}/01`,
+      Q: `${value.slice(0, 4)}/${qMonths[value.slice(5, 7)]}/01`,
+      M: `${value}/01`,
+      W:  value,
+      D:  value
     };
     calendar === 'calendar-start' ? this.setCalendarStartVars(newDate[freq], freq) : this.setCalendarEndVars(newDate[freq], freq);
     this.sliderSelectedRange = [this.start, this.end];

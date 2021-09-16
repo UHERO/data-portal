@@ -3,22 +3,12 @@
   min-height: 100%;
   margin-top: 65px;
 
-  .fa-spinner {
-    display: block;
-    margin: 20px;
-    color: #1D667F;
-  }
-
   .filters {
     display: inline-block;
     margin-bottom: 5px;
-    margin-right: 10px;
 
     .sliders {
       display: inline-block;
-      vertical-align: bottom;
-      margin-left: 10px;
-      margin-right: 10px;
 
       @media (max-width: 767px) {
         display: block;
@@ -67,17 +57,12 @@
     height: 2px;
   }
 
-  .material-icons.md-18 {
-    max-width: 18px;
-    font-size: 18px;
-    vertical-align: middle;
-  }
-
   .switch-view {
     text-decoration: none;
     font-size: 0.85em;
     vertical-align: middle;
     cursor: pointer;
+    margin: 0 0.5em;
 
     @media(max-width: 767px) {
       display: none;

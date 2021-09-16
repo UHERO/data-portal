@@ -18,7 +18,7 @@
           <span>Share</span>
           <div class="input-group">
             <span class="input-group-addon" id="share-link">
-              <i class="bi bi-link share-link" (click)="copyLink(shareLinkInput)" title="Copy Link"></i>
+              <i class="bi bi-link share-link" (click)="copyLink(shareLinkInput, shareLink)" title="Copy Link"></i>
             </span>
             <input type="text" class="form-control" [value]="shareLink" aria-describedby="share-link" #shareLinkInput>
           </div>
@@ -27,7 +27,7 @@
           <span>Embed</span>
           <div class="input-group">
             <span class="input-group-addon" id="embed-code">
-              <i class="bi bi-code share-link" (click)="copyLink(embedCodeInput)" title="Copy Embed"></i>
+              <i class="bi bi-code share-link" (click)="copyLink(embedCodeInput, embedCode)" title="Copy Embed"></i>
             </span>
             <input type="text" class="form-control" [value]="embedCode" aria-describedby="embed-code" #embedCodeInput>
           </div>

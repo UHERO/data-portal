@@ -52,7 +52,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
           this.storeUrlSeries(params[`analyzerSeries`]);
         }
         if (params[`chartSeries`]) {
-          this.storeUrlChartSeries(params[`chartSeries`]);
+          this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
         }
         this.analyzerService.analyzerData.minDate = params['start'] || '';
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
@@ -76,7 +76,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   updateAnalyzer (analyzerSeries: Array<any>) {
     if (analyzerSeries.length) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.yRightSeries);
+      this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache);
       this.analyzerService.analyzerData.indexed = this.indexSeries;
     }
   }
@@ -88,14 +88,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   storeUrlSeries(urlSeries: string) {
     const urlASeries = urlSeries.split('-').map(id => ({ id: +id }));
     this.analyzerService.updateAnalyzerSeries(urlASeries);
-  }
-
-  storeUrlChartSeries(urlChartSeries: string) {
-    const urlCSeries = urlChartSeries.split('-').map(Number);
-    urlCSeries.forEach((cSeries) => {
-      const aSeries = this.analyzerSeries.find(analyzer => analyzer.id === cSeries);
-      aSeries.compare = true;
-    });
   }
 
   // Update table when selecting new ranges in the chart
@@ -125,7 +117,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     const siblingIds = [];
     this.analyzerService.analyzerSeriesCompareSource.next([]);
     const siblingsList = analyzerSeries.map((serie) => {
-      //const seasonal = serie.seasonalAdjustment === 'seasonally_adjusted' || serie.seasonalAdjustment === 'not_applicable';
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, serie.seasonalAdjustment, freq);
     });
     forkJoin(siblingsList).subscribe((res: any) => {

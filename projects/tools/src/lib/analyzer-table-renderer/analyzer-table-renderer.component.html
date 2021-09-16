@@ -2,7 +2,7 @@
   <span>
     <a [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id, sa: params.data.seriesInfo.saParam }">{{params.value}}</a>
   </span>
-  <a tabindex="0" id="{{params.data.seriesInfo.id}}" class="info" (click)="showPopover(params.data.seriesInfo)" role="button"
+  <a tabindex="0" id="popover-{{params.data.seriesInfo.id}}" class="info" (click)="showPopover(params.data.seriesInfo)" role="button"
     data-animation='false' data-toggle="popover">
     <i class="bi bi-info-circle"></i>
   </a>

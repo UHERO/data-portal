@@ -11,9 +11,8 @@ import {
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
-import 'jquery';
+import { Dropdown } from 'bootstrap';
 import { HighstockHelperService } from '../highstock-helper.service';
-declare var $: any;
 import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
@@ -74,24 +73,32 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
-      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a, index) => {
+      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
         if (a) {
           const seriesId = +a.id.split('-')[1];
           const settingIcon = a.querySelector('svg.bi-gear-fill');
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
-          settingIcon.setAttribute('data-bs-boundary', 'viewport');
           settingIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-          settingIcon.setAttribute('viewBox', '0 0 16 16')
+          settingIcon.setAttribute('viewBox', '0 0 16 16');
+          const dropdownElements = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+          const dropdownList = dropdownElements.map(function (dropdownToggleEl) {
+            return new Dropdown(dropdownToggleEl, {
+              boundary: document.querySelector('.analyzer-view'),
+              popperConfig: {
+                placement: 'top-start'
+              }
+            });
+          });
           const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
           const changeYAxisSideItem = a.querySelector('.change-y-axis-side');
           const removeFromAnalyzerItem = a.querySelector('.remove-from-analyzer');
-          changeYAxisSideItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
-          changeChartTypeItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
-          removeFromComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
-          addToComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'none' : 'block';
+          changeYAxisSideItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
+          changeChartTypeItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
+          removeFromComparisonChartItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
+          addToComparisonChartItem.style.display = chartOptionSeries?.visible ? 'none' : 'block';
           if (!a.querySelector(`#chart-type-${seriesId}`)) {
             this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem);
           }
@@ -280,8 +287,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       description: undefined,
       events: {
         render() {
-          const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
-          const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
+          const extremes = this.xAxis[0].getExtremes();
+          const userMin = new Date(extremes.min).toISOString().split('T')[0];
+          const userMax = new Date(extremes.max).toISOString().split('T')[0];
           this._selectedMin = highestFreq === 'A' ? `${userMin.substr(0, 4)}-01-01` : userMin;
           this._selectedMax = highestFreq.frequency === 'A' ? `${userMax.substr(0, 4)}-01-01` : userMax;
           this._hasSetExtremes = true;
@@ -313,7 +321,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       useHTML: true,
       labelFormatter() {
         return `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
-        <svg width="16" height="16" class="bi bi-gear-fill">
+        <svg width="16" height="16" class="bi bi-gear-fill dropdown-toggle">
           <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.` +
           `987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.` +
           `105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.` +
@@ -439,8 +447,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
-          const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
-          const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
+          const extremes = this.getExtremes();
+          const userMin = new Date(extremes.min).toISOString().split('T')[0];
+          const userMax = new Date(extremes.max).toISOString().split('T')[0];
           this._selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
           this._selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
           this._hasSetExtremes = true;
@@ -508,8 +517,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
     const getSeriesColor = (seriesIndex: number) => {
       // Get color of the line for a series & use for tooltip label
-      const lineColor = $(`.highcharts-markers.highcharts-color-${seriesIndex} path`).css('fill');
-      return '<span style="fill:' + lineColor + '">\u25CF</span> ';
+      const lineColor = getComputedStyle(document.querySelector(`.highcharts-markers.highcharts-color-${seriesIndex} path`)).fill;
+      return `<span style="fill:${lineColor}">\u25CF</span>`;
     };
     const formatObsValue = (value: number, decimals: number) => {
       // Round observation to specified decimal place

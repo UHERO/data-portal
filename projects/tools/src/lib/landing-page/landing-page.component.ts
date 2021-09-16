@@ -7,9 +7,6 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
 
-import 'jquery';
-declare var $: any;
-
 @Component({
   selector: 'lib-landing-page',
   templateUrl: './landing-page.component.html',
@@ -64,8 +61,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
-      this.id = this.getIdParam(params[`id`]);
-      this.dataListId = this.getIdParam(params[`data_list_id`]);
+      this.id = this.helperService.getIdParam(params[`id`]);//this.getIdParam(params[`id`]);
+      this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);//this.getIdParam(params[`data_list_id`]);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeGeo = params[`geo`];
       this.routeFreq = params[`freq`];
@@ -85,7 +82,10 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
-      this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
+      const dataListId = this.dataListId;
+      const geo = this.routeGeo;
+      const freq = this.routeFreq;
+      this.categoryData = this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq })
     });
   }
 
@@ -95,26 +95,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
-  }
-
-  getIdParam(id) {
-    if (id === undefined) {
-      return null;
-    }
-    if (id && isNaN(+id)) {
-      // id param is a string, display search results
-      return id;
-    }
-    if (id && +id) {
-      // id of category selected in sidebar
-      return +id;
-    }
-  }
-
-  getData(id, noCache, dataListId, geo, freq) {
-    return (typeof id === 'number' || id === null) ?
-      this.catHelper.initContent(id, noCache, { dataListId, geo, freq }) :
-      this.catHelper.initSearch(id, noCache, { geo, freq });
   }
 
   // Redraw series when a new region is selected

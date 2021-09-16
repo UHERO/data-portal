@@ -2,12 +2,6 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
-    <!-- <i *ngIf="data.seriesDetail && !data.seriesDetail.analyze" title="Add to Analyzer"
-      [class.add-button]="!data.seriesDetail.analyze" class="material-icons analyzer-toggle"
-      (click)="addToAnalyzer(data.seriesDetail)">star_border</i>
-    <i *ngIf="data.seriesDetail && data.seriesDetail.analyze" title="Remove from Analyzer"
-      [class.remove-button]="data.seriesDetail.analyze" class="material-icons analyzer-toggle remove-button"
-      (click)="removeFromAnalyzer(data.seriesDetail)">star</i> -->
     <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
       (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
       class="geo-selector"></lib-geo-selector>
@@ -53,7 +47,7 @@
     </div>
     <div class="series-table">
       <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
-        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'fas fa-spinner'">
+        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'">
         <ng-template pTemplate="header" let-columns>
           <tr>
             <th *ngFor="let col of columns" [pSortableColumn]="col.field"

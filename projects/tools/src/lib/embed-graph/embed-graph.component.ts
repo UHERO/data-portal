@@ -11,14 +11,14 @@ import { AnalyzerService } from '../analyzer.service';
 })
 export class EmbedGraphComponent implements OnInit {
   private seriesId: number;
-  private chartSeries: Array<any>;
+  private analyzerIds: Array<any>;
   startDate: string;
   endDate: string;
   seriesData: any;
   analyzerData: any;
   portalSettings: any;
-  y0: string;
-  y1: string;
+  yLeftSeries: string;
+  yRightSeries: string;
   indexSeries: boolean;
   
   constructor(
@@ -35,8 +35,11 @@ export class EmbedGraphComponent implements OnInit {
       if (params[`id`]) {
         this.seriesId = Number(params[`id`]);
       }
+      if (params[`analyzerSeries`]) {
+        this.analyzerIds = params[`analyzerSeries`].split('-').map(series => ({ id: +series }));
+      }
       if (params[`chartSeries`]) {
-        this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: +series, compare: true }));
+        this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
       }
       if (params[`start`]) {
         this.startDate = params[`start`];
@@ -44,11 +47,13 @@ export class EmbedGraphComponent implements OnInit {
       if (params[`end`]) {
         this.endDate = params[`end`];
       }
-      if (params[`y0`]) {
-        this.y0 = params[`y0`];
+      if (params[`yleft`]) {
+        this.yLeftSeries = params['yleft'];
+        this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || []
       }
       if (params[`yright`]) {
-        this.y1 = params[`yright`];
+        this.yRightSeries = params['yright'];
+        this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || []
       }
       if (params[`index`]) {
         this.indexSeries = params[`index`];
@@ -57,28 +62,12 @@ export class EmbedGraphComponent implements OnInit {
     if (this.seriesId) {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
-    if (this.chartSeries) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, this.y1);
+    if (this.analyzerIds) {
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerIds, true);
     }
   }
 
   ngOnDestroy() {
-    this.analyzerService.analyzerData = {
-      analyzerTableDates: [],
-      sliderDates: [],
-      analyzerDateWrapper: { firstDate: '', endDate: '' },
-      analyzerSeries: [],
-      displayFreqSelector: false,
-      siblingFreqs: [],
-      analyzerFrequency: {},
-      y0Series: null,
-      yRightSeries: [],
-      yLeftSeries: [],
-      requestComplete: false,
-      indexed: false,
-      baseYear: null,
-      minDate: null,
-      maxDate: null
-    };
+    this.analyzerService.analyzerData = this.analyzerService.resetAnalyzerData();
   }
 }

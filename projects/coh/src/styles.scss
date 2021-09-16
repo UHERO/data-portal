@@ -24,7 +24,7 @@ body {
     width: unset;
   }
 
-  .fa-spinner {
+  .spinner-border {
     color: $primary;
   }
 
@@ -46,10 +46,6 @@ body {
 
   .sublist-separator {
     background-color: $primary;
-  }
-
-  .material-icons.md-18 {
-    color: $secondary;
   }
 
   .switch-view {
@@ -143,8 +139,9 @@ body {
     }
 
     .p-datatable {
-      .fa-spinner {
+      .spinner-border {
         color: $primary;
+        font-size: unset;
       }
     }
   }
@@ -164,12 +161,6 @@ body {
   }
 
   lib-landing-page, lib-analyzer {
-    .multi-series-container {
-      .material-icons.md-18 {
-        color: $secondary;
-      }
-    }
-
     .content-links:before {
       display: block;
       content: ' ';
@@ -483,12 +474,6 @@ lib-search-results, lib-single-series {
     .p-datatable-tbody tr td {
       padding: .25em .5em;
       text-transform: capitalize;
-    }
-
-    .fa-spinner {
-      display: block;
-      font-size: 1.3em;
-      margin-top: 20px;    
     }
 
     .p-widget-overlay {
