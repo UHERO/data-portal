@@ -28,27 +28,6 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
     this.tableHelper.showPopover(seriesInfo);
   }
 
-  getPopoverTitle = (title: string, geo: string, freq: string, units: string, unitsShort: string) => {
-    return `${title} (${geo}; ${freq}) (${units || unitsShort})`;
-  }
-
-  getPopoverContent = (seasonal: string, description: string, link: string, details: string) => {
-    let content = '';
-    if (seasonal === 'seasonally_adjusted') {
-      content += 'Seasonally Adjusted<br />';
-    }
-    if (description) {
-      content += `Source: ${description}<br />`;
-    }
-    if (link) {
-      content += `<a target="_blank" href="${link}">${link}</a><br />`
-    }
-    if (details) {
-      content += details;
-    }
-    return content;
-  }
-
   addToAnalyzer(series) {
     series.analyze = true;
     this.analyzerService.addToAnalyzer(series.id);

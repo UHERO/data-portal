@@ -3,6 +3,7 @@ import { forkJoin as observableForkJoin, of as observableOf, Observable } from '
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
+import { CategoryHelperService } from './category-helper.service';
 import { CategoryData } from './tools.models';
 import { DateWrapper } from './tools.models';
 import { switchMap, tap } from 'rxjs/operators';
@@ -15,25 +16,27 @@ export class NtaHelperService {
   private defaults;
   private categoryData = {};
 
-  constructor(private apiService: ApiService, private helperService: HelperService) { }
+  constructor(
+    private apiService: ApiService,
+    private helperService: HelperService,
+    private categoryHelper: CategoryHelperService
+  ) { }
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, noCache: boolean, routeParams)/*: Observable<any>*/ {
+  initContent(catId: any, noCache: boolean, routeParams): Observable<any> {
     const { dataListId, selectedMeasure } = routeParams;
     const cacheId = this.helperService.setCacheId(catId, routeParams);
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
-      return observableOf([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
       this.getCategory(cacheId, noCache, catId, dataListId, selectedMeasure);
-      return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
       this.getSearch(cacheId, noCache, catId);
-      return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
+    return observableOf([this.categoryData[cacheId]]);
   }
 
   getCategory(cacheId: string, noCache: boolean, catId: any, dataListId, selectedMeasure?: string) {

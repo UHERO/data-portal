@@ -27,7 +27,7 @@ export class AnalyzerService {
     y0Series: null,
     yRightSeries: [],
     yLeftSeries: [],
-    chartSeries: [],
+    urlChartSeries: [],
     minDate: null,
     maxDate: null,
     requestComplete: false,
@@ -170,7 +170,7 @@ export class AnalyzerService {
     this.analyzerData.analyzerSeries.find(s => s.id === id).compare = false;
     const compareSeries = currentCompare.find(c => c.className === id);
     compareSeries.visible = false;
-    this.analyzerData.chartSeries = this.analyzerData.chartSeries.filter(ids => ids !== id);
+    this.analyzerData.urlChartSeries = this.analyzerData.urlChartSeries.filter(ids => ids !== id);
     const seriesToCalcBaseYear = currentCompare.filter(s => s.visible).length ? currentCompare.filter(s => s.visible) : currentCompare;
     this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, this.analyzerData.minDate);
     const indexed = this.analyzerData.indexed;
@@ -258,12 +258,13 @@ export class AnalyzerService {
   }
 
   isVisible = (series: any, analyzerSeries: Array<any>) => {
+    const { urlChartSeries } = this.analyzerData;
     // On load, analyzer should add 1 (or 2 if available) series to comparison chart
     // if user has not already added/removed series for comparison
-    if (!this.analyzerData.chartSeries.length) {
+    if (!urlChartSeries.length) {
       return analyzerSeries.filter(series => series.compare).length < 2;
     }
-    return this.analyzerData.chartSeries.includes(series.id);
+    return urlChartSeries.includes(series.id);
   }
 
   addToCompareChart(compareSource: Array<any>, seriesData: any) {
@@ -276,7 +277,7 @@ export class AnalyzerService {
   storeUrlChartSeries(urlChartSeries: string) {
     const urlCSeries = urlChartSeries.split('-').map(Number);
     urlCSeries.forEach((cSeries) => {
-      this.analyzerData.chartSeries.push(cSeries);
+      this.analyzerData.urlChartSeries.push(cSeries);
     });
   }
 
@@ -298,7 +299,7 @@ export class AnalyzerService {
       y0Series: null,
       yRightSeries: [],
       yLeftSeries: [],
-      chartSeries: [],
+      urlChartSeries: [],
       requestComplete: false,
       indexed: false,
       baseYear: null,

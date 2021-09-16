@@ -64,11 +64,11 @@ export class DateSliderComponent implements OnInit {
 
   setInvalidDates = (year: number, freq: string, month?: number) => {
     const datesToDisable = {
-      'A': [],
-      'S': this.getInvalidMonths(year, freq),
-      'Q': this.getInvalidMonths(year, freq),
-      'M': [],
-      'W': this.getInvalidWeeklyDates(year, month)
+      A: [],
+      S: this.getInvalidMonths(year, freq),
+      Q: this.getInvalidMonths(year, freq),
+      M: [],
+      W: this.getInvalidWeeklyDates(year, month)
     };
     return datesToDisable[freq] || [];
   }

@@ -316,8 +316,9 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
-          const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
-          const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
+          const extremes = this.getExtremes();
+          const userMin = new Date(extremes.min).toISOString().split('T')[0];
+          const userMax = new Date(extremes.max).toISOString().split('T')[0];
           this._selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
           this._selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
           this._hasSetExtremes = true;

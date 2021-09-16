@@ -205,10 +205,8 @@ export class HighchartComponent implements OnChanges {
           const s0 = this.series[0];
           const s1 = this.series[1];
           // Get position of last non-null value
-          let lastValue0 = (s0 !== undefined && s0.points && s0.points.length) ?
-            HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
-          let lastValue1 = (s1 !== undefined && s1.points && s1.points.length) ?
-            HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
+            let lastValue0 = (s0?.points?.length) ? HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
+            let lastValue1 = (s1?.points?.length) ? HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
           if (s0.userOptions._indexed && !s0.points.some(p => p.y !== null)) {
             lastValue0 = -1;
             lastValue1 = -1

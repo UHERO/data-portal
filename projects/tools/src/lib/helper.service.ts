@@ -39,6 +39,20 @@ export class HelperService {
     this.categoryData.next(data);
   }
 
+  getIdParam = (id: any) => {
+    if (id === undefined) {
+      return null;
+    }
+    if (id && isNaN(+id)) {
+      // id param is a string, display search results
+      return id;
+    }
+    if (id && +id) {
+      // id of category selected in sidebar
+      return +id;
+    }
+  }
+
   toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean) => {
     const seasonalAdjustment = series.seasonalAdjustment;
     if (!hasSeasonal) {

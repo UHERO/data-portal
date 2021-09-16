@@ -73,7 +73,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
-      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a, index) => {
+      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
         if (a) {
           const seriesId = +a.id.split('-')[1];
           const settingIcon = a.querySelector('svg.bi-gear-fill');
@@ -287,8 +287,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       description: undefined,
       events: {
         render() {
-          const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
-          const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
+          const extremes = this.xAxis[0].getExtremes();
+          const userMin = new Date(extremes.min).toISOString().split('T')[0];
+          const userMax = new Date(extremes.max).toISOString().split('T')[0];
           this._selectedMin = highestFreq === 'A' ? `${userMin.substr(0, 4)}-01-01` : userMin;
           this._selectedMax = highestFreq.frequency === 'A' ? `${userMax.substr(0, 4)}-01-01` : userMax;
           this._hasSetExtremes = true;
@@ -446,8 +447,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
-          const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
-          const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
+          const extremes = this.getExtremes();
+          const userMin = new Date(extremes.min).toISOString().split('T')[0];
+          const userMax = new Date(extremes.max).toISOString().split('T')[0];
           this._selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
           this._selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
           this._hasSetExtremes = true;

@@ -106,11 +106,18 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
   }
 
 
-  copyLink(inputValue) {
+  copyLink(inputValue, shareText) {
     $('.share-link').attr('title', 'Copied');
     inputValue.select();
-    document.execCommand('copy');
-    inputValue.setSelectionRange(0, 0);
+    if (!navigator.clipboard) {
+      // execCommand is deprecated
+      // leave in as fallback if user's browser does not allow navigator.clipboard
+      inputValue.select();
+      document.execCommand('copy');
+      inputValue.setSelectionRange(0, 0);
+    } else {
+      navigator.clipboard.writeText(shareText);
+    }
     setTimeout(() => {
       // Reset share link title
       $('.share-link').attr('title', 'Copy');
