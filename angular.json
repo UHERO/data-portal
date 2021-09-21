@@ -45,9 +45,6 @@
               "node_modules/jquery/dist/jquery.js",
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
-<<<<<<< HEAD
-            ]
-=======
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -55,7 +52,6 @@
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           },
           "configurations": {
             "staging": {
@@ -238,9 +234,6 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js"
-<<<<<<< HEAD
-            ]
-=======
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -248,7 +241,6 @@
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           },
           "configurations": {
             "staging": {
@@ -422,9 +414,6 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js"
-<<<<<<< HEAD
-            ]
-=======
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -432,7 +421,6 @@
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           },
           "configurations": {
             "staging": {
@@ -655,9 +643,6 @@
             },
             "scripts": [
               "node_modules/jquery/dist/jquery.js"
-<<<<<<< HEAD
-            ]
-=======
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -665,7 +650,6 @@
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           },
           "configurations": {
             "staging": {
