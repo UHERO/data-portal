@@ -73,20 +73,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
-<<<<<<< HEAD
-      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a, index) => {
-=======
       [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
         if (a) {
           const seriesId = +a.id.split('-')[1];
           const settingIcon = a.querySelector('svg.bi-gear-fill');
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
-<<<<<<< HEAD
-          settingIcon.setAttribute('data-bs-boundary', 'viewport');
-          settingIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-          settingIcon.setAttribute('viewBox', '0 0 16 16')
-=======
           settingIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
           settingIcon.setAttribute('viewBox', '0 0 16 16');
           const dropdownElements = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
@@ -98,24 +89,16 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
               }
             });
           });
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
           const changeYAxisSideItem = a.querySelector('.change-y-axis-side');
           const removeFromAnalyzerItem = a.querySelector('.remove-from-analyzer');
-<<<<<<< HEAD
-          changeYAxisSideItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
-          changeChartTypeItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
-          removeFromComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
-          addToComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'none' : 'block';
-=======
           changeYAxisSideItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
           changeChartTypeItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
           removeFromComparisonChartItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
           addToComparisonChartItem.style.display = chartOptionSeries?.visible ? 'none' : 'block';
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           if (!a.querySelector(`#chart-type-${seriesId}`)) {
             this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem);
           }
@@ -194,10 +177,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   updateChartData(series: Array<any>) {
-<<<<<<< HEAD
-=======
     series.sort(this.sortVisible); //visible series should be listed first
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     const chartSeries = [...series, {
       className: 'navigator',
       data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
@@ -263,15 +243,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     }
   }
 
-<<<<<<< HEAD
-  createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator').map(s => s.yAxisText))].join(', ');
-
-=======
   sortVisible = (a, b) => b.visible - a.visible;
 
   createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator').map(s => s.yAxisText))].join(', ');
 
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   changeYAxisMin(e, axis) {
     this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null
     this.updateChart = true;
@@ -312,14 +287,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       description: undefined,
       events: {
         render() {
-<<<<<<< HEAD
-          const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
-          const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
-=======
           const extremes = this.xAxis[0].getExtremes();
           const userMin = new Date(extremes.min).toISOString().split('T')[0];
           const userMax = new Date(extremes.max).toISOString().split('T')[0];
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           this._selectedMin = highestFreq === 'A' ? `${userMin.substr(0, 4)}-01-01` : userMin;
           this._selectedMax = highestFreq.frequency === 'A' ? `${userMax.substr(0, 4)}-01-01` : userMax;
           this._hasSetExtremes = true;
@@ -351,11 +321,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       useHTML: true,
       labelFormatter() {
         return `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
-<<<<<<< HEAD
-        <svg width="16" height="16" class="bi bi-gear-fill">
-=======
         <svg width="16" height="16" class="bi bi-gear-fill dropdown-toggle">
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.` +
           `987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.` +
           `105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.` +
@@ -376,12 +342,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             <i class="bi bi-trash-fill"></i> Remove From Analyzer
           </p>
         </ul>
-<<<<<<< HEAD
-      </div> ${this.name} (${this.userOptions.yAxis})`
-=======
         <p class="series-name">${this.name} (${this.userOptions.yAxis})</p>
       </div>`
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
       }
     };
     // incorrect indexing when using range selector
@@ -485,14 +447,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
-<<<<<<< HEAD
-          const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
-          const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
-=======
           const extremes = this.getExtremes();
           const userMin = new Date(extremes.min).toISOString().split('T')[0];
           const userMax = new Date(extremes.max).toISOString().split('T')[0];
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           this._selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
           this._selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
           this._hasSetExtremes = true;
@@ -560,13 +517,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
     const getSeriesColor = (seriesIndex: number) => {
       // Get color of the line for a series & use for tooltip label
-<<<<<<< HEAD
-      const lineColor = $(`.highcharts-markers.highcharts-color-${seriesIndex} path`).css('fill');
-      return '<span style="fill:' + lineColor + '">\u25CF</span> ';
-=======
       const lineColor = getComputedStyle(document.querySelector(`.highcharts-markers.highcharts-color-${seriesIndex} path`)).fill;
       return `<span style="fill:${lineColor}">\u25CF</span>`;
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     };
     const formatObsValue = (value: number, decimals: number) => {
       // Round observation to specified decimal place

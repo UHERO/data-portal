@@ -4,12 +4,6 @@
 			{{data.selectedCategory.name}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-<<<<<<< HEAD
-		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">
-			{{data.selectedDataList.name}}</h3>
-		<div class="filters">
-=======
 		<div *ngIf="search && !data.requestComplete && !data.invalid" class="d-flex justify-content-center">
 			<div class="spinner-border" role="status">
 				<span class="visually-hidden">Loading...</span>
@@ -18,7 +12,6 @@
 		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">
 			{{data.selectedDataList.name}}</h3>
 		<div *ngIf="data.requestComplete && !search" class="filters">
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
 			<lib-measurement-selector *ngIf="data.measurements" [measurements]="data.measurements"
 				[selectedMeasurement]="data.currentMeasurement" (selectedMeasurementChange)="redrawSeries($event)"
 				class="selector">
@@ -35,15 +28,11 @@
 				[dateTo]="data?.seriesEnd || null" [freq]="data.currentFreq?.freq"
 				(updateRange)="changeRange($event, data)"></lib-date-slider>
 		</div>
-<<<<<<< HEAD
-		<i *ngIf="!search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-=======
 		<div *ngIf="!search && !data.requestComplete && !data.invalid" class="d-flex justify-content-center">
 			<div class="spinner-border" role="status">
 				<span class="visually-hidden">Loading...</span>
 			</div>
 		</div>
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && data.seriesStart && data.seriesEnd">
 			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings" [dates]="data.dateArray"
 				[tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd" [data]="data.displaySeries"
@@ -56,14 +45,11 @@
 				(updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>
-<<<<<<< HEAD
-=======
 		<ng-template ngIf [ngIf]="data.requestComplete && data.noData && !search">
 			<p class="no-data">No data available for current selection.</p>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && search">
 			<lib-search-results [searchData]="data"></lib-search-results>
 		</ng-template>
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
 	</ng-template>
 </div>

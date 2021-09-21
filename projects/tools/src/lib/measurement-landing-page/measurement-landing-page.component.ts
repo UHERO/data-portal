@@ -43,34 +43,8 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
-<<<<<<< HEAD
-      this.id = this.getIdParam(params[`id`]);
-      this.dataListId = this.getIdParam(params[`data_list_id`]);
-      this.search = typeof this.id === 'string' ? true : false;
-      this.routeView = params[`view`];
-      this.routeC5ma = params[`c5ma`];
-      this.selectedMeasure = params[`m`];
-      this.noCache = params[`nocache`] === 'true';
-      if (this.id) { this.queryParams.id = this.id; }
-      if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; }
-      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
-      if (this.routeView) { this.queryParams.view = this.routeView; }
-      if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
-      if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
-      const dataListId = this.dataListId;
-      const selectedMeasure = this.selectedMeasure;
-      this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, { dataListId, selectedMeasure });
-    });
-  }
-
-  ngAfterViewInit() {
-    /*this.sub = this.activatedRoute.queryParams.subscribe((params) => {
-      this.id = this.getIdParam(params[`id`]);
-      this.dataListId = this.getIdParam(params[`data_list_id`]);
-=======
       this.id = this.helperService.getIdParam(params[`id`]);//this.getIdParam(params[`id`]);
       this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);//this.getIdParam(params[`data_list_id`]);
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params[`view`];
       this.routeC5ma = params[`c5ma`];
@@ -82,15 +56,10 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
       if (this.routeView) { this.queryParams.view = this.routeView; }
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
-<<<<<<< HEAD
-      this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, this.dataListId, this.selectedMeasure);
-    });*/
-=======
       const dataListId = this.dataListId;
       const selectedMeasure = this.selectedMeasure;
       this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, { dataListId, selectedMeasure });
     });
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   }
 
   ngOnDestroy() {

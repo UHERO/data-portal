@@ -2,27 +2,12 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
-<<<<<<< HEAD
-    <i *ngIf="data.seriesDetail && !data.seriesDetail.analyze" title="Add to Analyzer"
-      [class.add-button]="!data.seriesDetail.analyze" class="material-icons analyzer-toggle"
-      (click)="addToAnalyzer(data.seriesDetail)">star_border</i>
-    <i *ngIf="data.seriesDetail && data.seriesDetail.analyze" title="Remove from Analyzer"
-      [class.remove-button]="data.seriesDetail.analyze" class="material-icons analyzer-toggle remove-button"
-      (click)="removeFromAnalyzer(data.seriesDetail)">star</i>
-=======
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
       (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
       class="geo-selector"></lib-geo-selector>
     <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
       (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
       class="freq-selector"></lib-freq-selector>
-<<<<<<< HEAD
-    <lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecastList"
-       (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)" class="selector">
-    </lib-forecast-selector>
-=======
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="chartStart"
       [endDate]="chartEnd" [seriesId]="data.seriesDetail.id"></lib-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">

@@ -98,11 +98,7 @@ export class CategoryChartsComponent implements OnChanges {
 
   addToAnalyzer(series) {
     series.analyze = true;
-<<<<<<< HEAD
-    this.analyzerService.addToAnalzyer(series.id);
-=======
     this.analyzerService.addToAnalyzer(series.id);
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   }
 
   removeFromAnalyzer(series) {
@@ -112,10 +108,6 @@ export class CategoryChartsComponent implements OnChanges {
 
   addCompare(series) {
     series.compare = true;
-<<<<<<< HEAD
-    //this.analyzerService.setCompareChartSeriesObject(series);
-=======
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     this.analyzerService.makeCompareSeriesVisible(series.id)
   }
 
