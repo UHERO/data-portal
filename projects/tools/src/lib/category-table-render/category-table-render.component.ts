@@ -1,10 +1,13 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { TableHelperService } from '../table-helper.service';
 import { AnalyzerService } from '../analyzer.service';
+<<<<<<< HEAD
 import 'jquery';
 //import { Popover } from 'bootstrap/dist/js/bootstrap.esm.min.js';
 declare var $: any;
+=======
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
 
 @Component({
   selector: 'lib-category-table-render',
@@ -40,13 +43,17 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
     return false;
   }
 
-  showPopover = (seriesInfo, subcatIndex) => {
-    return this.tableHelper.showPopover(seriesInfo, subcatIndex);
+  showPopover(seriesInfo) {
+    this.tableHelper.showPopover(seriesInfo);
   }
 
   addToAnalyzer(series) {
     series.analyze = true;
+<<<<<<< HEAD
     this.analyzerService.addToAnalzyer(series.id);
+=======
+    this.analyzerService.addToAnalyzer(series.id);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   }
 
   removeFromAnalyzer(series) {

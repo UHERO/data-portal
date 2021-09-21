@@ -154,7 +154,11 @@ export class HighchartComponent implements OnChanges {
     const decimals = seriesData.decimals || 1;
     let { series0, series1, pseudoZones } = seriesData.gridDisplay.chartData;
     series0 = this.indexChecked ? this.helperService.getIndexedTransformation(seriesData.observations[0], this._analyzerService.analyzerData.baseYear) : series0;
+<<<<<<< HEAD
     const startDate = Date.parse(chartStart) || Date.parse(seriesData.gridDisplay.start)
+=======
+    const startDate = Date.parse(chartStart) || Date.parse(seriesData.gridDisplay.start);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     const endDate = Date.parse(chartEnd) || Date.parse(seriesData.gridDisplay.end);
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));
@@ -205,10 +209,15 @@ export class HighchartComponent implements OnChanges {
           const s0 = this.series[0];
           const s1 = this.series[1];
           // Get position of last non-null value
+<<<<<<< HEAD
           let lastValue0 = (s0 !== undefined && s0.points && s0.points.length) ?
             HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
           let lastValue1 = (s1 !== undefined && s1.points && s1.points.length) ?
             HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
+=======
+            let lastValue0 = (s0?.points?.length) ? HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
+            let lastValue1 = (s1?.points?.length) ? HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           if (s0.userOptions._indexed && !s0.points.some(p => p.y !== null)) {
             lastValue0 = -1;
             lastValue1 = -1

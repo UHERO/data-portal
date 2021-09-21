@@ -2,17 +2,16 @@
 import { Inject, Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { NtaHelperService } from '../nta-helper.service';
+import { HelperService } from '../helper.service';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
-import 'jquery';
-declare var $: any;
 
 @Component({
   selector: 'lib-measurement-landing-page',
   templateUrl: './measurement-landing-page.component.html',
   styleUrls: ['./measurement-landing-page.component.scss']
 })
-export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
   private sub;
   private id: number;
   private dataListId: number;
@@ -35,6 +34,7 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
     @Inject('portal') private portal,
     private analyzerService: AnalyzerService,
     private ntaHelperService: NtaHelperService,
+    private helperService: HelperService,
     private dataPortalSettingsServ: DataPortalSettingsService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -43,6 +43,7 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
   ngOnInit() {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
+<<<<<<< HEAD
       this.id = this.getIdParam(params[`id`]);
       this.dataListId = this.getIdParam(params[`data_list_id`]);
       this.search = typeof this.id === 'string' ? true : false;
@@ -66,6 +67,10 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
     /*this.sub = this.activatedRoute.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params[`id`]);
       this.dataListId = this.getIdParam(params[`data_list_id`]);
+=======
+      this.id = this.helperService.getIdParam(params[`id`]);//this.getIdParam(params[`id`]);
+      this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);//this.getIdParam(params[`data_list_id`]);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params[`view`];
       this.routeC5ma = params[`c5ma`];
@@ -77,26 +82,19 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
       if (this.routeView) { this.queryParams.view = this.routeView; }
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
+<<<<<<< HEAD
       this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, this.dataListId, this.selectedMeasure);
     });*/
+=======
+      const dataListId = this.dataListId;
+      const selectedMeasure = this.selectedMeasure;
+      this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, { dataListId, selectedMeasure });
+    });
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-  }
-
-  getIdParam(id) {
-    if (id === undefined) {
-      return null;
-    }
-    if (id && isNaN(+id)) {
-      // id param is a string, display search results
-      return id;
-    }
-    if (id && +id) {
-      // id of category selected in sidebar
-      return +id;
-    }
   }
 
   // Redraw series when a new measurement is selected

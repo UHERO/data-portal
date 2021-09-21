@@ -1,16 +1,11 @@
 // Component for multi-chart view
 import { Inject, Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-
-import { AnalyzerService } from '../analyzer.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
-
-import 'jquery';
-declare var $: any;
 
 @Component({
   selector: 'lib-landing-page',
@@ -52,7 +47,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject('portal') public portal,
-    private analyzerService: AnalyzerService,
     private dataPortalSettingsServ: DataPortalSettingsService,
     private catHelper: CategoryHelperService,
     private helperService: HelperService,
@@ -73,8 +67,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
-      this.id = this.getIdParam(params[`id`]);
-      this.dataListId = this.getIdParam(params[`data_list_id`]);
+      this.id = this.helperService.getIdParam(params[`id`]);//this.getIdParam(params[`id`]);
+      this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);//this.getIdParam(params[`data_list_id`]);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeGeo = params[`geo`];
       this.routeFreq = params[`freq`];
@@ -96,7 +90,10 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
-      this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq, this.routeFc);
+      const dataListId = this.dataListId;
+      const geo = this.routeGeo;
+      const freq = this.routeFreq;
+      this.categoryData = this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq })
     });
   }
 
@@ -109,26 +106,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
-  }
-
-  getIdParam(id) {
-    if (id === undefined) {
-      return null;
-    }
-    if (id && isNaN(+id)) {
-      // id param is a string, display search results
-      return id;
-    }
-    if (id && +id) {
-      // id of category selected in sidebar
-      return +id;
-    }
-  }
-
-  getData(id, noCache, dataListId, geo, freq, forecast) {
-    return (typeof id === 'number' || id === null) ?
-      this.catHelper.initContent(id, noCache, { dataListId, geo, freq }, forecast) :
-      this.catHelper.initSearch(id, noCache, { geo, freq });
   }
 
   // Redraw series when a new region is selected

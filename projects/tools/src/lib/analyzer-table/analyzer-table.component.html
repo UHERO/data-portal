@@ -23,7 +23,7 @@
   </ag-grid-angular>
 </ng-template>
 <p *ngIf="missingSummaryStat" class="stat-warning">
-  <i class="material-icons text-danger">&#xE001;</i> The following series contain N/As due to missing values included in the selected range:
+  <i class="bi bi-exclamation-circle"></i> The following series contain N/As due to missing values included in the selected range:
   <ng-template ngFor let-serie [ngForOf]="summaryRows">
     <ul>
       <li *ngIf="serie.missing">{{serie.series}}</li>

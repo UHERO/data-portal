@@ -194,4 +194,30 @@ export class SeriesHelperService {
     };
     return (Math.pow((lastValue / firstValue), multiplier[freq] / periods) - 1) * 100 || Infinity;
   }
+
+  selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
+    const saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted' && series.frequencyShort === freq);
+    const nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted' && series.frequencyShort === freq);
+    const naSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable' && series.frequencyShort === freq);
+    // If more than one sibling exists (i.e. seasonal & non-seasonal)
+    // Select series where seasonalAdjustment matches sa setting
+    if (freq === 'A') {
+      return geoFreqSiblings.find(s => s.frequencyShort === 'A').id;
+    }
+    if (saSeries && nsaSeries) {
+      if (sa) {
+        return saSeries.id //saSeries.find(sibling => sibling.seasonalAdjustment === 'seasonally_adjusted').id;
+      }
+      return nsaSeries.id //nsaSeries.find(sibling => sibling.seasonalAdjustment === 'not_seasonally_adjusted').id;
+    }
+    if (!saSeries && nsaSeries) {
+      return nsaSeries.id;
+    }
+    if (saSeries && !nsaSeries) {
+      return saSeries.id;
+    }
+    if (!saSeries && !nsaSeries) {
+      return naSeries.id;
+    }
+  }
 }

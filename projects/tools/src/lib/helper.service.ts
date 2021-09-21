@@ -17,12 +17,12 @@ export class HelperService {
 
   constructor() { }
 
-  setCacheId(category: any, routeParams: any, forecast) {
+  setCacheId(category: any, routeParams: any) {
     let id = `category${category}`;
     Object.keys(routeParams).forEach((param) => {
       id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
     });
-    return forecast ? id + forecast : id;
+    return id;
   }
 
   updateCurrentFrequency = (newFreq: Frequency) => {
@@ -46,6 +46,20 @@ export class HelperService {
 
   updateCatData(data) {
     this.categoryData.next(data);
+  }
+
+  getIdParam = (id: any) => {
+    if (id === undefined) {
+      return null;
+    }
+    if (id && isNaN(+id)) {
+      // id param is a string, display search results
+      return id;
+    }
+    if (id && +id) {
+      // id of category selected in sidebar
+      return +id;
+    }
   }
 
   toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean) => {
@@ -98,9 +112,14 @@ export class HelperService {
   fineDateWrapperEnd = series => series.reduce((end: string, s) => (s.seriesObservations.observationEnd > end || end === '') ? s.seriesObservations.observationEnd : end, '');
 
   createDateArray = (dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) => {
-    const start = new Date(dateStart.replace(/-/g, '\/'));
-    const end = new Date(dateEnd.replace(/-/g, '\/'));
+    const start = this.parseISOString(dateStart);
+    const end = this.parseISOString(dateEnd);
     return this.addToDateArray(start, end, dateArray, currentFreq);
+  }
+
+  parseISOString = (dateString: string) => {
+    const dateSplit = dateString.split(/\D+/).map(str => +str);
+    return new Date(Date.UTC(dateSplit[0], --dateSplit[1], dateSplit[2]));
   }
 
   addToDateArray = (start: Date, end: Date, dateArray: Array<any>, currentFreq: string) => {
@@ -111,36 +130,53 @@ export class HelperService {
     };
     const monthIncrease = monthIncreases[currentFreq] || null;
     while (start <= end) {
-      const month = start.toISOString().substr(5, 2);
-      const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
-      const tableDate = this.getTableDate(start, currentFreq, q);
-      dateArray.push({ date: start.toISOString().substr(0, 10), tableDate });
+      const yearStr = start.getUTCFullYear()
+      const monthStr = this.paddedMonthDateString(start.getUTCMonth() + 1);
+      const dateStr = this.paddedMonthDateString(start.getUTCDate())
+      const q = this.getQuarter(monthStr);
+      const dateStrFormat = this.parseISOString(`${yearStr}-${monthStr}-${dateStr}`).toISOString().substr(0, 10);
+      const tableDate = this.getTableDate(start, currentFreq, q, dateStrFormat);
+      dateArray.push({ date: dateStrFormat , tableDate });
       if (currentFreq === 'A') {
-        start.setFullYear(start.getFullYear() + 1);
-        start.setMonth(0);
-        start.setDate(1);
+        start.setUTCFullYear(start.getUTCFullYear() + 1);
+        start.setUTCMonth(0);
+        start.setUTCDate(1);
       }
       if (currentFreq === 'M' || currentFreq === 'S' || currentFreq === 'Q') {
-        start.setMonth(start.getMonth() + monthIncrease);
+        start.setUTCMonth(start.getUTCMonth() + monthIncrease);
       }
       if (currentFreq === 'W') {
-        start.setDate(start.getDate() + 7);
+        start.setUTCDate(start.getUTCDate() + 7);
       }
       if (currentFreq === 'D') {
-        start.setDate(start.getDate() + 1);
+        start.setUTCDate(start.getUTCDate() + 1);
       }
     }
     return dateArray;
   }
 
-  getTableDate(start: Date, currentFreq: string, q: string) {
+  getTableDate = (start: Date, currentFreq: string, q: string, fullDateStr: string) => {
     const dateStr = {
-      A: start.toISOString().substr(0, 4),
-      Q: `${start.toISOString().substr(0, 4)} ${q}`,
-      W: start.toISOString().substr(0, 10),
-      D: start.toISOString().substr(0, 10)
-    }
-    return dateStr[currentFreq] || start.toISOString().substr(0, 7);
+      A: `${start.getUTCFullYear()}`,
+      Q: `${start.getUTCFullYear()} ${q}`,
+      W: fullDateStr,
+      D: fullDateStr
+    };
+    return dateStr[currentFreq] || `${start.getUTCFullYear()}-${this.paddedMonthDateString(start.getUTCMonth() + 1)}`;
+  }
+
+  getQuarter = (month: string) => {
+    const quarters = {
+      '01': 'Q1',
+      '04': 'Q2',
+      '07': 'Q3',
+      '10': 'Q4'
+    };
+    return quarters[month];
+  }
+
+  paddedMonthDateString = (partialDate: number) => {
+    return `0${partialDate}`.slice(-2);
   }
 
   getTransformations = (transformations: Array<any>) => {
@@ -361,10 +397,12 @@ export class HelperService {
 
   setDefaultCategoryRange(freq, dateArray, defaults) {
     const defaultSettings = defaults.find(ranges => ranges.freq === freq);
-    const defaultEnd = defaultSettings.end || new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
+    let lastYearInArray = +`${this.parseISOString(dateArray[dateArray.length - 1].date).getUTCFullYear()}`
+    const defaultEnd = defaultSettings.end || lastYearInArray;
     let counter = dateArray.length - 1;
-    while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
+    while (lastYearInArray > defaultEnd) {
       counter--;
+      lastYearInArray--
     }
     return this.getRanges(freq, counter, defaultSettings.range);
   }

@@ -27,15 +27,17 @@ import { SearchBarComponent } from './search-bar/search-bar.component';
 import { AnalyzerComponent } from './analyzer/analyzer.component';
 import { AnalyzerHighstockComponent } from './analyzer-highstock/analyzer-highstock.component';
 import { AnalyzerTableComponent } from './analyzer-table/analyzer-table.component';
-import { AnalyzerInteractionsEditorComponent } from './analyzer-interactions-editor/analyzer-interactions-editor.component';
-import { AnalyzerInteractionsRendererComponent } from './analyzer-interactions-renderer/analyzer-interactions-renderer.component';
 import { AnalyzerStatsRendererComponent } from './analyzer-stats-renderer/analyzer-stats-renderer.component';
 import { AnalyzerTableRendererComponent } from './analyzer-table-renderer/analyzer-table-renderer.component';
 import { MeasurementLandingPageComponent } from './measurement-landing-page/measurement-landing-page.component';
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
+<<<<<<< HEAD
 import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/analyzer-compare-options.component';
 import { ForecastSelectorComponent } from './forecast-selector/forecast-selector.component';
+=======
+import { SearchResultsComponent } from './search-results/search-results.component';
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
 
 @NgModule({
   declarations: [
@@ -57,15 +59,17 @@ import { ForecastSelectorComponent } from './forecast-selector/forecast-selector
     AnalyzerComponent,
     AnalyzerHighstockComponent,
     AnalyzerTableComponent,
-    AnalyzerInteractionsEditorComponent,
-    AnalyzerInteractionsRendererComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
     EmbedGraphComponent,
+<<<<<<< HEAD
     AnalyzerCompareOptionsComponent,
     ForecastSelectorComponent,
+=======
+    SearchResultsComponent,
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   ],
   imports: [
     CommonModule,
@@ -82,8 +86,6 @@ import { ForecastSelectorComponent } from './forecast-selector/forecast-selector
       CategoryTableRenderComponent,
       AnalyzerTableRendererComponent,
       AnalyzerStatsRendererComponent,
-      AnalyzerInteractionsEditorComponent,
-      AnalyzerInteractionsRendererComponent
     ])
   ],
   exports: [
@@ -103,13 +105,14 @@ import { ForecastSelectorComponent } from './forecast-selector/forecast-selector
     AnalyzerComponent,
     AnalyzerHighstockComponent,
     AnalyzerTableComponent,
-    AnalyzerInteractionsEditorComponent,
-    AnalyzerInteractionsRendererComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
+<<<<<<< HEAD
     AnalyzerCompareOptionsComponent,
+=======
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   ]
 })
 export class ToolsModule { }

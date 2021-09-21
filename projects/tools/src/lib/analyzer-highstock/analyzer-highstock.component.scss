@@ -40,6 +40,33 @@
   width: 100%;
 }
 
+#single-stock-chart {
+  .analyzer-toggle.bi-star, .analyzer-toggle.bi-star-fill {
+    cursor: pointer;
+    font-size: 1.2em;
+
+    &:hover::after {
+      color: #505050;
+      font-family: 'Lucida Sans', sans-serif;
+      font-style: normal;
+      font-weight: bold;
+      text-shadow: none;
+    }
+  }
+
+  .analyzer-toggle.bi-star {
+    &:hover::after {
+      content: ' Add to Analyzer';
+    }
+  }
+
+  .analyzer-toggle.bi-star-fill {
+    &:hover::after {
+      content: ' Remove From Analyzer';
+    }
+  }
+}
+
 .highcharts-button, .highcharts-button-hover {
   stroke: none;
 }
@@ -101,6 +128,19 @@ input.highcharts-range-selector {
   cursor: pointer;
 }
 
+<<<<<<< HEAD
+=======
+.highcharts-legend-item-hidden .series-name {
+  opacity: 50%;
+}
+
+.highcharts-legend-item .series-name,
+.highcharts-legend-item-hidden .series-name {
+  margin-left: 0.25em;
+  margin-bottom: 0;
+}
+
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
 .highcharts-legend-item .dropdown-menu {
   background-color: #FAFAFB;
 }

@@ -40,6 +40,9 @@ export interface HighchartsObject {
   exporting: {
     enabled: boolean,
   };
+  time?: {
+    timezone: string
+  };
   title: {
     text: string,
     useHTML: boolean,
@@ -165,6 +168,9 @@ export interface HighstockObject {
     },
     filename: string,
     chartOptions: {
+      legend?: {
+        labelFormatter: () => string
+      },
       events: any,
       chart: any,
       navigator: {
@@ -234,6 +240,7 @@ export interface HighstockObject {
 }
 
 export interface Series {
+  analyze: boolean;
   id: string;
   title?: string;
   name: string;

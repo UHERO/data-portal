@@ -3,17 +3,18 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start-dev": "ng build tools --prod && ng serve --project=${PROJECT:-uhero}",
-    "start-staging": "ng build tools --prod && ng serve --project=${PROJECT:-uhero} -c=staging --port=4200",
-    "start-api-dev": "ng build tools --prod && ng serve --project=${PROJECT:-uhero} -c=apiDev",
-    "build-staging": "ng build tools --prod && ng build --project=${PROJECT:-uhero} -c=staging",
-    "build": "ng build tools --prod && ng build --project=${PROJECT:-uhero} --prod",
+    "start-dev": "ng build tools --configuration production && ng serve --project=${PROJECT:-uhero}",
+    "start-staging": "ng build tools --configuration production && ng serve --project=${PROJECT:-uhero} -c=staging --port=4200",
+    "start-api-dev": "ng build tools --configuration production && ng serve --project=${PROJECT:-uhero} -c=apiDev",
+    "build-staging": "ng build tools --configuration production && ng build --project=${PROJECT:-uhero} -c=staging",
+    "build": "ng build tools --configuration production && ng build --project=${PROJECT:-uhero} --configuration production",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
+<<<<<<< HEAD
     "@angular-devkit/schematics": "^11.2.6",
     "@angular/animations": "^11.2.7",
     "@angular/cdk": "^11.2.7",
@@ -31,6 +32,24 @@
     "ag-grid-angular": "^25.1.0",
     "ag-grid-community": "^25.1.0",
     "bootstrap": "^5.0.2",
+=======
+    "@angular-devkit/schematics": "^12.2.5",
+    "@angular/animations": "^12.2.5",
+    "@angular/cdk": "^12.2.5",
+    "@angular/common": "^12.2.5",
+    "@angular/compiler": "^12.2.5",
+    "@angular/core": "^12.2.5",
+    "@angular/forms": "^12.2.5",
+    "@angular/platform-browser": "^12.2.5",
+    "@angular/platform-browser-dynamic": "^12.2.5",
+    "@angular/router": "^12.2.5",
+    "@angular/service-worker": "^12.2.5",
+    "@popperjs/core": "^2.10.1",
+    "@types/bootstrap": "^5.0.17",
+    "ag-grid-angular": "^26.0.0",
+    "ag-grid-community": "^26.0.0",
+    "bootstrap": "^5.1.1",
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     "bootstrap-icons": "^1.5.0",
     "core-js": "^3.10.0",
     "highcharts": "^9.0.1",
@@ -42,29 +61,48 @@
     "rxjs": "^6.6.7",
     "tether": "^1.4.7",
     "tslib": "^2.0.0",
-    "zone.js": "^0.10.3"
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@angular-devkit/build-angular": "^0.1100.7",
     "@angular/cli": "^11.2.6",
     "@angular/compiler-cli": "^11.2.7",
     "@angular/language-service": "^11.2.7",
+=======
+    "@angular-devkit/build-angular": "^12.2.5",
+    "@angular/cli": "^12.2.5",
+    "@angular/compiler-cli": "^12.2.5",
+    "@angular/language-service": "^12.2.5",
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     "@types/jasmine": "^3.6.9",
     "@types/jasminewd2": "~2.0.3",
     "@types/jquery": "^3.5.5",
     "@types/node": "^14.14.37",
+<<<<<<< HEAD
     "codelyzer": "^6.0.0",
+=======
+    "codelyzer": "^6.0.2",
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
-    "karma": "~5.1.1",
+    "karma": "~6.3.4",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
+<<<<<<< HEAD
     "ng-packagr": "^11.2.4",
     "protractor": "~7.0.0",
     "ts-node": "~9.0.0",
     "tslint": "^6.1.3",
     "typescript": "^4.0.7"
+=======
+    "ng-packagr": "^12.2.0",
+    "protractor": "~7.0.0",
+    "ts-node": "~9.0.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.3.5"
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   }
 }

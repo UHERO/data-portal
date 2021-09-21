@@ -103,6 +103,7 @@ export class DataPortalSettingsService {
         {
           name: `UHERO Dashboard Project`,
           url: `https://uhero.hawaii.edu/analytics-dashboards/`
+<<<<<<< HEAD
         }
       ],
       selectors: []
@@ -158,6 +159,8 @@ export class DataPortalSettingsService {
         {
           name: `Hawai'i High Frequency Economic Data`,
           url: `https://data.uhero.hawaii.edu/high-frequency-dashboard/#/`
+=======
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
         }
       ],
       selectors: [

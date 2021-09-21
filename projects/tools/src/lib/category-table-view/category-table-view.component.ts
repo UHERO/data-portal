@@ -21,7 +21,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() ytdActive;
   @Input() c5maActive;
   @Input() params;
-  @Input() subcatIndex;
   @Input() tableStart;
   @Input() tableEnd;
   @Input() portalSettings;
@@ -111,7 +110,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
         return params.value;
       }
     });
-    const tableDates = dates//.slice(seriesStart, seriesEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = dates.length - 1; i >= 0; i--) {
       const hideColumn = dates[i].date < tableStart || dates[i].date > tableEnd
@@ -122,16 +120,17 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
 
   formatLvlData = (series, level, parentId) => {
     const { dates, values } = level;
-    const units = series.unitsLabelShort || series.unitsLabel;
+    const { unitsLabelShort, unitsLabel, tablePrefix, displayName, tablePostfix, saParam, decimals } = series;
+    const units = unitsLabelShort || unitsLabel;
     const seriesData = {
-      series: `${series.tablePrefix || ''} ${series.displayName} ${series.tablePostfix || ''} (${units})`,
-      saParam: series.saParam,
+      series: `${tablePrefix || ''} ${displayName} ${tablePostfix || ''} (${units})`,
+      saParam: saParam,
       seriesInfo: series,
       lvlData: true,
       categoryId: parentId
     };
     dates.forEach((d, index) => {
-      seriesData[d] = this.helperService.formatNum(+values[index], series.decimals);
+      seriesData[d] = this.helperService.formatNum(+values[index], decimals);
     });
     return seriesData;
   }
@@ -173,12 +172,12 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     const fileName = `${sublistName}_${geoName}-${freqLabel}`
     const catId = (this.selectedCategory && this.selectedCategory.id) || '';
     const dataListId = `&data_list_id=${(this.selectedDataList && this.selectedDataList.id)}` || '';
-    const displayedColumns = this.gridApi.csvCreator.columnController.getAllDisplayedColumns()
+    const { displayedColumns } = this.gridApi.csvCreator.columnModel;
     const params = {
       columnKeys: ['series'].concat(displayedColumns.flatMap(col => col.userProvidedColDef.field === 'series' ? [] : col).reverse()),
       suppressQuotes: false,
       fileName,
-      customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoName}-${freqLabel} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`
+      appendContent: `\n\n ${parentName}${sublistName} Table \n ${geoName}-${freqLabel} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`
     };
     this.gridApi.exportDataAsCsv(params);
   }

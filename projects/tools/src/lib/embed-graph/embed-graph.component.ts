@@ -11,14 +11,23 @@ import { AnalyzerService } from '../analyzer.service';
 })
 export class EmbedGraphComponent implements OnInit {
   private seriesId: number;
+<<<<<<< HEAD
   private chartSeries: Array<any>;
+=======
+  private analyzerIds: Array<any>;
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   startDate: string;
   endDate: string;
   seriesData: any;
   analyzerData: any;
   portalSettings: any;
+<<<<<<< HEAD
   y0: string;
   y1: string;
+=======
+  yLeftSeries: string;
+  yRightSeries: string;
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   indexSeries: boolean;
   
   constructor(
@@ -35,8 +44,15 @@ export class EmbedGraphComponent implements OnInit {
       if (params[`id`]) {
         this.seriesId = Number(params[`id`]);
       }
+      if (params[`analyzerSeries`]) {
+        this.analyzerIds = params[`analyzerSeries`].split('-').map(series => ({ id: +series }));
+      }
       if (params[`chartSeries`]) {
+<<<<<<< HEAD
         this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: +series, compare: true }));
+=======
+        this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
       }
       if (params[`start`]) {
         this.startDate = params[`start`];
@@ -44,11 +60,17 @@ export class EmbedGraphComponent implements OnInit {
       if (params[`end`]) {
         this.endDate = params[`end`];
       }
-      if (params[`y0`]) {
-        this.y0 = params[`y0`];
+      if (params[`yleft`]) {
+        this.yLeftSeries = params['yleft'];
+        this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || []
       }
       if (params[`yright`]) {
+<<<<<<< HEAD
         this.y1 = params[`yright`];
+=======
+        this.yRightSeries = params['yright'];
+        this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || []
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
       }
       if (params[`index`]) {
         this.indexSeries = params[`index`];
@@ -57,12 +79,18 @@ export class EmbedGraphComponent implements OnInit {
     if (this.seriesId) {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
+<<<<<<< HEAD
     if (this.chartSeries) {
       this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, this.y1);
+=======
+    if (this.analyzerIds) {
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerIds, true);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
     }
   }
 
   ngOnDestroy() {
+<<<<<<< HEAD
     this.analyzerService.analyzerData = {
       analyzerTableDates: [],
       sliderDates: [],
@@ -80,5 +108,8 @@ export class EmbedGraphComponent implements OnInit {
       minDate: null,
       maxDate: null
     };
+=======
+    this.analyzerService.analyzerData = this.analyzerService.resetAnalyzerData();
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   }
 }

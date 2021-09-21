@@ -8,8 +8,6 @@ import { Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
 import { HelperService } from '../helper.service';
 
-declare var $: any;
-
 @Component({
   selector: 'lib-single-series',
   templateUrl: './single-series.component.html',
@@ -145,7 +143,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this.seriesHelper.findGeoFreqSibling(siblings, geo, freq);
-    const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
+    //const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
+    const id = geoFreqSib.length ? this.seriesHelper.selectSibling(geoFreqSib, sa, freq) : null;
     if (id) {
       const queryParams = {
         id,
@@ -163,7 +162,11 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   addToAnalyzer(series) {
     series.analyze = true;
+<<<<<<< HEAD
     this.analyzerService.addToAnalzyer(series.id);
+=======
+    this.analyzerService.addToAnalyzer(series.id);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   }
 
   removeFromAnalyzer(series) {

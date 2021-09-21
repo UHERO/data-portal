@@ -30,7 +30,5 @@ export class AnalyzerTableRendererComponent implements ICellRendererAngularComp 
     return false;
   }
 
-  showPopover = (seriesInfo) => {
-    return this.tableHelper.showPopover(seriesInfo);
-  }
+  showPopover = (seriesInfo: any) => this.tableHelper.showPopover(seriesInfo);
 }

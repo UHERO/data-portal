@@ -52,7 +52,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
           this.storeUrlSeries(params[`analyzerSeries`]);
         }
         if (params[`chartSeries`]) {
+<<<<<<< HEAD
           this.storeUrlChartSeries(params[`chartSeries`]);
+=======
+          this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
         }
         this.analyzerService.analyzerData.minDate = params['start'] || '';
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
@@ -76,7 +80,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   updateAnalyzer (analyzerSeries: Array<any>) {
     if (analyzerSeries.length) {
+<<<<<<< HEAD
       this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.yRightSeries);
+=======
+      this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache);
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
       this.analyzerService.analyzerData.indexed = this.indexSeries;
     }
   }
@@ -90,6 +98,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.analyzerService.updateAnalyzerSeries(urlASeries);
   }
 
+<<<<<<< HEAD
   storeUrlChartSeries(urlChartSeries: string) {
     const urlCSeries = urlChartSeries.split('-').map(Number);
     urlCSeries.forEach((cSeries) => {
@@ -98,6 +107,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     });
   }
 
+=======
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   // Update table when selecting new ranges in the chart
   setTableDates(e) {
     this.analyzerService.analyzerData.minDate = e.minDate;
@@ -125,6 +136,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     const siblingIds = [];
     this.analyzerService.analyzerSeriesCompareSource.next([]);
     const siblingsList = analyzerSeries.map((serie) => {
+<<<<<<< HEAD
       const nonSeasonal = serie.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, nonSeasonal);
     });
@@ -134,8 +146,18 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
           if (series.frequencyShort === freq && !siblingIds.some(serie => serie.id === series.id)) {
             const drawInCompare = analyzerSeries.find(s => s.title === series.title).compare === true;
             siblingIds.push({ id: series.id, compare: drawInCompare });
+=======
+      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, serie.seasonalAdjustment, freq);
+    });
+    forkJoin(siblingsList).subscribe((res: any) => {
+      res.forEach((siblings) => {
+        siblings.forEach((sib) => {
+          if (!siblingIds.some(s => s.id === sib.id) && sib.frequencyShort === freq) {
+            const drawInCompare = analyzerSeries.find(s => s.title === sib.title).compare === true;
+            siblingIds.push({ id: sib.id, compare: drawInCompare });  
+>>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
           }
-        });
+        })
       });
       this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
