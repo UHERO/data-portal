@@ -16,6 +16,7 @@ import { CategoryTableViewComponent } from './category-table-view/category-table
 import { DateSliderComponent } from './date-slider/date-slider.component';
 import { FreqSelectorComponent } from './freq-selector/freq-selector.component';
 import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
+import { ForecastSelectorComponent } from './forecast-selector/forecast-selector.component';
 import { HighchartComponent } from './highchart/highchart.component';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { AgGridModule } from 'ag-grid-angular';
@@ -32,12 +33,7 @@ import { AnalyzerTableRendererComponent } from './analyzer-table-renderer/analyz
 import { MeasurementLandingPageComponent } from './measurement-landing-page/measurement-landing-page.component';
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
-<<<<<<< HEAD
-import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/analyzer-compare-options.component';
-import { ForecastSelectorComponent } from './forecast-selector/forecast-selector.component';
-=======
 import { SearchResultsComponent } from './search-results/search-results.component';
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
 
 @NgModule({
   declarations: [
@@ -50,6 +46,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     DateSliderComponent,
     FreqSelectorComponent,
     GeoSelectorComponent,
+    ForecastSelectorComponent,
     HighchartComponent,
     CategoryTableRenderComponent,
     SingleSeriesComponent,
@@ -64,12 +61,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
     EmbedGraphComponent,
-<<<<<<< HEAD
-    AnalyzerCompareOptionsComponent,
-    ForecastSelectorComponent,
-=======
     SearchResultsComponent,
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   ],
   imports: [
     CommonModule,
@@ -97,6 +89,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     CategoryTableViewComponent,
     FreqSelectorComponent,
     GeoSelectorComponent,
+    ForecastSelectorComponent,
     HighchartComponent,
     SingleSeriesComponent,
     HighstockComponent,
@@ -109,10 +102,6 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
-<<<<<<< HEAD
-    AnalyzerCompareOptionsComponent,
-=======
->>>>>>> f86a666cb72b69e88d0d6717c11eb4e0852a4175
   ]
 })
 export class ToolsModule { }

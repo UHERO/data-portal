@@ -93,7 +93,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       const dataListId = this.dataListId;
       const geo = this.routeGeo;
       const freq = this.routeFreq;
-      this.categoryData = this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq })
+      const fc = this.routeFc
+      this.categoryData = this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq, fc })
     });
   }
 

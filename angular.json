@@ -801,7 +801,6 @@
             "main": "projects/forecast/src/main.ts",
             "polyfills": "projects/forecast/src/polyfills.ts",
             "tsConfig": "projects/forecast/tsconfig.app.json",
-            "aot": true,
             "assets": [
               "projects/forecast/src/favicon.ico",
               "projects/forecast/src/assets"
@@ -812,12 +811,24 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
-              "projects/uhero/src/styles.scss"
+              "projects/forecast/src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets"
+              ]
+            },
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
+              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "staging": {

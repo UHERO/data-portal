@@ -26,12 +26,15 @@
 					{{data.selectedDataList.dataListName}}</h3>
 			</ng-template>
 			<div class="filters">
-				<lib-geo-selector [regions]="data.regions" (selectedGeoChange)="redrawSeriesGeo($event, selectedFreq)"
+				<lib-geo-selector [regions]="data.regions" (selectedGeoChange)="redrawSeriesGeo($event, selectedFreq, selectedFc)"
 					class="selector">
 				</lib-geo-selector>
 				<lib-freq-selector [freqs]="data.frequencies" (selectedFreqChange)="redrawSeriesFreq($event, selectedGeo, selectedFc)"
 					class="selector">
 				</lib-freq-selector>
+				<lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecasts" (selectedFcChange)="redrawSeriesFc($event, selectedGeo, selectedFreq)"
+					class="selector">
+				</lib-forecast-selector>
 				<a (click)="switchView()" class="btn btn-sm switch-view">{{routeView === 'table' ? 'Chart View' : 'Table View'}} 
 					<i class="bi" [class.bi-graph-up]="routeView === 'table'" [class.bi-table]="routeView === 'chart' || !routeView"></i>
 				</a>

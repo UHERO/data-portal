@@ -1,6 +1,7 @@
 @import './assets/app_colors';
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-balham.css';
+@import "~bootstrap-icons/font/bootstrap-icons.css";
 /* You can add global styles to this file, and also import other style files */
 body {
   position: relative;
@@ -9,8 +10,9 @@ body {
    font-family: 'Lucida Sans', sans-serif;
    font-size: 16px;
 
-  .custom-select {
+  .form-select {
     color: $primary;
+    display: unset;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.8em;
     height: calc(1.75rem - 2px);
@@ -18,10 +20,11 @@ body {
     background: $white url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
     background-size: 8px 10px;
     margin-right: 0.25em;
+    text-transform: capitalize;
     width: unset;
   }
 
-  .fa-spinner {
+  .spinner-border {
     color: $primary;
   }
 
@@ -43,10 +46,6 @@ body {
 
   .sublist-separator {
     background-color: $primary;
-  }
-
-  .material-icons.md-18 {
-    color: $secondary;
   }
 
   .switch-view {
@@ -140,8 +139,9 @@ body {
     }
 
     .p-datatable {
-      .fa-spinner {
+      .spinner-border {
         color: $primary;
+        font-size: unset;
       }
     }
   }
@@ -183,13 +183,7 @@ body {
     }
   }
 
-  lib-landing-page {
-    .multi-series-container {
-      .material-icons.md-18 {
-        color: $secondary;
-      }
-    }
-
+  lib-landing-page, lib-analyzer {
     .content-links:before {
       display: block;
       content: ' ';
@@ -289,7 +283,7 @@ body {
   }
 
   lib-analyzer {
-    h3 {
+    h2 {
       color: $primary;
     }
 
@@ -299,6 +293,12 @@ body {
   }
 
   .analyzer-chart, .single-series-chart {
+    .highcharts-series-1 {
+      .highcharts-graph {
+        stroke: unset;
+      }
+    }
+
     .highcharts-background {
       fill: $chart-background;
     }
@@ -463,4 +463,71 @@ body {
       vertical-align: middle;
     }
   }
+}
+
+lib-search-results, lib-single-series {
+  .p-datatable {
+    background-color: transparent;
+    text-align: right;
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: 0.9em;
+    border: 0;
+    border-right: 1px solid #E5E5E5;
+
+    .p-sortable-column.p-highlight {
+      background: #F4F4F4;
+      color: #333;
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover {
+        background: #F4F4F4;
+        color: #333;
+
+        .p-sortable-column-icon {
+          color: #848484;
+        }
+      }
+
+      .p-sortable-column-icon {
+        color: #848484;
+        vertical-align: middle;
+      }
+    }
+
+    .p-datatable-thead tr th{
+      padding: .25em .5em;
+    }
+
+    .p-datatable-tbody tr td {
+      padding: .25em .5em;
+      text-transform: capitalize;
+
+      a {
+        color: $primary-text;
+      }
+    }
+
+    .p-widget-overlay {
+      background-color: transparent;
+    }
+  
+    tr.p-widget-content {
+      border-top-color: transparent;
+      border-bottom-color: transparent;
+      border-left: 1px solid #E5E5E5;
+      border-right: 1px solid #E5E5E5;
+    }
+  
+    tr:last-child {
+      border-bottom: 1px solid #E5E5E5;
+    }
+  }
+}
+
+lib-single-series .p-datatable .p-datatable-thead tr th, 
+lib-single-series .p-datatable .p-datatable-tbody tr td {
+  text-align: right;
 }
