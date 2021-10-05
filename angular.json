@@ -163,7 +163,7 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
+              "projects/uhero/src/styles.scss"
             ]
           }
         },

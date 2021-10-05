@@ -42,7 +42,7 @@ export class SeriesHelperService {
     };
     const dateArray = [];
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
-      console.log('data', data)
+      console.log('DATA', data)
       this.seriesData.seriesDetail = data.series;
       this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
@@ -56,9 +56,10 @@ export class SeriesHelperService {
       this.seriesData.regions = geos || [data.series.geography];
       this.seriesData.forecasts = data.forecasts;
       this.seriesData.forecastList = data.forecasts.map(f => f.forecast);
-      currentForecast = data.forecasts.find(f => f.freq === currentFreq.freq).forecast;
+      console.log('data.forecasts', data.forecasts)
+      currentForecast = data.forecasts.find(f => f.freq === currentFreq.freq && data.series.name.includes(f.forecast)).forecast;
+      console.log('currentForecast', currentForecast)
       this.helperService.updateCurrentForecast(currentForecast);
-      console.log(currentForecast)
       this.seriesData.frequencies = freqs || [{ freq: data.series.frequencyShort, label: data.series.frequency }];
       this.seriesData.yoyChange = data.series.percent ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = data.series.percent ? 'Year-to-Date Change' : 'Year-to-Date % Change';
@@ -195,10 +196,14 @@ export class SeriesHelperService {
     return (Math.pow((lastValue / firstValue), multiplier[freq] / periods) - 1) * 100 || Infinity;
   }
 
-  selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
-    const saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted' && series.frequencyShort === freq);
-    const nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted' && series.frequencyShort === freq);
-    const naSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable' && series.frequencyShort === freq);
+  selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string, forecast) {
+    let saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted' && series.frequencyShort === freq && series.name.includes(forecast.forecast));
+    let nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted' && series.frequencyShort === freq && series.name.includes(forecast.forecast));
+    let naSeries = geoFreqSiblings.find(series => ((series.seasonalAdjustment === 'not_applicable' && series.frequencyShort === freq) || !series.seasonalAdjustment) && series.name.includes(forecast.forecast));
+    console.log('saSeries', saSeries);
+    console.log('nsaSeries', nsaSeries);
+    console.log('naSeries', naSeries);
+    console.log('state siblings', geoFreqSiblings.filter(s => s.geography.handle === 'HI' && s.frequencyShort === freq && s.name.includes(forecast.forecast)))
     // If more than one sibling exists (i.e. seasonal & non-seasonal)
     // Select series where seasonalAdjustment matches sa setting
     if (freq === 'A') {
@@ -206,18 +211,18 @@ export class SeriesHelperService {
     }
     if (saSeries && nsaSeries) {
       if (sa) {
-        return saSeries.id //saSeries.find(sibling => sibling.seasonalAdjustment === 'seasonally_adjusted').id;
+        return saSeries?.id;
       }
-      return nsaSeries.id //nsaSeries.find(sibling => sibling.seasonalAdjustment === 'not_seasonally_adjusted').id;
+      return nsaSeries?.id;
     }
     if (!saSeries && nsaSeries) {
-      return nsaSeries.id;
+      return nsaSeries?.id;
     }
     if (saSeries && !nsaSeries) {
-      return saSeries.id;
+      return saSeries?.id;
     }
     if (!saSeries && !nsaSeries) {
-      return naSeries.id;
+      return naSeries?.id;
     }
   }
 }

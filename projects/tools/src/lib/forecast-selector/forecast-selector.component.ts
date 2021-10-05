@@ -16,7 +16,6 @@ export class ForecastSelectorComponent implements OnDestroy {
 
   constructor(private helperService: HelperService) {
     this.fcSubscription = helperService.currentFc.subscribe((fc) => {
-      console.log('SELECTEDFC', fc)
       this.selectedForecast = fc;
     });
   }
@@ -26,7 +25,6 @@ export class ForecastSelectorComponent implements OnDestroy {
   }
 
   onChange(newFc: string) {
-    console.log('this.forecasts', this.forecasts)
     this.selectedForecast = this.forecasts.find(fc => fc === newFc);
     this.selectedFcChange.emit(this.selectedForecast);
     this.helperService.updateCurrentForecast(this.selectedForecast);

@@ -3,17 +3,20 @@
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
     <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
-      (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
+      (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted, selectedForecast)"
       class="geo-selector"></lib-geo-selector>
     <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
-      (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
+      (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted, selectedForecast)"
       class="freq-selector"></lib-freq-selector>
+    <lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecastList"
+      (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)"
+      class="selector"></lib-forecast-selector>
     <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="chartStart"
       [endDate]="chartEnd" [seriesId]="data.seriesDetail.id"></lib-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">
         <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
-          (ngModelChange)="goToSeries(data.siblings, selectedFreq.freq, selectedGeo.handle, $event)">Seasonally
+          (ngModelChange)="goToSeries(data.siblings, selectedFreq.freq, selectedGeo.handle, $event, selectedForecast)">Seasonally
         Adjusted
       </label>
     </div>

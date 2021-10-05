@@ -30,8 +30,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   seriesShareLink: string;
   freqSub: Subscription;
   geoSub: Subscription;
+  fcSub: Subscription;
   selectedGeo: Geography;
-
+  selectedForecast;
   selectedFreq: Frequency;
 
   // Vars used in selectors
@@ -41,37 +42,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   static saFromSeasonalAdjustment(seasonalAdjustment: string): boolean {
     return seasonalAdjustment !== 'not_seasonally_adjusted';
-  }
-
-  static selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
-    const saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
-    const nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted');
-    const naSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable');
-    console.log('geoFreqSib', geoFreqSiblings)
-    console.log('naSeries', naSeries)
-    // If more than one sibling exists (i.e. seasonal & non-seasonal)
-    // Select series where seasonalAdjustment matches sa setting
-    if (geoFreqSiblings.length === 1) {
-      return geoFreqSiblings[0].id;
-    }
-    if (freq === 'A') {
-      return geoFreqSiblings[0].id;
-    }
-    if (saSeries && nsaSeries) {
-      if (sa) {
-        return geoFreqSiblings.find(sibling => sibling.seasonalAdjustment === 'seasonally_adjusted').id;
-      }
-      return geoFreqSiblings.find(sibling => sibling.seasonalAdjustment === 'not_seasonally_adjusted').id;
-    }
-    if (!saSeries && nsaSeries) {
-      return nsaSeries.id;
-    }
-    if (saSeries && !nsaSeries) {
-      return saSeries.id;
-    }
-    if (!saSeries && !nsaSeries) {
-      return naSeries.id;
-    }
   }
 
   constructor(
@@ -91,6 +61,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.geoSub = helperService.currentGeo.subscribe((geo) => {
       this.selectedGeo = geo;
     });
+    this.fcSub = helperService.currentFc.subscribe((forecast) => {
+      this.selectedForecast = forecast;
+    })
   }
 
   ngOnInit() {
@@ -126,29 +99,31 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ngOnDestroy() {
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
+    this.fcSub.unsubscribe();
   }
 
   updateSelectedForecast(siblings: Array<any>, geo: string, sa: boolean, forecasts: Array<any>, newFc: string) {
     this.helperService.updateCurrentForecast(newFc);
-    console.log(forecasts)
     const selectedFc = forecasts.find(f => f.forecast === newFc);
     const { freq, label } = selectedFc;
+    console.log(selectedFc)
     this.helperService.updateCurrentFrequency({ freq, label });
-    this.goToSeries(siblings, freq, geo, sa);
+    this.goToSeries(siblings, freq, geo, sa, selectedFc);
   }
 
   // Redraw chart when selecting a new region or frequency
-  goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean) => {
+  goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean, forecast) => {
+    console.log('siblings', siblings)
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this.seriesHelper.findGeoFreqSibling(siblings, geo, freq);
-    //const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
-    const id = geoFreqSib.length ? this.seriesHelper.selectSibling(geoFreqSib, sa, freq) : null;
+    const id = geoFreqSib.length ? this.seriesHelper.selectSibling(geoFreqSib, sa, freq, forecast) : null;
     if (id) {
       const queryParams = {
         id,
         sa: this.seasonallyAdjusted,
+        fc: forecast.forecast,
         geo,
         freq
       };

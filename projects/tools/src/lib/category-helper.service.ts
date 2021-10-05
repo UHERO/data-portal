@@ -112,7 +112,6 @@ export class CategoryHelperService {
         this.categoryData[cacheId].series = series;
         this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
         this.categoryData[cacheId].requestComplete = true;
-        console.log(this.categoryData[cacheId])
       }
       if (!data || !data.length) {
         this.categoryData[cacheId].requestComplete = true;

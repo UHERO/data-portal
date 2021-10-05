@@ -135,7 +135,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   redrawSeriesFc(event, currentGeo: Geography, currentFreq: Frequency) {
     this.displaySeries = false;
     this.loading = true;
-    console.log('redraw fc event', event)
     setTimeout(() => {
       this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = currentFreq.freq;
@@ -183,7 +182,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.queryParams.id = this.queryParams.id || this.id;
     this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
-    console.log(this.queryParams)
     this.router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;
     this.displaySeries = true;

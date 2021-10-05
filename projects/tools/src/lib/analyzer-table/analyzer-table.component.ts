@@ -210,7 +210,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   onExport = () => {
-    console.log(this.gridApi.csvCreator)
     const { columnDefs } = this.gridApi.csvCreator.columnModel;
     const params = {
       columnKeys: ['series'].concat(columnDefs.flatMap(col => col.field === 'series' ? [] : col.field).reverse()),
