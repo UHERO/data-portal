@@ -19,13 +19,11 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   tableHeaders;
   summaryStats;
   seasonallyAdjusted = false;
-  private seasonalAdjustment;
   startDate;
   endDate;
   chartStart;
   chartEnd;
   portalSettings;
-  private category;
   seriesId;
   seriesShareLink: string;
   freqSub: Subscription;
@@ -34,15 +32,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   selectedGeo: Geography;
   selectedForecast;
   selectedFreq: Frequency;
+  displayFcSelector: boolean;
 
   // Vars used in selectors
-  public currentFreq: Frequency;
-  public currentGeo: Geography;
+  //public currentFreq: Frequency;
+  //public currentGeo: Geography;
   public seriesData;
-
-  static saFromSeasonalAdjustment(seasonalAdjustment: string): boolean {
-    return seasonalAdjustment !== 'not_seasonally_adjusted';
-  }
 
   constructor(
     @Inject('environment') private environment,
@@ -63,11 +58,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     });
     this.fcSub = helperService.currentFc.subscribe((forecast) => {
       this.selectedForecast = forecast;
-    })
+    });
   }
 
   ngOnInit() {
     this.portalSettings = this.dataPortalSettings.dataPortalSettings[this.portal.universe];
+    this.displayFcSelector = this.portalSettings.selectors.includes('forecast');
   }
 
   ngAfterViewInit() {
@@ -112,18 +108,18 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Redraw chart when selecting a new region or frequency
-  goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean, forecast) => {
-    console.log('siblings', siblings)
+  goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean, forecast = null) => {
+    const { findGeoFreqSibling, selectSibling } = this.seriesHelper;
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
-    const geoFreqSib = this.seriesHelper.findGeoFreqSibling(siblings, geo, freq);
-    const id = geoFreqSib.length ? this.seriesHelper.selectSibling(geoFreqSib, sa, freq, forecast) : null;
+    const geoFreqSib = siblings.length ? findGeoFreqSibling(siblings, geo, freq, forecast) : [];
+    const id = geoFreqSib.length ? selectSibling(geoFreqSib, sa, freq) : null;
     if (id) {
       const queryParams = {
         id,
         sa: this.seasonallyAdjusted,
-        fc: forecast.forecast,
+        ...(forecast?.forecast && { fc: forecast.forecast }),
         geo,
         freq
       };
@@ -174,17 +170,26 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   createTableColumns = (portalSettings, seriesDetail) => {
+    const { frequencyShort, percent } = seriesDetail;
+    const {
+      series1,
+      series2,
+      series2PercLabel,
+      series2Label,
+      columns,
+      series3,
+      series3PercLabel,
+      series3Label
+    } = portalSettings.seriesTable;
     const cols = [];
     cols.push({ field: 'tableDate', header: 'Date' });
-    cols.push({ field: portalSettings.seriesTable.series1, header: 'Level' });
+    cols.push({ field: series1, header: 'Level' });
     cols.push({
-      field: portalSettings.seriesTable.series2, header: seriesDetail.percent ?
-        portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label
+      field: series2, header: percent ? series2PercLabel : series2Label
     });
-    if (seriesDetail.frequencyShort !== 'A' && portalSettings.seriesTable.columns === 4) {
+    if (frequencyShort !== 'A' && columns === 4) {
       cols.push({
-        field: portalSettings.seriesTable.series3, header: seriesDetail.percent ?
-        portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label
+        field: series3, header: percent ? series3PercLabel : series3Label
       });
     }
     return cols;
