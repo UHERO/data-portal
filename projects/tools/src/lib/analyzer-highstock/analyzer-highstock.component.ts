@@ -64,8 +64,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       });
       return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
     });
-    this.chartCallback = chart => {
-      this.chartObject = chart;
+    this.chartCallback = (chart) => {
+      if (!this.chartObject) {
+        this.chartObject = chart;
+      }
     };
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
@@ -117,6 +119,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
+    console.log('onchanges', this.chartObject)
     // prevent date ranges from resetting when adding a series/indexing
     if (this.chartOptions.xAxis) {
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
@@ -402,6 +405,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
               }
             }
           },
+          styledMode: false,
           spacingBottom: 40
         },
         navigator: {
