@@ -119,7 +119,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    console.log('onchanges', this.chartObject)
     // prevent date ranges from resetting when adding a series/indexing
     if (this.chartOptions.xAxis) {
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
