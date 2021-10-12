@@ -278,6 +278,7 @@ export class HighstockComponent implements OnChanges {
               }
             }
           },
+          styledMode: false,
           spacingBottom: 40
         },
         navigator: {

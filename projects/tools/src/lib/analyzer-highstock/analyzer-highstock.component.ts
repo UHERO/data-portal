@@ -64,8 +64,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       });
       return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
     });
-    this.chartCallback = chart => {
-      this.chartObject = chart;
+    this.chartCallback = (chart) => {
+      if (!this.chartObject) {
+        this.chartObject = chart;
+      }
     };
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
@@ -402,6 +404,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
               }
             }
           },
+          styledMode: false,
           spacingBottom: 40
         },
         navigator: {
