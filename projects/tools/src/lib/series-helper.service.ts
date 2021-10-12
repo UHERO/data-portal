@@ -149,40 +149,52 @@ export class SeriesHelperService {
       cagr: 'N/A',
       missing: null,
       range: null,
-      showInChart: null,
-      interactionSettings: {
-        showInChart: null,
-        color: null,
-        seriesInfo: seriesDetail
-      }
     };
-    formattedStats.range = `${this.helperService.formatDate(startDate, freq)} - ${this.helperService.formatDate(endDate, freq)}`;
+    const { formatNum, formatDate } = this.helperService;
+    formattedStats.range = `${formatDate(startDate, freq)} - ${formatDate(endDate, freq)}`;
     const decimals = seriesDetail.decimals;
     const { dates, level } = chartData;
-    const values = indexed ? this.analyzerService.getChartIndexedValues(level, indexBase) : level;
-    const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
-    const valuesInRange = values.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
-    if (valuesInRange.includes(null) || !datesInRange.length || !valuesInRange.length) {
+    const startDateExists = dates.find(d => d.date === startDate);
+    const endDateExists = dates.find(d => d.date === endDate);
+    // if selected date range has its start or end date beyond the range available for a series,
+    // do not calculate stats
+    if (!startDateExists || !endDateExists) {
       formattedStats.missing = true;
       return formattedStats;
     }
-    const minValue = Math.min(...valuesInRange);
-    const minValueIndex = valuesInRange.indexOf(minValue);
-    const maxValue = Math.max(...valuesInRange);
-    const maxValueIndex = valuesInRange.indexOf(maxValue);
+    const values = indexed ? this.analyzerService.getChartIndexedValues(level, indexBase) : level;
+    const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
+    const valuesInRange = values.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
+    // if the selected range includes missing values, do not calculate stats
+    if (valuesInRange.includes(null) || !valuesInRange.length) {
+      formattedStats.missing = true;
+      return formattedStats;
+    }
+    const min = this.findMinAndIndex(valuesInRange);
+    const max = this.findMaxAndIndex(valuesInRange);
     const diff = valuesInRange[valuesInRange.length - 1] - valuesInRange[0];
-    const percChange = this.helperService.formatNum((diff / valuesInRange[0]) * 100, decimals);
+    const percChange = formatNum((diff / valuesInRange[0]) * 100, decimals);
     const sum = valuesInRange.reduce((a, b) => a + b, 0);
     const periods = valuesInRange.length - 1;
     const cagr = this.calculateCAGR(valuesInRange[0], valuesInRange[valuesInRange.length - 1], freq, periods);
-    formattedStats.minValue = `${this.helperService.formatNum(Math.min(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[minValueIndex].date, freq)})`;
-    formattedStats.maxValue = `${this.helperService.formatNum(Math.max(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[maxValueIndex].date, freq)})`;
+    formattedStats.minValue = `${formatNum(min.value, decimals)} (${formatDate(datesInRange[min.index].date, freq)})`;
+    formattedStats.maxValue = `${formatNum(max.value, decimals)} (${formatDate(datesInRange[max.index].date, freq)})`;
     formattedStats.percChange = seriesDetail.percent ? null : percChange;
-    formattedStats.levelChange = this.helperService.formatNum(diff, decimals);
-    formattedStats.total = this.helperService.formatNum(sum, decimals);
-    formattedStats.avg = this.helperService.formatNum(sum / valuesInRange.length, decimals);
-    formattedStats.cagr = this.helperService.formatNum(cagr, decimals);
+    formattedStats.levelChange = formatNum(diff, decimals);
+    formattedStats.total = formatNum(sum, decimals);
+    formattedStats.avg = formatNum(sum / valuesInRange.length, decimals);
+    formattedStats.cagr = formatNum(cagr, decimals);
     return formattedStats;
+  }
+
+  findMinAndIndex = (values: Array<any>) => {
+    const value = Math.min(...values);
+    return { value, index: values.indexOf(value) };
+  }
+  
+  findMaxAndIndex = (values: Array<any>) => {
+    const value = Math.max(...values);
+    return { value, index: values.indexOf(value) };
   }
 
   calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {

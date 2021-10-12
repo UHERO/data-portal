@@ -93,14 +93,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
-    const { observationStart, observationEnd } = series.seriesObservations;
-    series.seriesStartDate = (observationStart > startDate || !startDate) ?
-      observationStart : startDate;
-    series.seriesEndDate = (observationEnd > endDate || !endDate) ?
-      observationEnd : endDate;
-    const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, series.seriesStartDate, series.seriesEndDate, indexed, indexBase);
+    const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, startDate, endDate, indexed, indexBase);
     stats.series = this.indexChecked ? series.indexDisplayName : series.displayName;
-    return stats
+    return stats;
   }
 
   setSummaryStatColumns = () => {
@@ -161,7 +156,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   formatLvlData = (series, level, minDate) => {
-    const seriesInChart = $('.highcharts-series.' + series.id);
     const { dates, values } = level;
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
     const baseYear = this.indexBaseYear
