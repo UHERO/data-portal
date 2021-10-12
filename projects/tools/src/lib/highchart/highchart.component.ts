@@ -148,18 +148,26 @@ export class HighchartComponent implements OnChanges {
   }
 
   drawChart = (seriesData, portalSettings, min: number, max: number, chartStart, chartEnd) => {
-    const currentFreq = seriesData.frequencyShort;
-    const { start, end } = seriesData.gridDisplay;
-    const { percent, title, unitsLabelShort, displayName, indexDisplayName } = seriesData;
+    const {
+      percent,
+      title,
+      unitsLabelShort,
+      displayName,
+      indexDisplayName,
+      frequencyShort: currentFreq,
+      gridDisplay,
+      observations
+    } = seriesData;
+    const { start, end } = gridDisplay;
     const decimals = seriesData.decimals || 1;
-    let { series0, series1, pseudoZones } = seriesData.gridDisplay.chartData;
-    series0 = this.indexChecked ? this.helperService.getIndexedTransformation(seriesData.observations[0], this._analyzerService.analyzerData.baseYear) : series0;
-    const startDate = Date.parse(chartStart) || Date.parse(seriesData.gridDisplay.start);
-    const endDate = Date.parse(chartEnd) || Date.parse(seriesData.gridDisplay.end);
+    let { series0, series1, pseudoZones } = gridDisplay.chartData;
+    series0 = this.indexChecked ? this.helperService.getIndexedTransformation(observations[0], this._analyzerService.analyzerData.baseYear) : series0;
+    const startDate = Date.parse(chartStart) || Date.parse(start);
+    const endDate = Date.parse(chartEnd) || Date.parse(end);
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate);
-    const formatLabel = (seriesName, freq, perc) => this.formatTransformLabel(seriesName, freq, perc);
+    const formatLabel = (seriesName, perc, freq) => this.formatTransformLabel(seriesName, perc, freq);
     const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const indexed = this.indexChecked;
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
@@ -184,7 +192,7 @@ export class HighchartComponent implements OnChanges {
       }
     };
     const checkPointCount = (freq, s0, point0, chart, point1?, s1?) => {
-      // Fiilter out null values
+      // Filter out null values
       const pointCount = s0.points.filter(point => Number.isFinite(point.y));
       // If only 1 non-null value exists, display data value as text
       if (pointCount.length === 1) {
@@ -265,28 +273,31 @@ export class HighchartComponent implements OnChanges {
             return;
           }
           points.forEach((point) => {
-            const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
-            const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            const name = formatLabel(point.series.name, currentFreq, percent);
-            let label = name + formattedValue;
-            const pseudo = ' Pseudo History ';
-            if (point.series.name === 'level') {
-              label += ` (${indexed ? 'Index' : unitsLabelShort}) <br />`;
-            }
-            if (pseudoZones.length) {
-              pseudoZones.forEach((zone) => {
-                if (point.x < zone.value) {
-                  const otherSeriesLabel = pseudo + name + formattedValue;
-                  const levelLabel = `${otherSeriesLabel} (${unitsLabelShort}) <br />`;
-                  labelString += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
-                }
-                if (point.x >= zone.value) {
-                  labelString += label;
-                }
-              });
-            }
-            if (pseudoZones.length === 0){
-              labelString += label;
+            if (point.y !== null) {
+              const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
+              const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
+              const { name } = point.series;
+              const labelName = formatLabel(name, percent, currentFreq);
+              let label = labelName + formattedValue;
+              const pseudo = ' Pseudo History ';
+              if (name === 'level') {
+                label += ` (${indexed ? 'Index' : unitsLabelShort}) <br />`;
+              }
+              if (pseudoZones.length) {
+                pseudoZones.forEach((zone) => {
+                  if (point.x < zone.value) {
+                    const pseudoZoneLabel = pseudo + labelName + formattedValue;
+                    const levelLabel = `${pseudoZoneLabel} (${unitsLabelShort}) <br />`;
+                    labelString += name === 'level' ? levelLabel : pseudoZoneLabel;
+                  }
+                  if (point.x >= zone.value) {
+                    labelString += label;
+                  }
+                });
+              }
+              if (pseudoZones.length === 0){
+                labelString += label;
+              }
             }
           });
           return labelString;
@@ -320,15 +331,16 @@ export class HighchartComponent implements OnChanges {
     }
   }
 
-  formatTransformLabel = (transformationName, percent, currentFreq) => {
+  formatTransformLabel = (transformationName: string, percent: boolean, currentFreq: string) => {
+    const changeString = percent ? 'Chg: ' : '% Chg: ';
     if (transformationName === 'c5ma') {
-      return percent ? 'Annual Chg: ' : 'Annual % Chg: ';
+      return `Annual ${changeString}`;
     }
     if (transformationName === 'ytd' && currentFreq === 'A') {
-      return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
+      return `Year/Year ${changeString}`;
     }
     if (transformationName === 'ytd' && currentFreq !== 'A') {
-      return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
+      return `Year-to-Date ${changeString}`;
     }
     return ': ';
   }
