@@ -77,7 +77,7 @@ export class CategoryHelperService {
         this.categoryData[cacheId].categoryDates = categoryDates;
         series.forEach((serie) => {
           serie.observations = this.helperService.formatSeriesForCharts(serie);
-          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
+          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'ytd');
         });
         const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;

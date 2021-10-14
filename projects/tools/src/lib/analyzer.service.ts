@@ -1,7 +1,8 @@
 import { of as observableOf, forkJoin as observableForkJoin, BehaviorSubject } from 'rxjs';
-import { Injectable, EventEmitter, Output } from '@angular/core';
+import { Inject, Injectable, EventEmitter, Output } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
+import { DataPortalSettingsService } from './data-portal-settings.service';
 import { DateWrapper } from './tools.models';
 
 @Injectable({
@@ -38,10 +39,16 @@ export class AnalyzerService {
     analyzerTableDates: [],
     analyzerSeries: [],
   };
+  portalSettings;
 
   @Output() public switchYAxes: EventEmitter<any> = new EventEmitter();
 
-  constructor(private apiService: ApiService, private helperService: HelperService) { }
+  constructor(
+    private apiService: ApiService,
+    private helperService: HelperService,
+    @Inject('portal') public portal,
+    private dataPortalSettingsServ: DataPortalSettingsService,
+  ) { }
 
   checkAnalyzer = (seriesInfo: any) => this.analyzerSeriesTrackerSource.value.some(series => series.id === seriesInfo.id);
 
@@ -191,7 +198,7 @@ export class AnalyzerService {
       this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
     this.analyzerData.analyzerSeries.forEach((s) => {
-      s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1');
+      s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'ytd');
     });
   }
 
@@ -222,6 +229,7 @@ export class AnalyzerService {
   }
 
   getAnalyzerData(aSeriesTracker: Array<any>, noCache: boolean) {
+    this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
@@ -232,9 +240,10 @@ export class AnalyzerService {
       this.analyzerData.analyzerDateWrapper = analyzerDateWrapper
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(series);
       this.analyzerData.siblingFreqs = this.getSiblingFrequencies(series);
+      const { series1Name } = this.portalSettings.highcharts;
       series.forEach((s) => {
         s.observations = this.helperService.formatSeriesForCharts(s);
-        s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1'); 
+        s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', series1Name); 
         this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries);
       });
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(series, this.analyzerData.siblingFreqs) : this.getHighestFrequency(this.analyzerData.analyzerSeries);
