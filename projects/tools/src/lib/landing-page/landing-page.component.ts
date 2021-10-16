@@ -194,4 +194,15 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.updateRoute();
     }, 10);
   }
+
+  // navigate to Summary or first data list when clicking on a category
+  navToFirstDataList(dataList) {
+    if (!dataList.children) {
+      this.queryParams.data_list_id = dataList.id;
+      this.updateRoute();
+    }
+    if (dataList.children) {
+      return this.navToFirstDataList(dataList.children[0]);
+    }
+  }
 }

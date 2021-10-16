@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { Frequency, Geography } from './tools.models';
+import { Frequency, Geography, DateWrapper } from './tools.models';
 
 @Injectable({
   providedIn: 'root'
@@ -38,14 +38,6 @@ export class HelperService {
   updateCurrentGeography = (newGeo: Geography) => {
     this.currentGeoChange.next(newGeo);
     return newGeo;
-  }
-
-  getCatData() {
-    return this.categoryData;
-  }
-
-  updateCatData(data) {
-    this.categoryData.next(data);
   }
 
   getIdParam = (id: any) => {
@@ -115,6 +107,23 @@ export class HelperService {
     const start = this.parseISOString(dateStart);
     const end = this.parseISOString(dateEnd);
     return this.addToDateArray(start, end, dateArray, currentFreq);
+  }
+
+  setDateWrapper = (series: Array<any>) => {
+    const dateWrapper = {} as DateWrapper;
+    dateWrapper.firstDate = this.setCategoryDateWrapperFirstDate(series);
+    dateWrapper.endDate = this.setCategoryDateWrapperEndDate(series);
+    return dateWrapper;
+  }
+
+  setCategoryDateWrapperFirstDate = (series: Array<any>) => {
+    const startDates = series.map(s => s.seriesObservations.observationStart);
+    return startDates.reduce((a, b) => b < a ? b : a);
+  }
+
+  setCategoryDateWrapperEndDate = (series: Array<any>) => {
+    const endDates = series.map(s => s.seriesObservations.observationEnd);
+    return endDates.reduce((a, b) => b > a ? b : a);
   }
 
   parseISOString = (dateString: string) => {
