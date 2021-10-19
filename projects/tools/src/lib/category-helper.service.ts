@@ -28,25 +28,23 @@ export class CategoryHelperService {
   // Gets data sublists available for a selected category
   initContent = (catId: any, noCache: boolean, routeParams): Observable<any> => {
     const cacheId = this.helperService.setCacheId(catId, routeParams);
-    if (this.categoryData[cacheId]) {
+    if (this.categoryData.hasOwnProperty(cacheId)) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
       if (this.portalSettings.selectors.includes('forecast')) {
         this.helperService.updateCurrentForecast(this.categoryData[cacheId].currentForecast);
       }
     }
-    if (!this.categoryData[cacheId] && typeof catId === 'number' || catId === null) {
-      this.categoryData[cacheId] = {} as CategoryData;
-      this.getCategoryData(cacheId, catId, noCache, routeParams, this.categoryData[cacheId]);
-    }
-    if (!this.categoryData[cacheId] && typeof catId === 'string') {
+    if (!this.categoryData.hasOwnProperty(cacheId)) {
       this.categoryData[cacheId] = {};
-      this.initSearch(this.categoryData[cacheId], noCache, catId);
+      (typeof catId === 'number' || catId === null) ?
+        this.getCategoryData(catId, noCache, routeParams, this.categoryData[cacheId]) :
+        this.initSearch(this.categoryData[cacheId], noCache, catId);
     }
     return observableOf([this.categoryData[cacheId]]);
   }
 
-  getCategoryData(cacheId: string, selectedCatId: number, noCache: boolean, routeParams, cachedCategoryData) {
+  getCategoryData(selectedCatId: number, noCache: boolean, routeParams, cachedCategoryData) {
     this.apiService.fetchCategories().pipe(
       tap(categories => {
         const { dataListId } = routeParams;
@@ -140,7 +138,9 @@ export class CategoryHelperService {
   }
 
   setCategorySelectorData(cachedCategoryData, routeParams, geos, freqs, forecasts) {
-    let { geo: defaultGeo, freq: defaultFreq } = cachedCategoryData.selectedDataList.defaults;
+    // fallback if defaults are specified in Udaman
+    const defaults = cachedCategoryData.selectedDataList.defaults || { geo: '', freq: '' };
+    let { geo: defaultGeo, freq: defaultFreq } = defaults;
     const { geo: routeGeo, freq: routeFreq } = routeParams;
     cachedCategoryData.regions = geos || [defaultGeo];
     cachedCategoryData.frequencies = freqs || [defaultFreq];
@@ -154,7 +154,6 @@ export class CategoryHelperService {
     cachedCategoryData.currentGeo = regions.find(r => r.handle === categoryGeo);
     this.helperService.updateCurrentFrequency(cachedCategoryData.currentFreq);
     this.helperService.updateCurrentGeography(cachedCategoryData.currentGeo);
-    console.log('cachedCategoryData', cachedCategoryData)
   }
 
   // Set up search results

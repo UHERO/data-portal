@@ -21,7 +21,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() routeEnd;
   @Input() search;
   @Input() dates;
-  @Input() dateWrapper;
+  //@Input() dateWrapper;
   @Input() analyzerView: boolean;
   @Input() indexChecked;
   @Input() indexBaseYear;

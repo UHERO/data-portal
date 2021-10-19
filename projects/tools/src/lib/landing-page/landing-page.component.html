@@ -63,7 +63,7 @@
 				[hasSeasonal]="data.hasSeasonal">
 			</lib-category-table-view>
 			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [routeStart]="routeStart"
-				[routeEnd]="routeEnd" [data]="data.displaySeries" [dates]="data.categoryDates" [dateWrapper]="data.dateWrapper"
+				[routeEnd]="routeEnd" [data]="data.displaySeries" [dates]="data.categoryDates"
 				[freq]="selectedFreq?.freq" [noSeries]="data.noData" [showSeasonal]="queryParams.sa === 'true'"
 				[hasSeasonal]="data.hasSeasonal" [analyzerView]="false" (updateURLFragment)="updateRoute()">
 			</lib-category-charts>

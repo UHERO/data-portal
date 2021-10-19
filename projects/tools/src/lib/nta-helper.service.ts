@@ -27,16 +27,14 @@ export class NtaHelperService {
   initContent(catId: any, noCache: boolean, routeParams): Observable<any> {
     const { dataListId, selectedMeasure } = routeParams;
     const cacheId = this.helperService.setCacheId(catId, routeParams);
-    if (this.categoryData[cacheId]) {
-      this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
+    if (this.categoryData.hasOwnProperty(cacheId)) {
+      this.helperService.updateCurrentForecast(this.categoryData[cacheId].currentFreq);
     }
-    if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
+    if (!this.categoryData.hasOwnProperty(cacheId)) {
       this.categoryData[cacheId] = {};
-      this.getCategory(this.categoryData[cacheId], noCache, catId, dataListId, selectedMeasure);
-    }
-    if (!this.categoryData[cacheId] && typeof catId === 'string') {
-      this.categoryData[cacheId] = {};
-      this.categoryHelper.initSearch(this.categoryData[cacheId], noCache, catId);
+      (typeof catId === 'number' || catId === null) ?
+        this.getCategory(this.categoryData[cacheId], noCache, catId, dataListId, selectedMeasure) :
+        this.categoryHelper.initSearch(this.categoryData[cacheId], noCache, catId);
     }
     return observableOf([this.categoryData[cacheId]]);
   }
