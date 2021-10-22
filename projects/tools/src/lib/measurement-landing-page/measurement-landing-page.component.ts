@@ -1,7 +1,8 @@
 // Component for multi-chart view
 import { Inject, Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { NtaHelperService } from '../nta-helper.service';
+import { CategoryHelperService } from '../category-helper.service';
+
 import { HelperService } from '../helper.service';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -33,7 +34,7 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
   constructor(
     @Inject('portal') private portal,
     private analyzerService: AnalyzerService,
-    private ntaHelperService: NtaHelperService,
+    private catHelper: CategoryHelperService,
     private helperService: HelperService,
     private dataPortalSettingsServ: DataPortalSettingsService,
     private activatedRoute: ActivatedRoute,
@@ -58,7 +59,7 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
       if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
       const dataListId = this.dataListId;
       const selectedMeasure = this.selectedMeasure;
-      this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, { dataListId, selectedMeasure });
+      this.categoryData = this.catHelper.initContent(this.id, this.noCache, { dataListId, selectedMeasure });
     });
   }
 

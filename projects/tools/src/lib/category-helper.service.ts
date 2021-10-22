@@ -29,58 +29,77 @@ export class CategoryHelperService {
   initContent = (catId: any, noCache: boolean, routeParams): Observable<any> => {
     const cacheId = this.helperService.setCacheId(catId, routeParams);
     if (this.categoryData.hasOwnProperty(cacheId)) {
-      this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
-      this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
-      if (this.portalSettings.selectors.includes('forecast')) {
-        this.helperService.updateCurrentForecast(this.categoryData[cacheId].currentForecast);
-      }
+      this.updateSelectors(this.categoryData[cacheId], this.portal.universe);
     }
     if (!this.categoryData.hasOwnProperty(cacheId)) {
       this.categoryData[cacheId] = {};
       (typeof catId === 'number' || catId === null) ?
-        this.getCategoryData(catId, noCache, routeParams, this.categoryData[cacheId]) :
+        this.getCategoryData(this.categoryData[cacheId], noCache, catId, routeParams) :
         this.initSearch(this.categoryData[cacheId], noCache, catId);
     }
     return observableOf([this.categoryData[cacheId]]);
   }
 
-  getCategoryData(selectedCatId: number, noCache: boolean, routeParams, cachedCategoryData) {
+  getCategoryData(cachedCategoryData, noCache: boolean, catId: any, routeParams/*selectedCatId: number, noCache: boolean, routeParams, cachedCategoryData*/) {
     this.apiService.fetchCategories().pipe(
       tap(categories => {
         const { dataListId } = routeParams;
-        this.findCategoryAndStoreDataLists(categories, selectedCatId, dataListId, cachedCategoryData);
+        this.findCategoryAndStoreDataLists(categories, catId, dataListId, cachedCategoryData);
       }),
       switchMap(() => {
         const { id: selectedDataListId } = cachedCategoryData.selectedDataList;
+        const { universe } = this.portal;
         return forkJoin([
-          this.apiService.fetchCategoryGeos(selectedDataListId),
-          this.apiService.fetchCategoryFreqs(selectedDataListId),
-          this.portalSettings.selectors.includes('forecast') ?
-            this.apiService.fetchCategoryForecasts(selectedDataListId) :
-            of(null)
+          universe !== 'nta' ? this.apiService.fetchCategoryGeos(selectedDataListId) : of(null),
+          universe !== 'nta' ? this.apiService.fetchCategoryFreqs(selectedDataListId) : of(null),
+          universe === 'fc' ? this.apiService.fetchCategoryForecasts(selectedDataListId) : of(null),
+          universe === 'nta' ? this.apiService.fetchCategoryMeasurements(selectedDataListId, noCache) : of(null)
         ]);
       }),
-      switchMap(([geos, freqs, forecasts]) => {
-        this.setCategorySelectorData(cachedCategoryData, routeParams, geos, freqs, forecasts);
-        const { currentGeo: categoryGeo, currentFreq: categoryFreq } = cachedCategoryData;
-        // For UHERO Forecast portals
-        if (this.portalSettings.selectors.includes('forecast')) {
-          cachedCategoryData.forecasts = forecasts || [];
-          const defaultFc = (cachedCategoryData.selectedDataList.defaults?.fc) || (cachedCategoryData.forecasts && cachedCategoryData.forecasts[0]);
-          let routeFcExists
-          if (routeParams.fc) {
-            routeFcExists = cachedCategoryData.forecasts.find(fc => fc === routeParams.fc);
+      switchMap(([geos, freqs, forecasts, measurements]) => {
+        console.log('args', forecasts)
+        if (this.portal.universe !== 'nta') {
+          this.setCategorySelectorData(cachedCategoryData, routeParams, geos, freqs, forecasts);
+          const { currentGeo: categoryGeo, currentFreq: categoryFreq } = cachedCategoryData;
+          // For UHERO Forecast portals
+          if (this.portalSettings.selectors.includes('forecast')) {
+            cachedCategoryData.forecasts = forecasts || [];
+            const defaultFc = (cachedCategoryData.selectedDataList.defaults?.fc) || (cachedCategoryData.forecasts && cachedCategoryData.forecasts[0]);
+            let routeFcExists
+            if (routeParams.fc) {
+              routeFcExists = cachedCategoryData.forecasts.find(fc => fc === routeParams.fc);
+            }
+            const categoryFc = routeFcExists ? routeParams.fc : defaultFc;
+            cachedCategoryData.currentForecast = forecasts.find(fc => fc === categoryFc);
+            this.helperService.updateCurrentForecast(cachedCategoryData.currentForecast);
+            return this.apiService.fetchExpanded(cachedCategoryData.selectedDataList.id, categoryGeo.handle, categoryFreq.freq, noCache, categoryFc);
           }
-          const categoryFc = routeFcExists ? routeParams.fc : defaultFc;
-          cachedCategoryData.currentForecast = forecasts.find(fc => fc === categoryFc);
-          this.helperService.updateCurrentForecast(cachedCategoryData.currentForecast);
-          return this.apiService.fetchExpanded(cachedCategoryData.selectedDataList.id, categoryGeo.handle, categoryFreq.freq, noCache, categoryFc);
+          return this.apiService.fetchExpanded(cachedCategoryData.selectedDataList.id, categoryGeo.handle, categoryFreq.freq, noCache);  
         }
-        return this.apiService.fetchExpanded(cachedCategoryData.selectedDataList.id, categoryGeo.handle, categoryFreq.freq, noCache);
+        if (measurements) {
+          const { selectedMeasure } = routeParams;
+          cachedCategoryData.currentFreq = { freq: 'A', label: 'Annual' };
+          cachedCategoryData.measurements = measurements;
+          cachedCategoryData.currentMeasurement = this.findSelectedMeasurement(cachedCategoryData, selectedMeasure);
+          return this.apiService.fetchMeasurementSeries(cachedCategoryData.currentMeasurement.id, noCache);
+        }
       }),
     ).subscribe((data: any) => {
-      this.processSeriesData(data, cachedCategoryData, 'ytd', false);
+      this.portal.universe === 'nta' ?
+        this.processSeriesData(data, cachedCategoryData, 'c5ma', true) :
+        this.processSeriesData(data, cachedCategoryData, 'ytd', false);
     });
+  }
+
+  updateSelectors(cachedCategoryData, portal: string) {
+    const { updateCurrentFrequency, updateCurrentForecast, updateCurrentGeography } = this.helperService;
+    if (portal !== 'nta') {
+      updateCurrentGeography(cachedCategoryData.currentGeo);
+    }
+    if (portal === 'forecast') {
+      updateCurrentForecast(cachedCategoryData.currentForecast);
+    }
+    updateCurrentFrequency(cachedCategoryData.currentFreq);
   }
 
   setNoCategoryCata(cachedCategoryData) {
@@ -138,7 +157,7 @@ export class CategoryHelperService {
   }
 
   setCategorySelectorData(cachedCategoryData, routeParams, geos, freqs, forecasts) {
-    // fallback if defaults are specified in Udaman
+    // fallback if defaults are not specified in Udaman
     const defaults = cachedCategoryData.selectedDataList.defaults || { geo: '', freq: '' };
     let { geo: defaultGeo, freq: defaultFreq } = defaults;
     const { geo: routeGeo, freq: routeFreq } = routeParams;
@@ -179,4 +198,9 @@ export class CategoryHelperService {
   }
 
   findSeasonalSeries = (categorySeries: Array<any>) => categorySeries.some(s => s.seasonalAdjustment === 'seasonally_adjusted');
+
+  findSelectedMeasurement = (cachedCategoryData, selectedMeasure: string) => {
+    const { measurements } = cachedCategoryData;
+    return measurements.find(m => selectedMeasure ? m.name === selectedMeasure : m.name === 'Region');
+  }
 }
