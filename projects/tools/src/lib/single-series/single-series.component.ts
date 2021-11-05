@@ -102,7 +102,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.helperService.updateCurrentForecast(newFc);
     const selectedFc = forecasts.find(f => f.forecast === newFc);
     const { freq, label } = selectedFc;
-    console.log(selectedFc)
     this.helperService.updateCurrentFrequency({ freq, label });
     this.goToSeries(siblings, freq, geo, sa, selectedFc);
   }
@@ -148,7 +147,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Update table when selecting new ranges in the chart
-  redrawTable = (e, seriesDetail, tableData, chartData) => {
+  redrawTable = (e, seriesData, tableData, chartData) => {
     let minDate;
     let maxDate;
     let tableStart;
@@ -164,9 +163,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
-    seriesDetail.observations = seriesDetail.seriesObservations;
-    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate, false, null);
+    this.tableHeaders = this.createTableColumns(this.portalSettings, seriesData.seriesDetail);
+    seriesData.observations = seriesData.seriesObservations;
+    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesData.seriesDetail, chartData, minDate, maxDate, false, null);
   }
 
   createTableColumns = (portalSettings, seriesDetail) => {

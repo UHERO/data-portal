@@ -57,7 +57,6 @@ export class CategoryHelperService {
         ]);
       }),
       switchMap(([geos, freqs, forecasts, measurements]) => {
-        console.log('args', forecasts)
         if (this.portal.universe !== 'nta') {
           this.setCategorySelectorData(cachedCategoryData, routeParams, geos, freqs, forecasts);
           const { currentGeo: categoryGeo, currentFreq: categoryFreq } = cachedCategoryData;
