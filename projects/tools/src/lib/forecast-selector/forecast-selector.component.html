@@ -1,0 +1,5 @@
+<select [ngModel]="selectedForecast" (ngModelChange)="onChange($event)" class="form-select" aria-label="forecast-selector">
+  <option [ngValue]="fc" *ngFor="let fc of forecasts">
+     {{fc}}
+  </option>
+</select>

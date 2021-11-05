@@ -163,7 +163,7 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
+              "projects/uhero/src/styles.scss"
             ]
           }
         },
@@ -777,6 +777,193 @@
           "configurations": {
             "production": {
               "devServerTarget": "ccom:serve:production"
+            }
+          }
+        }
+      }
+    },
+    "forecast": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/forecast",
+      "sourceRoot": "projects/forecast/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/forecast",
+            "index": "projects/forecast/src/index.html",
+            "main": "projects/forecast/src/main.ts",
+            "polyfills": "projects/forecast/src/polyfills.ts",
+            "tsConfig": "projects/forecast/tsconfig.app.json",
+            "assets": [
+              "projects/forecast/src/favicon.ico",
+              "projects/forecast/src/assets"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/nova/theme.css",
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "projects/forecast/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets"
+              ]
+            },
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
+          },
+          "configurations": {
+            "staging": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/forecast/src/environments/environment.ts",
+                  "with": "projects/forecast/src/environments/environment.staging.ts"
+                }
+              ],
+              "baseHref": "/fc/"
+            },
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/forecast/src/environments/environment.ts",
+                  "with": "projects/forecast/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "baseHref": "/fc/",
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/forecast/ngsw-config.json"
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/forecast/src/environments/environment.ts",
+                  "with": "projects/forecast/src/environments/environment.apiDev.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "forecast:build"
+          },
+          "configurations": {
+            "staging": {
+              "browserTarget": "forecast:build:staging"
+            },
+            "production": {
+              "browserTarget": "forecast:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "forecast:build:apiDev"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "forecast:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/forecast/src/test.ts",
+            "polyfills": "projects/forecast/src/polyfills.ts",
+            "tsConfig": "projects/forecast/tsconfig.spec.json",
+            "karmaConfig": "projects/forecast/karma.conf.js",
+            "assets": [
+              "projects/forecast/src/favicon.ico",
+              "projects/forecast/src/assets"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/nova/theme.css",
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/forecast/tsconfig.app.json",
+              "projects/forecast/tsconfig.spec.json",
+              "projects/forecast/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/forecast/e2e/protractor.conf.js",
+            "devServerTarget": "forecast:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "forecast:serve:production"
             }
           }
         }

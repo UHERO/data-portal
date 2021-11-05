@@ -15,7 +15,7 @@
 			<ng-template ngIf [ngIf]="portal.categoryTabs && data.subcategories?.length > 1">
 				<ul class="content-links">
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
-						<a [routerLink]="['/category']" [queryParams]="{data_list_id: sub.id}" queryParamsHandling="merge"
+						<a (click)="navToFirstDataList(sub)"
 							[class.current-sub]="sub.id === data.selectedDataList.id">{{sub.name}}</a>
 					</li>
 				</ul>
@@ -26,14 +26,18 @@
 					{{data.selectedDataList.dataListName}}</h3>
 			</ng-template>
 			<div class="filters">
-				<lib-geo-selector [regions]="data.regions" (selectedGeoChange)="redrawSeriesGeo($event, selectedFreq)"
-					class="selector">
+				<lib-geo-selector [regions]="data.regions"
+					(selectedGeoChange)="redrawSeriesGeo($event, selectedFreq, selectedFc)" class="selector">
 				</lib-geo-selector>
-				<lib-freq-selector [freqs]="data.frequencies" (selectedFreqChange)="redrawSeriesFreq($event, selectedGeo)"
-					class="selector">
+				<lib-freq-selector [freqs]="data.frequencies"
+					(selectedFreqChange)="redrawSeriesFreq($event, selectedGeo, selectedFc)" class="selector">
 				</lib-freq-selector>
-				<a (click)="switchView()" class="btn btn-sm switch-view">{{routeView === 'table' ? 'Chart View' : 'Table View'}} 
-					<i class="bi" [class.bi-graph-up]="routeView === 'table'" [class.bi-table]="routeView === 'chart' || !routeView"></i>
+				<lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecasts"
+					(selectedFcChange)="redrawSeriesFc($event, selectedGeo, selectedFreq)" class="selector">
+				</lib-forecast-selector>
+				<a (click)="switchView()" class="btn btn-sm switch-view">{{routeView === 'table' ? 'Chart View' : 'Table View'}}
+					<i class="bi" [class.bi-graph-up]="routeView === 'table'"
+						[class.bi-table]="routeView === 'chart' || !routeView"></i>
 				</a>
 				<label *ngIf="routeView === 'table'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year/Year
@@ -60,9 +64,8 @@
 			</lib-category-table-view>
 			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [routeStart]="routeStart"
 				[routeEnd]="routeEnd" [data]="data.displaySeries" [dates]="data.categoryDates"
-				[dateWrapper]="data.categoryDateWrapper" [freq]="selectedFreq?.freq" [noSeries]="data.noData"
-				[showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" [analyzerView]="false"
-				(updateURLFragment)="updateRoute()">
+				[freq]="selectedFreq?.freq" [noSeries]="data.noData" [showSeasonal]="queryParams.sa === 'true'"
+				[hasSeasonal]="data.hasSeasonal" [analyzerView]="false" (updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && data.noData && !search">

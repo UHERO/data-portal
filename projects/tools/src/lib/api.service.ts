@@ -14,6 +14,7 @@ export class ApiService {
   private cachedCategories;
   private cachedCategoryGeos = [];
   private cachedCategoryFreqs = [];
+  private cachedCategoryFcs = [];
   private cachedExpanded = [];
   private cachedPackageSeries = [];
   private cachedCatMeasures = [];
@@ -85,17 +86,32 @@ export class ApiService {
     }
   }
 
+  fetchCategoryForecasts(id: number): Observable<any> {
+    if (this.cachedCategoryFcs[id]) {
+      return observableOf(this.cachedCategoryFcs[id]);
+    } else {
+      let categoryFcs$ = this.http.get(`${this.baseUrl}/category/fc?id=${id}`, this.httpOptions).pipe(
+        map(mapData),
+        tap(val => {
+          this.cachedCategoryFcs[id] = val;
+          categoryFcs$ = null;
+        }), );
+      return categoryFcs$;
+    }
+  }
+
   // Gets observations for series in a (sub) category
-  fetchExpanded(id: number, geo: string, freq: string, noCache: boolean): Observable<any> {
-    if (this.cachedExpanded[id + geo + freq]) {
-      return observableOf(this.cachedExpanded[id + geo + freq]);
+  fetchExpanded(id: number, geo: string, freq: string, noCache: boolean, fc: string = ''): Observable<any> {
+    if (this.cachedExpanded[id + geo + freq + fc]) {
+      return observableOf(this.cachedExpanded[id + geo + freq + fc]);
     } else {
       const caching = noCache ? '&nocache' : '';
-      const url = `${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}&expand=true${caching}`;
+      const forecast = fc ? `&fc=${fc}` : '';
+      const url = `${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}${forecast}&u=${this.portal.universe}&expand=true${caching}`;
       let expanded$ = this.http.get(url, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
-          this.cachedExpanded[id + geo + freq] = val;
+          this.cachedExpanded[id + geo + freq + fc] = val;
           expanded$ = null;
         }), );
       return expanded$;

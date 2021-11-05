@@ -1,0 +1,39 @@
+$black: #000;
+$white: #FFF;
+$blue: #1D667F;
+$orange: #F6A01B;
+$dark-gray: #505050;
+$hover-gray: #B3B3B3;
+$series-gray: #9E9E9E; 
+$gray: #E5E5E5;
+$light-gray: #FAFAFB;
+$green: #9BBB59;
+$purple: #8064A2;
+
+$primary: $blue;
+$primary-text: $dark-gray;
+$secondary: $orange;
+$border: $gray;
+$tooltip: $light-gray;
+
+/* Highcharts */
+$chart-background: $light-gray;
+$highcharts-series0: $blue;
+$highcharts-series1: none;
+$highstock-series0: $blue;
+$highstock-series1: $series-gray;
+
+/* Analyzer Chart */
+$analyzer-series0: $blue;
+$analyzer-series1: $series-gray;
+$analyzer-series2: $orange;
+$analyzer-series3: $green;
+$analyzer-series4: $purple;
+
+$table-gray: rgba(212, 212, 212, 0.2);
+$table-analyze-button: rgb(212, 212, 212);
+
+/* Loading Screen */
+$img-src: '/../../assets/UHEROdata-Logo-color.svg';
+
+$bg-src: ''

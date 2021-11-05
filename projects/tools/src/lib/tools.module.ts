@@ -16,6 +16,7 @@ import { CategoryTableViewComponent } from './category-table-view/category-table
 import { DateSliderComponent } from './date-slider/date-slider.component';
 import { FreqSelectorComponent } from './freq-selector/freq-selector.component';
 import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
+import { ForecastSelectorComponent } from './forecast-selector/forecast-selector.component';
 import { HighchartComponent } from './highchart/highchart.component';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { AgGridModule } from 'ag-grid-angular';
@@ -45,6 +46,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     DateSliderComponent,
     FreqSelectorComponent,
     GeoSelectorComponent,
+    ForecastSelectorComponent,
     HighchartComponent,
     CategoryTableRenderComponent,
     SingleSeriesComponent,
@@ -87,6 +89,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     CategoryTableViewComponent,
     FreqSelectorComponent,
     GeoSelectorComponent,
+    ForecastSelectorComponent,
     HighchartComponent,
     SingleSeriesComponent,
     HighstockComponent,

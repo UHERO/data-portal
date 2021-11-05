@@ -3,7 +3,7 @@
   "index": "/index.html",
   "assetGroups": [
     {
-      "name": "UHERO Data Portal",
+      "name": "UHERO Forecast Data Portal",
       "installMode": "prefetch",
       "resources": {
         "files": [
@@ -38,24 +38,5 @@
         "strategy": "freshness"
       }
     }
-  ],
-  "navigationUrls": [
-    "/**", "!/**/*.*", "!/**/*__*", "!/**/*__*/**",
-    "!/coh",
-    "!/coh/**",
-    "!/nta",
-    "!/nta/**",
-    "!/ccom",
-    "!/ccom/**",
-    "!/fc",
-    "!/fc/**",
-    "!/high-frequency-dashboard",
-    "!/high-frequency-dashboard/**",
-    "!/dbedt",
-    "!/dbedt/**",
-    "!/dvw",
-    "!/dvw/**",
-    "!/fc",
-    "!/fc/**"
   ]
 }

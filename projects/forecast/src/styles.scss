@@ -152,21 +152,38 @@ body {
     }
   }
 
+  lib-header a#uhero-link, lib-primeng-menu-nav a#uhero-link {
+    display: inline-block;
+    width: 31% !important;
+  }
+
+  lib-header a#data-portal-link, lib-primeng-menu-nav a#data-portal-link {
+    display: inline-block;
+
+    img {
+      margin-left: -61%;
+    }
+  }
+
   lib-header {
     #header {
       p {
         color: $primary;
       }
     }
+
+    #about-link {
+      color: $primary;
+    }
+  }
+
+  lib-primeng-menu-nav {
+    #sidebar-nav .navbar-brand {
+      overflow: hidden;
+    }
   }
 
   lib-landing-page, lib-analyzer {
-    .multi-series-container {
-      .material-icons.md-18 {
-        color: $secondary;
-      }
-    }
-
     .content-links:before {
       display: block;
       content: ' ';
@@ -276,6 +293,12 @@ body {
   }
 
   .analyzer-chart, .single-series-chart {
+    .highcharts-series-1 {
+      .highcharts-graph {
+        stroke: unset;
+      }
+    }
+
     .highcharts-background {
       fill: $chart-background;
     }
@@ -321,7 +344,6 @@ body {
     .highcharts-color-0 {
       fill: $analyzer-series0;
       stroke: $analyzer-series0;
-      color: $analyzer-series0;
     }
       
     .highcharts-color-1 {
@@ -416,8 +438,10 @@ body {
     }
 
     .highcharts-color-2 {
-      fill: none;
-      stroke: none;
+      fill: #fff;
+      stroke: #fff;
+      stroke-opacity: 0;
+      fill-opacity: 0;
     }
 
     .highcharts-tooltip {
@@ -480,6 +504,10 @@ lib-search-results, lib-single-series {
     .p-datatable-tbody tr td {
       padding: .25em .5em;
       text-transform: capitalize;
+
+      a {
+        color: $primary-text;
+      }
     }
 
     .p-widget-overlay {
