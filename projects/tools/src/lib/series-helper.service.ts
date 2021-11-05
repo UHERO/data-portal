@@ -40,6 +40,7 @@ export class SeriesHelperService {
     };
     const dateArray = [];
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
+      console.log('DATA', data)
       this.seriesData.seriesDetail = data.series;
       this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
