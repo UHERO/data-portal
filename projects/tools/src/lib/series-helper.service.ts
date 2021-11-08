@@ -54,9 +54,7 @@ export class SeriesHelperService {
       this.seriesData.regions = geos || [data.series.geography];
       this.seriesData.forecasts = data.forecasts;
       this.seriesData.forecastList = data.forecasts?.map(f => f.forecast) || [];
-      console.log('data.forecasts', data.forecasts)
       currentForecast = data.forecasts?.find(f => f.freq === currentFreq.freq && data.series.name.includes(f.forecast)).forecast || '';
-      console.log('currentForecast', currentForecast)
       this.helperService.updateCurrentForecast(currentForecast);
       this.seriesData.frequencies = freqs || [{ freq: data.series.frequencyShort, label: data.series.frequency }];
       this.seriesData.yoyChange = data.series.percent ? 'Year/Year Change' : 'Year/Year % Change';
@@ -136,7 +134,7 @@ export class SeriesHelperService {
   }
 
   calculateSeriesSummaryStats = (seriesDetail, chartData, startDate: string, endDate: string, indexed: boolean, indexBase) => {
-    const freq = seriesDetail.frequencyShort;
+    const { frequencyShort: freq, decimals, percent } = seriesDetail;
     const formattedStats = {
       series: '',
       seriesInfo: seriesDetail,
@@ -152,7 +150,6 @@ export class SeriesHelperService {
     };
     const { formatNum, formatDate } = this.helperService;
     formattedStats.range = `${formatDate(startDate, freq)} - ${formatDate(endDate, freq)}`;
-    const decimals = seriesDetail.decimals;
     const { dates, level } = chartData;
     const startDateExists = dates.find(d => d.date === startDate);
     const endDateExists = dates.find(d => d.date === endDate);
@@ -179,7 +176,7 @@ export class SeriesHelperService {
     const cagr = this.calculateCAGR(valuesInRange[0], valuesInRange[valuesInRange.length - 1], freq, periods);
     formattedStats.minValue = `${formatNum(min.value, decimals)} (${formatDate(datesInRange[min.index].date, freq)})`;
     formattedStats.maxValue = `${formatNum(max.value, decimals)} (${formatDate(datesInRange[max.index].date, freq)})`;
-    formattedStats.percChange = seriesDetail.percent ? null : percChange;
+    formattedStats.percChange = percent ? null : percChange;
     formattedStats.levelChange = formatNum(diff, decimals);
     formattedStats.total = formatNum(sum, decimals);
     formattedStats.avg = formatNum(sum / valuesInRange.length, decimals);
@@ -217,9 +214,6 @@ export class SeriesHelperService {
     const saSeries = this.seasonalityAndFreqFilter(geoFreqSiblings, 'seasonally_adjusted', freq);
     const nsaSeries = this.seasonalityAndFreqFilter(geoFreqSiblings, 'not_seasonally_adjusted', freq);
     const naSeries = this.seasonalityAndFreqFilter(geoFreqSiblings, 'not_applicable', freq);
-    console.log('saSeries', saSeries);
-    console.log('nsaSeries', nsaSeries);
-    console.log('naSeries', naSeries);
     // If more than one sibling exists (i.e. seasonal & non-seasonal)
     // Select series where seasonalAdjustment matches sa setting
     if (freq === 'A') {
