@@ -40,7 +40,6 @@ export class SeriesHelperService {
     };
     const dateArray = [];
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
-      console.log('DATA', data)
       this.seriesData.seriesDetail = data.series;
       this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
@@ -208,9 +207,6 @@ export class SeriesHelperService {
   }
 
   selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
-    //let saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted' && series.frequencyShort === freq);
-    //let nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted' && series.frequencyShort === freq);
-    //let naSeries = geoFreqSiblings.find(series => ((series.seasonalAdjustment === 'not_applicable' && series.frequencyShort === freq) || !series.seasonalAdjustment));
     const saSeries = this.seasonalityAndFreqFilter(geoFreqSiblings, 'seasonally_adjusted', freq);
     const nsaSeries = this.seasonalityAndFreqFilter(geoFreqSiblings, 'not_seasonally_adjusted', freq);
     const naSeries = this.seasonalityAndFreqFilter(geoFreqSiblings, 'not_applicable', freq);
@@ -220,10 +216,7 @@ export class SeriesHelperService {
       return geoFreqSiblings.find(s => s.frequencyShort === 'A').id;
     }
     if (saSeries && nsaSeries) {
-      if (sa) {
-        return saSeries?.id;
-      }
-      return nsaSeries?.id;
+      return sa ? saSeries?.id : nsaSeries?.id;
     }
     if (!saSeries && nsaSeries) {
       return nsaSeries?.id;
@@ -237,6 +230,6 @@ export class SeriesHelperService {
   }
 
   seasonalityAndFreqFilter = (seriesSiblings: Array<any>, seasonality: string, freq: string) => {
-    return seriesSiblings.find(s => (s.seasonalAdjustment === seasonality && s.frequency === freq) || !s.seasonalAdjustment);
+    return seriesSiblings.find(s => (s.seasonalAdjustment === seasonality && s.frequencyShort === freq) || !s.seasonalAdjustment);
   }
 }
