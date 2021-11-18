@@ -68,6 +68,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = [];
     // Display values in the range of dates selected
+    console.log('table seriess', this.series)
+
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
       const { level, yoy, ytd, c5ma } = transformations;

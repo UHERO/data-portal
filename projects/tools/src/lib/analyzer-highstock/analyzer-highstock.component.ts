@@ -96,6 +96,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
           const changeYAxisSideItem = a.querySelector('.change-y-axis-side');
+          const changeChartValueItem = a.querySelector('.change-chart-value');
           const removeFromAnalyzerItem = a.querySelector('.remove-from-analyzer');
           changeYAxisSideItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
           changeChartTypeItem.style.display = chartOptionSeries?.visible ? 'block' : 'none';
@@ -106,6 +107,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
           if (!a.querySelector(`#y-axis-side-${seriesId}`)) {
             this.createYAxisSideSelector(seriesId, chartOptionSeries, changeYAxisSideItem);
+          }
+          if (!a.querySelector(`#chart-values-${seriesId}`)) {
+            this.createChartSeriesValueSelector(seriesId, chartOptionSeries, changeChartValueItem);
           }
           addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(seriesId));
           removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
@@ -154,6 +158,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   createYAxisSideSelector(seriesId: number, series: any, yAxisSideMenuItem: HTMLElement) {
     if (series) {
+      console.log('series', series)
       const yAxisSelect = document.createElement('select');
       yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
       yAxisSelect.classList.add('form-select');
@@ -161,6 +166,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       yAxisSideMenuItem.appendChild(yAxisSelect);
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
       yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value));
+    }
+  }
+
+  createChartSeriesValueSelector(seriesId: number, series: any, chartValueItem: HTMLElement) {
+    if (series) {
+      const valueSelect = document.createElement('select');
+      valueSelect.setAttribute('id', `chart-values-${seriesId}`);
+      valueSelect.classList.add('form-select');
+      this.addSelectorOptions(valueSelect, series.chartValues, series.selectedChartValue);
+      chartValueItem.appendChild(valueSelect);
+      chartValueItem.addEventListener('mousedown', e => e.stopPropagation());
+      chartValueItem.addEventListener('change', e => this.analyzerService.updateCompareChartTransformation(seriesId, (e.target as HTMLSelectElement).value));
     }
   }
 
@@ -334,6 +351,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         <ul class="dropdown-menu px-2">
           <p class="change-y-axis-side">Y-Axis: </p>
           <p class="change-chart-type">Chart Type: </p>
+          <p class="change-chart-value">Values: </p>
           <p class="remove-from-comparison">
           <i class="bi bi-bar-chart-fill"></i> Remove From Comparison
           </p>
@@ -520,7 +538,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
     const getSeriesColor = (seriesIndex: number) => {
       // Get color of the line for a series & use for tooltip label
-      const lineColor = getComputedStyle(document.querySelector(`.highcharts-markers.highcharts-color-${seriesIndex} path`)).fill;
+      const lineColor = getComputedStyle(document.querySelector(`.highcharts-markers.highcharts-color-${seriesIndex}`)).fill;
       return `<span style="fill:${lineColor}">\u25CF</span>`;
     };
     const formatObsValue = (value: number, decimals: number) => {
@@ -530,10 +548,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     const formatSeriesLabel = (point, seriesValue: number, date: string, pointX, str: string) => {
       const seriesColor = getSeriesColor(point.colorIndex);
-      const displayName = `${point.userOptions.tooltipName} (${point.userOptions.geography})`;
+      const displayName = `${point.userOptions.title} (${point.userOptions.geography.name})`;
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
       const label = `${displayName} ${date}: ${value}`;
-      const pseudoZones = point.userOptions.pseudoZones;
+      const pseudoZones = point.userOptions.chartData.pseudoZones;
       if (pseudoZones.length) {
         pseudoZones.forEach((zone) => {
           return str += pointX < zone.value ? `${seriesColor}Pseudo History ${label}` : `${seriesColor}${label}`;
@@ -609,7 +627,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
         }
       }
-      const dateLabel = getFreqLabel(point.series.userOptions.frequency, point.x);
+      const dateLabel = getFreqLabel(point.series.userOptions.frequencyShort, point.x);
       tooltip += formatSeriesLabel(point.series, point.y, dateLabel, point.x, s);
     });
     return tooltip;

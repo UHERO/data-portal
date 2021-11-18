@@ -64,8 +64,46 @@ export class AnalyzerService {
       this.updateCompareSeriesDataAndAxes(currentCompare);
     }
     const yAxisSide = this.assignYAxisSide(series);
+    const chartValues = series.observations.map(obs => obs.displayName);
+    const selectedChartValue = chartValues.find(name => name === 'Level') || chartValues[0];
+    console.log('series', series)
+    const selectedTransformation = series.observations.find(t => t.displayName === selectedChartValue).values;
     currentCompare.push({
+      ...series,
       className: series.id,
+      name: indexed ? series.indexDisplayName : series.displayName,
+      //data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
+      //levelData: series.chartData.level,
+      data: indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : selectedTransformation,
+      levelData: selectedTransformation,
+      yAxis: yAxisSide,
+      yAxisText: indexed ? `Index (${baseYear})` : `${series.unitsLabelShort}`,
+      type: series.selectedChartType,
+      currentFreq: { freq: series.frequencyShort, label: series.frequency },
+      includeInDataExport: true,
+      showInLegend: true,
+      showInNavigator: false,
+      events: {
+        legendItemClick() {
+          return false;
+        }
+      },
+      seasonallyAdjusted: series.seasonalAdjustment === 'seasonally_adjusted',
+      visible: series.compare,
+      chartType: [
+        'line',
+        'column',
+        'area'
+      ],
+      selectedChartType: 'line',
+      yAxisSides: [
+        'left',
+        'right'
+      ],
+      chartValues: chartValues,
+      selectedChartValue: selectedChartValue
+      //tooltipName: series.title
+      /* className: series.id,
       name: indexed ? series.indexDisplayName : series.displayName,
       tooltipName: series.title,
       data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
@@ -103,7 +141,7 @@ export class AnalyzerService {
       yAxisSides: [
         'left',
         'right'
-      ],
+      ], */
     });
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
@@ -160,7 +198,7 @@ export class AnalyzerService {
       yLeftSeries.push(seriesId);
     }
     currentCompareSeries.yAxis = axis;
-    currentCompareSeries.yAxisText = indexed ? `Index (${baseYear})` : `${currentCompareSeries.seriesInfo.unitsLabelShort}`;
+    currentCompareSeries.yAxisText = indexed ? `Index (${baseYear})` : `${currentCompareSeries.unitsLabelShort}`;
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -169,6 +207,17 @@ export class AnalyzerService {
     const currentCompareSeries = currentCompare.find(s => s.className === seriesId);
     currentCompareSeries.type = chartType;
     currentCompareSeries.selectedChartType = chartType;
+    this.analyzerSeriesCompareSource.next(currentCompare);
+  }
+
+  updateCompareChartTransformation(seriesId: number, transformation: string) {
+    const { indexed, baseYear } = this.analyzerData;
+    const currentCompare = this.analyzerSeriesCompareSource.value;
+    const currentCompareSeries = currentCompare.find(s => s.className === seriesId);
+    currentCompareSeries.selectedChartValue = transformation;
+    const selectedTransformation = currentCompareSeries.observations.find(t => t.displayName === transformation).values;
+    currentCompareSeries.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : selectedTransformation;
+    currentCompareSeries.levelData = selectedTransformation;
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -229,9 +278,11 @@ export class AnalyzerService {
   }
 
   getAnalyzerData(aSeriesTracker: Array<any>, noCache: boolean) {
+    this.analyzerData.analyzerSeries = []
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
+    console.log('fetch ids', ids)
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       const analyzerDateWrapper = { } as DateWrapper;
@@ -355,7 +406,7 @@ export class AnalyzerService {
       // Use to format dates for table
       this.helperService.createDateArray(observationStart, observationEnd, series.currentFreq.freq, dateArray);
       const levelChartData = this.helperService.createSeriesChartData(transformationResults[0], dateArray);
-      series.chartData = { level: levelChartData, dates: dateArray, pseudoZones };
+      series.chartData = { level: levelChartData, dates: dateArray, pseudoZones, ...series.observations };
     } else {
       series.noData = 'Data not available';
     }
@@ -468,10 +519,10 @@ export class AnalyzerService {
 
   getIndexBaseYear = (series: any, start: string) => {
     const maxObsStartDate = series.reduce((prev, current) => {
-      const prevObsStart = prev.seriesInfo.seriesObservations.observationStart;
-      const currentObsStart = current.seriesInfo.seriesObservations.observationStart;
+      const prevObsStart = prev.seriesObservations.observationStart;
+      const currentObsStart = current.seriesObservations.observationStart;
       return prevObsStart > currentObsStart ? prev : current;
-    }).seriesInfo.seriesObservations.observationStart;
+    }).seriesObservations.observationStart;
     this.analyzerData.baseYear = (maxObsStartDate > start || !start) ? maxObsStartDate : start;
     return this.analyzerData.baseYear;
   }

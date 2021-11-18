@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { forkJoin, Subscription } from 'rxjs';
 import { ApiService } from '../api.service';
@@ -38,9 +38,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private dataPortalSettingsServ: DataPortalSettingsService,
     private route: ActivatedRoute,
     private apiService: ApiService,
+    private router: Router,
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
+      console.log('analyzer sub', series)
       this.updateAnalyzer(series);
     });
   }
@@ -61,6 +63,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         this.tableYoy = this.evalParamAsTrue(params['yoy']);
         this.tableYtd = this.evalParamAsTrue(params['ytd']);
         this.tableC5ma = this.evalParamAsTrue(params['c5ma']);
+        if (this.tableYoy) { this.queryParams.yoy = this.tableYoy } else { delete this.queryParams.yoy };
+        if (this.tableYtd) { this.queryParams.ytd = this.tableYtd } else { delete this.queryParams.ytd };
+        if (this.tableC5ma) { this.queryParams.c5ma = this.tableC5ma } else { delete this.queryParams.c5ma };
+        if (this.displayCompare) { this.queryParams.compare = this.displayCompare } else { delete this.queryParams.compare };
+        if (this.indexSeries) { this.queryParams.index = this.indexSeries } else { delete this.queryParams.index };
         this.yRightSeries = params['yright'];
         this.yLeftSeries = params['yleft'];
         this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || []
@@ -69,6 +76,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       });
     }
     this.updateAnalyzer(this.analyzerSeries);
+
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
@@ -94,23 +102,32 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   setTableDates(e) {
     this.analyzerService.analyzerData.minDate = e.minDate;
     this.analyzerService.analyzerData.maxDate = e.maxDate;
+    this.queryParams.start = e.minDate;
+    this.queryParams.end = e.maxDate;
+    this.updateRoute();
   }
 
   indexActive(e) {
     this.indexSeries = e.target.checked;
-    this.analyzerService.toggleIndexValues(e.target.checked, this.analyzerService.analyzerData.minDate)
+    this.queryParams.index = e.target.checked ? e.target.checked : null;
+    this.analyzerService.toggleIndexValues(e.target.checked, this.analyzerService.analyzerData.minDate);
+    this.updateRoute();
   }
 
   checkTransforms(e) {
     if (e.label === 'yoy') {
       this.tableYoy = e.value;
+      this.queryParams.yoy = e.value ? e.value : null;
     }
     if (e.label === 'ytd') {
       this.tableYtd = e.value;
+      this.queryParams.ytd = e.value ? e.value : null;
     }
     if (e.label === 'c5ma') {
       this.tableC5ma = e.value;
+      this.queryParams.c5ma = e.value ? e.value : null;
     }
+    this.updateRoute();
   }
 
   changeAnalyzerFrequency(freq, analyzerSeries) {
@@ -122,13 +139,18 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
         siblings.forEach((sib) => {
+          console.log('sib', sib);
+          console.log(analyzerSeries)
           if (!siblingIds.some(s => s.id === sib.id) && sib.frequencyShort === freq) {
             const drawInCompare = analyzerSeries.find(s => s.title === sib.title).compare === true;
             siblingIds.push({ id: sib.id, compare: drawInCompare });  
           }
         })
       });
-      this.analyzerService.updateAnalyzerSeries(siblingIds);
+      this.queryParams.analyzerSeries = siblingIds.map(ids => ids.id).join('-');
+      this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.compare).map(ids => ids.id).join('-');
+      this.updateRoute();
+      //this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
   }
 
@@ -138,6 +160,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   toggleAnalyzerDisplay() {
     this.displayCompare = !this.displayCompare;
+    this.queryParams.compare = this.displayCompare;
+    this.updateRoute();
   }
 
   changeRange(e) {
@@ -145,7 +169,14 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
     const currentCompareSeries = this.analyzerService.analyzerSeriesCompareSource.value;
     const seriesToCalcBaseYear = currentCompareSeries.filter(s => s.visible).length ? currentCompareSeries.filter(s => s.visible) : currentCompareSeries;
-    this.analyzerService.getIndexBaseYear(seriesToCalcBaseYear, e.seriesStart)
-    this.analyzerService.updateCompareSeriesDataAndAxes(this.analyzerService.analyzerSeriesCompareSource.value)
+    this.analyzerService.getIndexBaseYear(seriesToCalcBaseYear, e.seriesStart);
+    this.analyzerService.updateCompareSeriesDataAndAxes(this.analyzerService.analyzerSeriesCompareSource.value);
+    this.queryParams.start = e.seriesStart;
+    this.queryParams.end = e.seriesEnd;
+    this.updateRoute();
+  }
+
+  updateRoute() {
+    this.router.navigate(['/analyzer'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
   }
 }

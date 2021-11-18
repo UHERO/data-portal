@@ -2,19 +2,6 @@
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../dist/tools",
   "lib": {
-    "entryFile": "src/public-api.ts",
-    "umdModuleIds": {
-      "primeng/panelmenu": "primeng/pangelmenu",
-      "highcharts": "highcharts",
-      "highcharts-angular": "highcharts-angular",
-      "primeng/table": "primeng/table",
-      "primeng/slider": "primeng/slider",
-      "primeng/calendar": "primeng/calendar",
-      "ag-grid-angular": "ag-grid-angular",
-      "highcharts/highstock": "highcharts/highstock",
-      "highcharts/modules/exporting": "highcharts/modules/exporting",
-      "highcharts/modules/export-data": "highcharts/modules/export-data",
-      "highcharts/modules/offline-exporting": "highcharts/modules/offline-exporting"
-    }
+    "entryFile": "src/public-api.ts"
   }
 }
