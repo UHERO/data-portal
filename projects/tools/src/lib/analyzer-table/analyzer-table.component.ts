@@ -165,7 +165,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     const indexBaseYearNotAvailable = !indexedValues.some(v => v !== Infinity);
     const indexDisplayName = indexBaseYearNotAvailable ? series.naIndex : series.indexDisplayName;
     const seriesData = {
-      series: this.indexChecked ? indexDisplayName : series.displayName,
+      series: this.analyzerService.formatDisplayName(series, this.indexChecked), //this.indexChecked ? indexDisplayName : series.displayName,
       lockPosition: true,
       saParam: series.saParam,
       seriesInfo: series,

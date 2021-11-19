@@ -174,7 +174,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const valueSelect = document.createElement('select');
       valueSelect.setAttribute('id', `chart-values-${seriesId}`);
       valueSelect.classList.add('form-select');
-      this.addSelectorOptions(valueSelect, series.chartValues, series.selectedChartValue);
+      this.addSelectorOptions(valueSelect, series.chartValues, series.selectedChartTransformation);
       chartValueItem.appendChild(valueSelect);
       chartValueItem.addEventListener('mousedown', e => e.stopPropagation());
       chartValueItem.addEventListener('change', e => this.analyzerService.updateCompareChartTransformation(seriesId, (e.target as HTMLSelectElement).value));

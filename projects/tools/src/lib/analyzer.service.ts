@@ -65,19 +65,19 @@ export class AnalyzerService {
     }
     const yAxisSide = this.assignYAxisSide(series);
     const chartValues = series.observations.map(obs => obs.displayName);
-    const selectedChartValue = chartValues.find(name => name === 'Level') || chartValues[0];
+    const selectedChartTransformation = chartValues.find(name => name === 'Level') || chartValues[0];
     console.log('series', series)
-    const selectedTransformation = series.observations.find(t => t.displayName === selectedChartValue).values;
+    const selectedTransformation = series.observations.find(t => t.displayName === selectedChartTransformation).values;
     currentCompare.push({
       ...series,
       className: series.id,
-      name: indexed ? series.indexDisplayName : series.displayName,
+      name: this.formatDisplayName(series, indexed, selectedChartTransformation), //indexed ? series.indexDisplayName : series.displayName,
       //data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
       //levelData: series.chartData.level,
       data: indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : selectedTransformation,
       levelData: selectedTransformation,
       yAxis: yAxisSide,
-      yAxisText: indexed ? `Index (${baseYear})` : `${series.unitsLabelShort}`,
+      yAxisText: this.setYAxisLabel(indexed, baseYear,series, selectedChartTransformation),
       type: series.selectedChartType,
       currentFreq: { freq: series.frequencyShort, label: series.frequency },
       includeInDataExport: true,
@@ -101,49 +101,19 @@ export class AnalyzerService {
         'right'
       ],
       chartValues: chartValues,
-      selectedChartValue: selectedChartValue
-      //tooltipName: series.title
-      /* className: series.id,
-      name: indexed ? series.indexDisplayName : series.displayName,
-      tooltipName: series.title,
-      data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
-      levelData: series.chartData.level,
-      yAxis: yAxisSide,
-      yAxisText: indexed ? `Index (${baseYear})` : `${series.unitsLabelShort}`,
-      type: series.selectedChartType,
-      decimals: series.decimals,
-      frequency: series.frequencyShort,
-      currentFreq: { freq: series.frequencyShort, label: series.frequency },
-      geography: series.geography.name,
-      includeInDataExport: true,
-      showInLegend: true,
-      showInNavigator: false,
-      seriesInfo: series,
-      events: {
-        legendItemClick() {
-          return false;
-        }
-      },
-      observations: series.observations,
-      unitsLabelShort: series.unitsLabelShort,
-      seasonallyAdjusted: series.seasonalAdjustment === 'seasonally_adjusted',
-      dataGrouping: {
-        enabled: false
-      },
-      pseudoZones: series.chartData.pseudoZones,
-      visible: series.compare,
-      chartType: [
-        'line',
-        'column',
-        'area'
-      ],
-      selectedChartType: 'line',
-      yAxisSides: [
-        'left',
-        'right'
-      ], */
+      selectedChartTransformation
     });
     this.analyzerSeriesCompareSource.next(currentCompare);
+  }
+
+  setYAxisLabel = (indexed: boolean, baseYear, series, transformation: string) => {
+    if (indexed) {
+      return `Index (${baseYear})`;
+    }
+    if (transformation !== 'Level') {
+      return series.percent ? 'Change' : '% Change';
+    }
+    return`${series.unitsLabelShort}`;
   }
 
   makeCompareSeriesVisible(seriesId: number) {
@@ -179,6 +149,7 @@ export class AnalyzerService {
   updateCompareSeriesAxis(seriesId: any, axis: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const currentCompareSeries = currentCompare.find(s => s.className === seriesId);
+    console.log('currentCompareSeries', currentCompareSeries)
     const { yRightSeries, yLeftSeries } = this.analyzerData;
     const rightSeriesMatch = yRightSeries.find(id => id === seriesId);
     const leftSeriesMatch = yLeftSeries.find(id => id === seriesId);
@@ -198,7 +169,7 @@ export class AnalyzerService {
       yLeftSeries.push(seriesId);
     }
     currentCompareSeries.yAxis = axis;
-    currentCompareSeries.yAxisText = indexed ? `Index (${baseYear})` : `${currentCompareSeries.unitsLabelShort}`;
+    currentCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, currentCompareSeries, currentCompareSeries.selectedChartTransformation);
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -214,7 +185,8 @@ export class AnalyzerService {
     const { indexed, baseYear } = this.analyzerData;
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const currentCompareSeries = currentCompare.find(s => s.className === seriesId);
-    currentCompareSeries.selectedChartValue = transformation;
+    currentCompareSeries.selectedChartTransformation = transformation;
+    currentCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, currentCompareSeries, transformation);
     const selectedTransformation = currentCompareSeries.observations.find(t => t.displayName === transformation).values;
     currentCompareSeries.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : selectedTransformation;
     currentCompareSeries.levelData = selectedTransformation;
@@ -254,6 +226,7 @@ export class AnalyzerService {
   updateCompareSeriesDataAndAxes(series: Array<any>) {
     const { indexed, baseYear } = this.analyzerData;
     series.forEach((s) => {
+      s.name = indexed ? s.indexDisplayName : s.displayName
       s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
       s.yAxisText = indexed ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
     });
@@ -391,9 +364,9 @@ export class AnalyzerService {
       seasonalAdjustment,
       units: 'Not available for current base year'
     }
-    series.displayName = this.formatDisplayName(abbreviatedNameDetails);
-    series.indexDisplayName = this.formatDisplayName(indexNameDetails);
-    series.naIndex = this.formatDisplayName(indexNameNoValues);
+    //series.displayName = this.formatDisplayName(abbreviatedNameDetails);
+    //series.indexDisplayName = this.formatDisplayName(indexNameDetails);
+    //series.naIndex = this.formatDisplayName(indexNameNoValues);
     series.saParam = seasonalAdjustment !== 'not_seasonally_adjusted';
     series.currentGeo = series.geography;
     series.currentFreq = { freq: frequencyShort, label: frequency };
@@ -506,7 +479,7 @@ export class AnalyzerService {
     return categoryTable;
   }
 
-  formatDisplayName({ title, geography, frequency, seasonalAdjustment, units }) {
+  /* formatDisplayName({ title, geography, frequency, seasonalAdjustment, units }) {
     let ending = '';
     if (seasonalAdjustment === 'seasonally_adjusted') {
       ending = '; Seasonally Adjusted';
@@ -515,6 +488,21 @@ export class AnalyzerService {
       ending = '; Not Seasonally Adjusted';
     }
     return `${title} (${units}) (${geography}; ${frequency}${ending})`;
+  } */
+
+  formatDisplayName = (series, indexed: boolean, transformation: string = 'Level') => {
+    const { seasonalAdjustment, unitsLabel, unitsLabelShort, geography, frequency, title } = series;
+    let ending = '';
+    if (seasonalAdjustment === 'seasonally_adjusted') {
+      ending = '; Seasonally Adjusted';
+    }
+    if (seasonalAdjustment === 'not_seasonally_adjusted') {
+      ending = '; Not Seasonally Adjusted';
+    }
+    let units = unitsLabelShort || unitsLabel;
+    units = transformation !== 'Level' ? `${transformation}` : units;
+    const displayUnits = indexed ? `Index` : `${units}`
+    return `${title} (${displayUnits}) (${geography.shortName}; ${frequency}${ending})`;
   }
 
   getIndexBaseYear = (series: any, start: string) => {
