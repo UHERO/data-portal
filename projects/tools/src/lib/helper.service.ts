@@ -265,8 +265,8 @@ export class HelperService {
     let dateArray = [];
     const observationNames = {
       lvl: 'Level',
-      ytd: 'Year-to-Date',
-      pc1: 'Year-over-Year',
+      ytd: 'YTD',
+      pc1: 'YOY',
       c5ma: 'Annual Change'
     };
     const { observationStart, observationEnd, transformationResults } = series.seriesObservations;

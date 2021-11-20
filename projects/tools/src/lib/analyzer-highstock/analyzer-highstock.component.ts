@@ -158,7 +158,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   createYAxisSideSelector(seriesId: number, series: any, yAxisSideMenuItem: HTMLElement) {
     if (series) {
-      console.log('series', series)
       const yAxisSelect = document.createElement('select');
       yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
       yAxisSelect.classList.add('form-select');
@@ -264,7 +263,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   sortVisible = (a, b) => b.visible - a.visible;
 
-  createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator').map(s => s.yAxisText))].join(', ');
+  createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator' && s.visible).map(s => s.yAxisText))].join(', ');
 
   changeYAxisMin(e, axis) {
     this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null

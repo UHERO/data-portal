@@ -42,7 +42,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
-      console.log('analyzer sub', series)
       this.updateAnalyzer(series);
     });
   }
@@ -139,18 +138,16 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
         siblings.forEach((sib) => {
-          console.log('sib', sib);
-          console.log(analyzerSeries)
           if (!siblingIds.some(s => s.id === sib.id) && sib.frequencyShort === freq) {
             const drawInCompare = analyzerSeries.find(s => s.title === sib.title).compare === true;
-            siblingIds.push({ id: sib.id, compare: drawInCompare });  
+            siblingIds.push({ id: sib.id, compare: drawInCompare });
           }
         })
       });
       this.queryParams.analyzerSeries = siblingIds.map(ids => ids.id).join('-');
       this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.compare).map(ids => ids.id).join('-');
+      this.analyzerService.updateAnalyzerSeries(siblingIds);
       this.updateRoute();
-      //this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
   }
 

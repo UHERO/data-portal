@@ -66,14 +66,11 @@ export class AnalyzerService {
     const yAxisSide = this.assignYAxisSide(series);
     const chartValues = series.observations.map(obs => obs.displayName);
     const selectedChartTransformation = chartValues.find(name => name === 'Level') || chartValues[0];
-    console.log('series', series)
     const selectedTransformation = series.observations.find(t => t.displayName === selectedChartTransformation).values;
     currentCompare.push({
       ...series,
       className: series.id,
-      name: this.formatDisplayName(series, indexed, selectedChartTransformation), //indexed ? series.indexDisplayName : series.displayName,
-      //data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
-      //levelData: series.chartData.level,
+      name: this.formatDisplayName(series, indexed, selectedChartTransformation),
       data: indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : selectedTransformation,
       levelData: selectedTransformation,
       yAxis: yAxisSide,
@@ -149,7 +146,6 @@ export class AnalyzerService {
   updateCompareSeriesAxis(seriesId: any, axis: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const currentCompareSeries = currentCompare.find(s => s.className === seriesId);
-    console.log('currentCompareSeries', currentCompareSeries)
     const { yRightSeries, yLeftSeries } = this.analyzerData;
     const rightSeriesMatch = yRightSeries.find(id => id === seriesId);
     const leftSeriesMatch = yLeftSeries.find(id => id === seriesId);
@@ -185,9 +181,10 @@ export class AnalyzerService {
     const { indexed, baseYear } = this.analyzerData;
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const currentCompareSeries = currentCompare.find(s => s.className === seriesId);
-    currentCompareSeries.selectedChartTransformation = transformation;
+    currentCompareSeries.selectedChartTransformation = currentCompareSeries.chartValues.find(t => t === transformation);
     currentCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, currentCompareSeries, transformation);
     const selectedTransformation = currentCompareSeries.observations.find(t => t.displayName === transformation).values;
+    currentCompareSeries.name = this.formatDisplayName(currentCompareSeries, indexed, transformation);
     currentCompareSeries.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : selectedTransformation;
     currentCompareSeries.levelData = selectedTransformation;
     this.analyzerSeriesCompareSource.next(currentCompare);
@@ -226,9 +223,10 @@ export class AnalyzerService {
   updateCompareSeriesDataAndAxes(series: Array<any>) {
     const { indexed, baseYear } = this.analyzerData;
     series.forEach((s) => {
-      s.name = indexed ? s.indexDisplayName : s.displayName
-      s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
-      s.yAxisText = indexed ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
+      s.name = this.formatDisplayName(s, indexed, s.selectedChartTransformation);
+      s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : s.observations.find(t => t.displayName === s.selectedChartTransformation).values;
+      s.levelData =  s.observations.find(t => t.displayName === s.selectedChartTransformation).values;
+      s.yAxisText = this.setYAxisLabel(indexed, baseYear, s, s.selectedChartTransformation);
     });
   }
 
@@ -255,7 +253,6 @@ export class AnalyzerService {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
-    console.log('fetch ids', ids)
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       const analyzerDateWrapper = { } as DateWrapper;
@@ -343,20 +340,6 @@ export class AnalyzerService {
 
   formatSeriesForAnalyzer = (series) => {
     const { title, geography, frequency, seasonalAdjustment, unitsLabelShort, unitsLabel, frequencyShort } = series;
-    const abbreviatedNameDetails = {
-      title,
-      geography: geography.shortName,
-      frequency,
-      seasonalAdjustment,
-      units: unitsLabelShort || unitsLabel
-    };
-    const indexNameDetails = {
-      title,
-      geography: geography.shortName,
-      frequency,
-      seasonalAdjustment,
-      units: 'Index'
-    }
     const indexNameNoValues = {
       title,
       geography: geography.shortName,
@@ -364,8 +347,8 @@ export class AnalyzerService {
       seasonalAdjustment,
       units: 'Not available for current base year'
     }
-    //series.displayName = this.formatDisplayName(abbreviatedNameDetails);
-    //series.indexDisplayName = this.formatDisplayName(indexNameDetails);
+    series.displayName = this.formatDisplayName(series, this.analyzerData.indexed);
+    series.indexDisplayName = this.formatDisplayName(series, this.analyzerData.indexed);
     //series.naIndex = this.formatDisplayName(indexNameNoValues);
     series.saParam = seasonalAdjustment !== 'not_seasonally_adjusted';
     series.currentGeo = series.geography;
@@ -479,17 +462,6 @@ export class AnalyzerService {
     return categoryTable;
   }
 
-  /* formatDisplayName({ title, geography, frequency, seasonalAdjustment, units }) {
-    let ending = '';
-    if (seasonalAdjustment === 'seasonally_adjusted') {
-      ending = '; Seasonally Adjusted';
-    }
-    if (seasonalAdjustment === 'not_seasonally_adjusted') {
-      ending = '; Not Seasonally Adjusted';
-    }
-    return `${title} (${units}) (${geography}; ${frequency}${ending})`;
-  } */
-
   formatDisplayName = (series, indexed: boolean, transformation: string = 'Level') => {
     const { seasonalAdjustment, unitsLabel, unitsLabelShort, geography, frequency, title } = series;
     let ending = '';
@@ -501,7 +473,7 @@ export class AnalyzerService {
     }
     let units = unitsLabelShort || unitsLabel;
     units = transformation !== 'Level' ? `${transformation}` : units;
-    const displayUnits = indexed ? `Index` : `${units}`
+    const displayUnits = indexed ? `Index - ${transformation}` : `${units}`
     return `${title} (${displayUnits}) (${geography.shortName}; ${frequency}${ending})`;
   }
 

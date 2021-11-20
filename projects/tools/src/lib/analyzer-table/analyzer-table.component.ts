@@ -68,7 +68,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = [];
     // Display values in the range of dates selected
-    console.log('table seriess', this.series)
 
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
@@ -96,7 +95,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
 
   calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
     const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, startDate, endDate, indexed, indexBase);
-    stats.series = this.indexChecked ? series.indexDisplayName : series.displayName;
+    stats.series = this.analyzerService.formatDisplayName(series, this.indexChecked);
     return stats;
   }
 
