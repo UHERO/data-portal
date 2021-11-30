@@ -228,6 +228,7 @@ export class AnalyzerService {
       s.levelData =  s.observations.find(t => t.displayName === s.selectedChartTransformation).values;
       s.yAxisText = this.setYAxisLabel(indexed, baseYear, s, s.selectedChartTransformation);
     });
+    this.analyzerSeriesCompareSource.next(series);
   }
 
   addToAnalyzer(seriesID: number) {

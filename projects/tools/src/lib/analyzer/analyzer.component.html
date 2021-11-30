@@ -21,7 +21,7 @@
             [attr.title]="!data.displayFreqSelector ? 'Unavailable for mixed frequencies' : ''" [checked]="indexSeries"
             [disabled]="!data.displayFreqSelector">Index
         </label>
-        <lib-date-slider *ngIf="!displayCompare && data.requestComplete" class="sliders"
+        <lib-date-slider *ngIf="data.requestComplete" class="sliders"
           [portalSettings]="portalSettings" [dates]="data.sliderDates" [dateFrom]="data.minDate" [dateTo]="data.maxDate"
           [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
           <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"

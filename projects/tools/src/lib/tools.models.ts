@@ -147,9 +147,13 @@ export interface HighstockObject {
     labelFormatter: () => string
   };
   navigator: {
-    series: {
+    enabled?: boolean,
+    series?: {
       includeInDataExport: boolean
     }
+  };
+  scrollbar?: {
+    enabled: boolean
   };
   exporting: {
     allowHTML: boolean,
@@ -161,6 +165,10 @@ export interface HighstockObject {
         text: string,
         _titleKey: string,
         menuItems: Array<any>
+      },
+      customButton?: {
+        text: string,
+        onclick: () => void
       }
     },
     csv: {

@@ -99,10 +99,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   // Update table when selecting new ranges in the chart
   setTableDates(e) {
-    this.analyzerService.analyzerData.minDate = e.minDate;
+    console.log('settabledates e', e)
+    /*this.analyzerService.analyzerData.minDate = e.minDate;
     this.analyzerService.analyzerData.maxDate = e.maxDate;
     this.queryParams.start = e.minDate;
-    this.queryParams.end = e.maxDate;
+    this.queryParams.end = e.maxDate;*/
     this.updateRoute();
   }
 
@@ -162,6 +163,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   changeRange(e) {
+    console.log('change range e', e)
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
     const currentCompareSeries = this.analyzerService.analyzerSeriesCompareSource.value;
