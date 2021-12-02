@@ -1,4 +1,4 @@
-import { Component, Input, Inject, OnInit, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, Inject, OnChanges, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { HelperService } from '../helper.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { HelperService } from '../helper.service';
   styleUrls: ['./date-slider.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DateSliderComponent implements OnInit {
+export class DateSliderComponent implements OnChanges {
   @ViewChild('calendarStart') calendarStart;
   @ViewChild('calendarEnd') calendarEnd;
   @Input() portalSettings;
@@ -38,7 +38,7 @@ export class DateSliderComponent implements OnInit {
     private helperService: HelperService,
   ) { }
 
-  ngOnInit() {
+  ngOnChanges() {
     if (this.dates && this.dates.length) {
       const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.dateFrom, this.dateTo, this.freq, this.defaultRange);
       // Start and end used for 'from' and 'to' inputs in slider

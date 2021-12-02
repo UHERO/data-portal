@@ -166,7 +166,11 @@ export interface HighstockObject {
         _titleKey: string,
         menuItems: Array<any>
       },
-      customButton?: {
+      lvlButton?: {
+        text: string,
+        onclick: () => void
+      },
+      yoyButton?: {
         text: string,
         onclick: () => void
       }

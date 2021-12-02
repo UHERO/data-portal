@@ -272,6 +272,7 @@ export class AnalyzerService {
       const currentCompareSeries = this.analyzerSeriesCompareSource.value;
       const seriesToCalcBaseYear = currentCompareSeries.filter(s => s.visible).length ? currentCompareSeries.filter(s => s.visible) : currentCompareSeries;
       this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, this.analyzerData.minDate);
+      console.log('GETOANALYZERDATA seriesToCalcBaseYear', seriesToCalcBaseYear)
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.analyzerData.requestComplete = true;
     });

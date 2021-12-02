@@ -129,7 +129,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       console.log('on change start', this.start)
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
       this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
-      this.chartObject.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end))
+      this.chartObject.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
       this.setYMinMax();
     }
     if (this.chartOptions.rangeSelector) {
@@ -321,7 +321,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
-            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+            tableExtremes.emit({ seriesStart: this._extremes.min, seriesEnd: this._extremes.max });
           }
         },
         load() {
@@ -409,8 +409,14 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
           text: 'Download'
         },
-        customButton: {
-          text: 'Test',
+        lvlButton: {
+          text: 'LVL',
+          onclick: function() {
+            alert('Test')
+          }
+        },
+        yoyButton: {
+          text: 'YOY',
           onclick: function() {
             alert('Test')
           }
@@ -481,6 +487,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
+          console.log('RANGE SELECTOR CHECK')
           const extremes = this.getExtremes();
           const userMin = new Date(extremes.min).toISOString().split('T')[0];
           const userMax = new Date(extremes.max).toISOString().split('T')[0];
@@ -491,7 +498,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._indexed = updateIndexed(this);
           if (this._extremes) {
             if (this._indexed) {
-              const compareSeries = this.series.filter(s => s.name !== 'Navigator').map(s => s.userOptions);
+              const compareSeries = this.series.filter(s => s.name !== 'Navigator' && s.visible).map(s => s.userOptions);
               const indexBaseYear = getIndexBaseYear(compareSeries, this._extremes.min);
               this.chart.yAxis.forEach((axis) => {
                 if (axis.userOptions.title.text && axis.userOptions.title.text.includes('Index')) {
@@ -511,7 +518,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
                 }
               });
             }
-            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+            tableExtremes.emit({ seriesStart: this._extremes.min, seriesEnd: this._extremes.max });
             // use setExtremes to snap dates to min/max date range
             this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max))
           }

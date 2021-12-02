@@ -48,6 +48,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.route) {
+      console.log('ROUTE LOAD')
       this.route.queryParams.subscribe(params => {
         if (params[`analyzerSeries`]) {
           this.storeUrlSeries(params[`analyzerSeries`]);
@@ -100,10 +101,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   // Update table when selecting new ranges in the chart
   setTableDates(e) {
     console.log('settabledates e', e)
-    /*this.analyzerService.analyzerData.minDate = e.minDate;
-    this.analyzerService.analyzerData.maxDate = e.maxDate;
-    this.queryParams.start = e.minDate;
-    this.queryParams.end = e.maxDate;*/
+    
+    this.analyzerService.analyzerData.minDate = e.seriesStart;
+    this.analyzerService.analyzerData.maxDate = e.seriesEnd;
+    this.queryParams.start = e.seriesStart;
+    this.queryParams.end = e.seriesEnd;
     this.updateRoute();
   }
 
@@ -167,9 +169,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
     const currentCompareSeries = this.analyzerService.analyzerSeriesCompareSource.value;
+    console.log('currentCompareSeries', currentCompareSeries)
     const seriesToCalcBaseYear = currentCompareSeries.filter(s => s.visible).length ? currentCompareSeries.filter(s => s.visible) : currentCompareSeries;
+    console.log('seriesToCalcBaserYear', seriesToCalcBaseYear)
     this.analyzerService.getIndexBaseYear(seriesToCalcBaseYear, e.seriesStart);
-    this.analyzerService.updateCompareSeriesDataAndAxes(this.analyzerService.analyzerSeriesCompareSource.value);
+    //this.analyzerService.updateCompareSeriesDataAndAxes(this.analyzerService.analyzerSeriesCompareSource.value);
     this.queryParams.start = e.seriesStart;
     this.queryParams.end = e.seriesEnd;
     this.updateRoute();
