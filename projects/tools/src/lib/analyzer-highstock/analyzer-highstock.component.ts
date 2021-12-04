@@ -72,7 +72,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
       this.compareSeries = series;
-      console.log('sub start', this.start)
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
@@ -126,7 +125,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   ngOnChanges() {
     // prevent date ranges from resetting when adding a series/indexing
     if (this.chartOptions.xAxis) {
-      console.log('on change start', this.start)
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
       this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
       this.chartObject.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
@@ -258,6 +256,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       return axes;
     }, []);
     this.chartOptions.series = chartSeries;
+    console.log('chartSeries', chartSeries)
     this.updateChart = true;
     if (this.chartObject) {
       this.chartObject.redraw();
@@ -286,6 +285,31 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return chartButtons;
   }
 
+  chartTransformationToggles = (chartSeries) => {
+    const updateTransformation = (seriesId, transformation) =>  this.analyzerService.updateCompareChartTransformation(seriesId, transformation);
+    const series = chartSeries.filter(s => s.className !== 'navigator');
+    const transformations = series.reduce((prev, curr) => {
+        prev.push(...curr.chartValues);
+        return prev;
+    }, []).filter((transformation, index, arr) => {
+      return arr.indexOf(transformation) === index;
+    });
+    const buttons = [];
+    transformations.forEach((t) => {
+      buttons.push({
+        text: t,
+        onclick: function() {
+         series.forEach((series) => {
+            if (series.className !== 'navigator') {
+              updateTransformation(series.id, t);
+            };
+          });
+        }
+      });
+    });
+    return buttons;
+  }
+
   initChart = (portalSettings, buttons, highestFreq) => {
     const startDate = this.start || null;
     const endDate = this.end || null;
@@ -301,6 +325,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
     const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
+    const chartTransformationButtons = (chart) => this.chartTransformationToggles(chart);
     this.chartOptions.navigator = {
       enabled: false
     };
@@ -404,23 +429,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         contextButton: {
           enabled: false
         },
+        ...chartTransformationButtons(this.chartOptions.series),
         exportButton: {
           _titleKey: 'exportKey',
           menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
           text: 'Download'
         },
-        lvlButton: {
-          text: 'LVL',
-          onclick: function() {
-            alert('Test')
-          }
-        },
-        yoyButton: {
-          text: 'YOY',
-          onclick: function() {
-            alert('Test')
-          }
-        }
       },
       csv: {
         dateFormat: '%Y-%m-%d',
@@ -487,7 +501,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
-          console.log('RANGE SELECTOR CHECK')
           const extremes = this.getExtremes();
           const userMin = new Date(extremes.min).toISOString().split('T')[0];
           const userMax = new Date(extremes.max).toISOString().split('T')[0];
