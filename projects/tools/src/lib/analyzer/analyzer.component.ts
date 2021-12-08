@@ -1,4 +1,5 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Location } from '@angular/common';
 import { AnalyzerService } from '../analyzer.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -39,9 +40,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private apiService: ApiService,
     private router: Router,
+    private location: Location,
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
+      console.log('sub', series)
       this.updateAnalyzer(series);
     });
   }
@@ -75,7 +78,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       });
     }
     this.updateAnalyzer(this.analyzerSeries);
-
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
@@ -84,6 +86,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   updateAnalyzer (analyzerSeries: Array<any>) {
     if (analyzerSeries.length) {
       this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache);
+      console.log('analyzerData', this.analyzerData)
       this.analyzerService.analyzerData.indexed = this.indexSeries;
     }
   }
@@ -99,25 +102,25 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   indexActive(e) {
     this.indexSeries = e.target.checked;
-    this.queryParams.index = e.target.checked ? e.target.checked : null;
+    this.queryParams.index = e.target.checked || null;
     this.analyzerService.toggleIndexValues(e.target.checked, this.analyzerService.analyzerData.minDate);
-    this.updateRoute();
+    this.updateUrlLocation();
   }
 
   checkTransforms(e) {
     if (e.label === 'yoy') {
       this.tableYoy = e.value;
-      this.queryParams.yoy = e.value ? e.value : null;
+      this.queryParams.yoy = e.value || null;
     }
     if (e.label === 'ytd') {
       this.tableYtd = e.value;
-      this.queryParams.ytd = e.value ? e.value : null;
+      this.queryParams.ytd = e.value || null;
     }
     if (e.label === 'c5ma') {
       this.tableC5ma = e.value;
-      this.queryParams.c5ma = e.value ? e.value : null;
+      this.queryParams.c5ma = e.value || null;
     }
-    this.updateRoute();
+    this.updateUrlLocation();
   }
 
   changeAnalyzerFrequency(freq, analyzerSeries) {
@@ -133,12 +136,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
             const drawInCompare = analyzerSeries.find(s => s.title === sib.title).compare === true;
             siblingIds.push({ id: sib.id, compare: drawInCompare });
           }
-        })
+        });
       });
       this.queryParams.analyzerSeries = siblingIds.map(ids => ids.id).join('-');
       this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.compare).map(ids => ids.id).join('-');
       this.analyzerService.updateAnalyzerSeries(siblingIds);
-      this.updateRoute();
     });
   }
 
@@ -148,8 +150,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   toggleAnalyzerDisplay() {
     this.displayCompare = !this.displayCompare;
-    this.queryParams.compare = this.displayCompare;
-    this.updateRoute();
+    this.queryParams.compare = this.displayCompare || null;
+    this.updateUrlLocation();
   }
 
   changeRange(e) {
@@ -157,10 +159,15 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
     this.queryParams.start = e.seriesStart;
     this.queryParams.end = e.seriesEnd;
-    this.updateRoute();
+    this.updateUrlLocation();
   }
 
-  updateRoute() {
-    this.router.navigate(['/analyzer'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
+  updateUrlLocation() {
+    const url = this.router.createUrlTree([], {
+      relativeTo: this.route, queryParams: this.queryParams
+    }).toString();
+    this.location.go(url);
+
+    //this.router.navigate(['/analyzer'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
   }
 }
