@@ -27,6 +27,7 @@ import offlineExport from 'highcharts/modules/offline-exporting';
 })
 export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() series;
+  @Input() compareSeriesData;
   @Input() portalSettings;
   @Input() start;
   @Input() end;
@@ -72,7 +73,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
       this.compareSeries = series;
-      this.updateChartData(series);
+      //this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
       [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
@@ -121,8 +122,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       });
     });
   }
-
-  ngOnChanges() {
+  
+  /*ngOnChanges() {
+    console.log('ON CHANGES COMPARE DATA', this.compareSeriesData)
     // prevent date ranges from resetting when adding a series/indexing
     if (this.chartOptions.xAxis) {
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
@@ -138,6 +140,21 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const highestFrequency = this.analyzerService.getHighestFrequency(this.compareSeries).freq;
       this.initChart(this.portalSettings, buttons, highestFrequency);
+    }
+  }*/
+
+  ngOnChanges() {
+    this.updateChartData(this.compareSeriesData)
+    if (this.chartOptions.xAxis) {
+      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
+      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+      this.chartObject.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
+      this.setYMinMax();
+    }
+    if (this.compareSeriesData.length && !this.chartObject) {
+      const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
+      const highestFrequency = this.analyzerService.getHighestFrequency(this.compareSeriesData).freq;
+      this.initChart(this.portalSettings, buttons, highestFrequency)  
     }
   }
 
@@ -223,6 +240,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
+    chartSeries.forEach((s, index) => {
+      s.colorIndex = index;
+    });
     const leftAxisLabel = this.createYAxisLabel(chartSeries, 'left');
     const rightAxisLabel = this.createYAxisLabel(chartSeries, 'right');
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
@@ -255,8 +275,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       }
       return axes;
     }, []);
-    this.chartOptions.series = chartSeries;
-    console.log('chartSeries', chartSeries)
+    this.chartOptions.series = [...chartSeries];
+    console.log('this.chartOptions', this.chartOptions);
+    console.log('this.chartObject', this.chartObject)
     this.updateChart = true;
     if (this.chartObject) {
       this.chartObject.redraw();

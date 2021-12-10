@@ -44,13 +44,14 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
-      console.log('sub', series)
       this.updateAnalyzer(series);
     });
   }
 
   ngOnInit() {
+    console.log('oninit')
     if (this.route) {
+      console.log(this.route)
       this.route.queryParams.subscribe(params => {
         if (params[`analyzerSeries`]) {
           this.storeUrlSeries(params[`analyzerSeries`]);
@@ -86,7 +87,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   updateAnalyzer (analyzerSeries: Array<any>) {
     if (analyzerSeries.length) {
       this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache);
-      console.log('analyzerData', this.analyzerData)
       this.analyzerService.analyzerData.indexed = this.indexSeries;
     }
   }
@@ -125,6 +125,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
+    this.analyzerService.analyzerData.urlChartSeries = [];
     this.analyzerService.analyzerSeriesCompareSource.next([]);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, serie.seasonalAdjustment, freq);
@@ -141,6 +142,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       this.queryParams.analyzerSeries = siblingIds.map(ids => ids.id).join('-');
       this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.compare).map(ids => ids.id).join('-');
       this.analyzerService.updateAnalyzerSeries(siblingIds);
+      this.updateUrlLocation();
+      //this.router.navigate(['/analyzer'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     });
   }
 
@@ -157,12 +160,23 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeRange(e) {
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
-    this.queryParams.start = e.seriesStart;
-    this.queryParams.end = e.seriesEnd;
+    //this.queryParams.start = e.seriesStart;
+    //this.queryParams.end = e.seriesEnd;
     this.updateUrlLocation();
   }
 
   updateUrlLocation() {
+    const analyzerData = this.analyzerService.analyzerData;
+    const {
+      analyzerSeries,
+      minDate,
+      maxDate
+    } = analyzerData;
+    this.queryParams.start = minDate;
+    this.queryParams.end = maxDate;
+    this.queryParams.analyzerSeries = analyzerSeries.map(s => s.id).join('-');
+    //const compareSeries = 
+    this.queryParams.chartSeries = analyzerSeries.filter(s => s.compare).map(s => s.id).join('-') || null;
     const url = this.router.createUrlTree([], {
       relativeTo: this.route, queryParams: this.queryParams
     }).toString();
