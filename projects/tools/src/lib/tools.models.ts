@@ -157,7 +157,7 @@ export interface HighstockObject {
   };
   exporting: {
     allowHTML: boolean,
-    buttons: {
+    buttons?: {
       contextButton: {
         enabled: boolean
       },
@@ -226,8 +226,8 @@ export interface HighstockObject {
   };
   xAxis: {
     events: {
-      afterSetExtremes: () => void,
-      setExtremes?: () => void
+      afterSetExtremes?: () => void,
+      setExtremes?: (e) => void
     },
     minRange?: number,
     min: number,

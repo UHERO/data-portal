@@ -7,7 +7,7 @@
           (click)="toggleAnalyzerDisplay()">
           <span><i class="bi" [class.bi-grid-3x3-gap-fill]="displayCompare" [class.bi-bar-chart-fill]="!displayCompare"></i>{{displayCompare ? ' Gallery View' : ' Compare'}}</span>
         </button>
-        <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
+        <lib-share-link *ngIf="data.analyzerSeries.length" [compareSeries]="data.compareSeries" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
           [index]="indexSeries" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="data.minDate"
           [endDate]="data.maxDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries" [displayCompare]="displayCompare">
         </lib-share-link>

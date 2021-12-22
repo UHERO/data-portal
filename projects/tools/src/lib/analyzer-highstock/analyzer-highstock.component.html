@@ -1,5 +1,5 @@
-<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor"
-  [options]="chartOptions" [(update)]="updateChart" [callbackFunction]="chartCallback" [oneToOne]="true">
+<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [callbackFunction]="chartCallback" [constructorType]="chartConstructor"
+  [options]="chartOptions" [(update)]="updateChart" [oneToOne]="true">
 </highcharts-chart>
 <div id="customize-yAxis" class="d-flex mt-2 justify-content-center">
   <ng-template ngFor let-axis [ngForOf]="chartObject?.yAxis">

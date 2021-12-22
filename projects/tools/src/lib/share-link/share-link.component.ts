@@ -15,7 +15,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
 
   // Series in the analyzer and series drawn in the analyzer chart
   @Input() analyzerSeries;
-
+  @Input() compareSeries;
   @Input() yoy: boolean;
   @Input() ytd: boolean;
   @Input() c5ma: boolean;
@@ -34,10 +34,10 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     @Inject('environment') private environment,
     private analyzerService: AnalyzerService,
   ) {
-    this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
+    /*this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
       this.compareChartSeries = series.filter(s => s.visible);
       this.updateShareAndEmbed(this.view);
-    });
+    });*/
   }
 
   ngOnChanges() {
@@ -45,7 +45,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.compareSeriesSub.unsubscribe();
+    // this.compareSeriesSub.unsubscribe();
   }
 
   updateShareAndEmbed(view: string) {
@@ -91,7 +91,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     let cSeries = '&chartSeries=';
     if (this.analyzerSeries) {
       aSeries += this.analyzerSeries.map(s => s.id).join('-');
-      cSeries += this.compareChartSeries.map(s => s.className).join('-');
+      cSeries += this.compareSeries.filter(s => s.visible).map(s => s.className).join('-');
     }
     seriesUrl += aSeries + cSeries;
     seriesUrl += `&start=${start}&end=${end}`;

@@ -49,9 +49,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('oninit')
     if (this.route) {
-      console.log(this.route)
       this.route.queryParams.subscribe(params => {
         if (params[`analyzerSeries`]) {
           this.storeUrlSeries(params[`analyzerSeries`]);
@@ -126,7 +124,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
     this.analyzerService.analyzerData.urlChartSeries = [];
-    this.analyzerService.analyzerSeriesCompareSource.next([]);
+    //this.analyzerService.analyzerSeriesCompareSource.next([]);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, serie.seasonalAdjustment, freq);
     });
@@ -160,6 +158,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeRange(e) {
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
+    if (this.analyzerService.analyzerData.indexed) {
+      this.analyzerService.updateBaseYear();
+    }
     //this.queryParams.start = e.seriesStart;
     //this.queryParams.end = e.seriesEnd;
     this.updateUrlLocation();
