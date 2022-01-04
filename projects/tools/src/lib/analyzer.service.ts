@@ -59,25 +59,25 @@ export class AnalyzerService {
   getVisibleCompareSeries = (compareSeries) => compareSeries.filter(s => s.visible);
 
   setCompareChartSeriesObject(series) {
-    const { indexed, baseYear, compareSeries, minDate } = this.analyzerData;
+    const { indexed, baseYear, analyzerSeries, minDate } = this.analyzerData;
+    const compareSeries = analyzerSeries.filter(s => s.compare);
     if (compareSeries.length && indexed) {
       const visibleCompareSeries = this.getVisibleCompareSeries(compareSeries);
       const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : compareSeries;
       this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minDate);
       this.updateCompareSeriesDataAndAxes(compareSeries);
     }
-    const yAxisSide = this.assignYAxisSide(series);
     const chartValues = series.observations.map(obs => obs.displayName);
     const selectedChartTransformation = chartValues.find(name => name === 'Level') || chartValues[0];
     const selectedTransformation = series.observations.find(t => t.displayName === selectedChartTransformation).values;
-    compareSeries.push({
+    series.yAxisText = this.setYAxisLabel(indexed, baseYear, series, selectedChartTransformation)
+    /*compareSeries.push({
       ...series,
       className: series.id,
       name: this.formatDisplayName(series, indexed, selectedChartTransformation),
       data: indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : [...selectedTransformation],
       levelData: [...selectedTransformation],
-      yAxis: yAxisSide,
-      yAxisText: this.setYAxisLabel(indexed, baseYear,series, selectedChartTransformation),
+      yAxis: this.assignYAxisSide(series),
       type: series.selectedChartType,
       currentFreq: { freq: series.frequencyShort, label: series.frequency },
       includeInDataExport: true,
@@ -102,8 +102,37 @@ export class AnalyzerService {
       ],
       chartValues: chartValues,
       selectedChartTransformation
-    });
-    this.analyzerData.compareSeries = [].concat(compareSeries);
+    });*/
+    series.className = series.id;
+    series.name = this.formatDisplayName(series, indexed, selectedChartTransformation);
+    series.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : [...selectedTransformation];
+    series.levelData = [...selectedTransformation];
+    series.yAxis = this.assignYAxisSide(series);
+    series.type = series.selectedChartType;
+    series.currentFreq = { freq: series.frequencyShort, label: series.frequency };
+    series.includeInDataExport = true;
+    series.showInLegend = true;
+    series.showInNavigator = false;
+    series.events = {
+      legendItemClick() {
+        return false;
+      }
+    };
+    series.seasonallyAdjusted = series.seasonalAdjustment === 'seasonally_adjusted';
+    series.visible = series.compare;
+    series.chartType = [
+      'line',
+      'column',
+      'area'
+    ];
+    series.selectedChartType = 'line';
+    series.yAxisSides = [
+      'left',
+      'right'
+    ];
+    series.chartValues = chartValues;
+    series.selectedChartTransformation = selectedChartTransformation;
+    //this.analyzerData.compareSeries = [].concat(compareSeries);
   }
 
   setYAxisLabel = (indexed: boolean, baseYear, series, transformation: string) => {
@@ -117,23 +146,36 @@ export class AnalyzerService {
   }
 
   makeCompareSeriesVisible(series: any) {
-    const { compareSeries, indexed, minDate } = this.analyzerData;
-    console.log('compare series', compareSeries)
+    /* const { compareSeries, indexed, minDate } = this.analyzerData;
+    console.log('compare series', compareSeries);
+    console.log('series', series)
     const visibleCompareSeries = this.getVisibleCompareSeries(compareSeries);
-    const seriesMatch = compareSeries.find(s => s.id === series.id);
+    const seriesMatch = compareSeries.find(s => s.id === series?.id);
     if (seriesMatch) {
       seriesMatch.compare = true;
       seriesMatch.visible = true;
+      this.analyzerData.compareSeries = [].concat(compareSeries);
     }
     if (!seriesMatch) {
       this.addToCompareChart(compareSeries, series)
     }
-    this.analyzerData.compareSeries = [].concat(compareSeries);
+    const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : compareSeries;
+    this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minDate);
+    if (visibleCompareSeries.length && indexed) {
+      this.updateBaseYear();
+    } */
+    console.log('series', series)
+    const { analyzerSeries, minDate, indexed } = this.analyzerData;
+    analyzerSeries.find(s => s.id === series?.id).compare = true;
+    analyzerSeries.find(s => s.id === series?.id).visible = true;
+    const compareSeries = analyzerSeries.filter(s => s.compare);
+    const visibleCompareSeries = this.getVisibleCompareSeries(compareSeries);
     const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : compareSeries;
     this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minDate);
     if (visibleCompareSeries.length && indexed) {
       this.updateBaseYear();
     }
+    this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
   }
 
   getIndexedValues = (values: Array<number>, dates: Array<string>, baseYear: string) => {
@@ -151,7 +193,8 @@ export class AnalyzerService {
   }
 
   updateCompareSeriesAxis(seriesId: any, axis: string) {
-    const { yRightSeries, yLeftSeries, compareSeries } = this.analyzerData;
+    const { yRightSeries, yLeftSeries, analyzerSeries } = this.analyzerData;
+    const compareSeries = analyzerSeries.filter(s => s.compare);
     const selectedCompareSeries = compareSeries.find(s => s.className === seriesId);
     const rightSeriesMatch = yRightSeries.find(id => id === seriesId);
     const leftSeriesMatch = yLeftSeries.find(id => id === seriesId);
@@ -172,58 +215,76 @@ export class AnalyzerService {
     }
     selectedCompareSeries.yAxis = axis;
     selectedCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, selectedCompareSeries, selectedCompareSeries.selectedChartTransformation);
-    this.analyzerData.compareSeries = [].concat(compareSeries)
+    this.analyzerData.analyzerSeries = [].concat(this.analyzerData.analyzerSeries)
   }
 
   updateCompareChartType(seriesId: number, chartType: string) {
-    const { compareSeries } = this.analyzerData;
+    const { analyzerSeries } = this.analyzerData;
+    const compareSeries = analyzerSeries.filter(s => s.compare);
     const selectedCompareSeries = compareSeries.find(s => s.className === seriesId);
     selectedCompareSeries.type = chartType;
     selectedCompareSeries.selectedChartType = chartType;
-    this.analyzerData.compareSeries = [].concat(compareSeries);
+    this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
   }
 
   updateCompareChartTransformation(seriesId: number, transformation: string) {
-    const { indexed, baseYear, compareSeries } = this.analyzerData;
+    const { indexed, baseYear, analyzerSeries } = this.analyzerData;
+    console.log('seriesId', seriesId);
+    console.log(analyzerSeries);
+    const compareSeries = analyzerSeries.filter(s => s.compare);
     const selectedCompareSeries = compareSeries.find(s => s.className === seriesId);
-    selectedCompareSeries.selectedChartTransformation = selectedCompareSeries.chartValues.find(t => t === transformation)
-    selectedCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, selectedCompareSeries, transformation);
-    selectedCompareSeries.yAxis = this.assignYAxisSide(selectedCompareSeries)
-    const selectedTransformation = selectedCompareSeries.observations.find(t => t.displayName === transformation).values;
-    selectedCompareSeries.name = this.formatDisplayName(selectedCompareSeries, indexed, transformation);
-    selectedCompareSeries.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : [...selectedTransformation];
-    selectedCompareSeries.levelData = [...selectedTransformation];
-    this.analyzerData.compareSeries = [].concat(compareSeries);
+    if (selectedCompareSeries) {
+      selectedCompareSeries.selectedChartTransformation = selectedCompareSeries.chartValues.find(t => t === transformation)
+      selectedCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, selectedCompareSeries, transformation);
+      selectedCompareSeries.yAxis = this.assignYAxisSide(selectedCompareSeries)
+      const selectedTransformation = selectedCompareSeries.observations.find(t => t.displayName === transformation).values;
+      selectedCompareSeries.name = this.formatDisplayName(selectedCompareSeries, indexed, transformation);
+      selectedCompareSeries.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : [...selectedTransformation];
+      selectedCompareSeries.levelData = [...selectedTransformation];
+      console.log('selectedCompareSeries', selectedCompareSeries)
+    }
+    this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
   }
 
   updateCompareSeriesDataAndAxes(series: Array<any>) {
     const { indexed, baseYear } = this.analyzerData;
     series.forEach((s) => {
+      console.log('update series s', s)
       s.name = this.formatDisplayName(s, indexed, s.selectedChartTransformation);
       s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : [...s.observations.find(t => t.displayName === s.selectedChartTransformation).values];
       s.levelData =  [...s.observations.find(t => t.displayName === s.selectedChartTransformation).values];
       s.yAxisText = this.setYAxisLabel(indexed, baseYear, s, s.selectedChartTransformation);
       s.yAxis = this.assignYAxisSide(s);
     });
-    this.analyzerData.compareSeries = [].concat(this.analyzerData.compareSeries);
+    this.analyzerData.analyzerSeries = [].concat(this.analyzerData.analyzerSeries);
   }
 
   removeFromComparisonChart(id: number) {
-    this.analyzerData.analyzerSeries.find(s => s.id === id).compare = false;
+    /*this.analyzerData.analyzerSeries.find(s => s.id === id).compare = false;
     const { compareSeries } = this.analyzerData;
     compareSeries.find(s => s.id === id).compare = false;
     compareSeries.find(s => s.id === id).visible = false;
     this.analyzerData.urlChartSeries = this.analyzerData.urlChartSeries.filter(ids => ids !== id);
     this.updateBaseYear();
-    this.analyzerData.compareSeries = [].concat(compareSeries);
+    this.analyzerData.compareSeries = [].concat(compareSeries);*/
+
+    const { analyzerSeries } = this.analyzerData;
+    analyzerSeries.find(s => s.id === id).compare = false;
+    analyzerSeries.find(s => s.id === id).visible = false;
+    this.analyzerData.urlChartSeries = this.analyzerData.urlChartSeries.filter(ids => ids !== id);
+    this.updateBaseYear();
+    this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
+
   }
 
   toggleIndexValues(index: boolean, minYear: string) {
     this.analyzerData.indexed = index;
-    const { compareSeries }  = this.analyzerData;
+    const { analyzerSeries }  = this.analyzerData;
+    const compareSeries = analyzerSeries.filter(s => s.compare);
     const visibleCompareSeries = this.getVisibleCompareSeries(compareSeries);
     const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : compareSeries;
     const baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minYear);
+    console.log('baseYear', baseYear)
     this.analyzerData.baseYear = baseYear;
     if (compareSeries) {
       this.updateCompareSeriesDataAndAxes(compareSeries);
@@ -234,7 +295,8 @@ export class AnalyzerService {
   }
 
   updateBaseYear() {
-    const { compareSeries, minDate } = this.analyzerData;
+    const { minDate, analyzerSeries } = this.analyzerData;
+    const compareSeries = analyzerSeries.filter(s => s.compare);
     const visibleCompareSeries = this.getVisibleCompareSeries(compareSeries);
     const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : compareSeries;
     this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minDate);
@@ -252,15 +314,17 @@ export class AnalyzerService {
 
   removeFromAnalyzer(seriesID: number) {
     let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
-    const { compareSeries } = this.analyzerData;
+    const { analyzerSeries } = this.analyzerData;
+    const compareSeries = analyzerSeries.filter(s => s.compare);
     this.analyzerData.analyzerSeries = this.analyzerData.analyzerSeries.filter(s => s.id !== seriesID);
     this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker.filter(s => s.id !== seriesID));
     this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
     const selectedSeries = compareSeries.find(s => s.className === seriesID);
     this.updateBaseYear();
-    if (selectedSeries) {
+    /*if (selectedSeries) {
       this.analyzerData.compareSeries = [].concat(compareSeries.filter(s => s.className !== seriesID));
-    }
+    }*/
+    this.analyzerData.analyzerSeries = [].concat(this.analyzerData.analyzerSeries);
   }
 
   getAnalyzerData(aSeriesTracker: Array<any>, noCache: boolean) {
@@ -298,7 +362,8 @@ export class AnalyzerService {
       const seriesData = this.formatSeriesForAnalyzer(series);
       seriesData.compare = this.isVisible(series, analyzerSeries);
       analyzerSeries.push(seriesData);
-      this.addToCompareChart(this.analyzerData.compareSeries, seriesData);
+      this.setCompareChartSeriesObject(seriesData)
+      // this.addToCompareChart(this.analyzerData.compareSeries, seriesData);
     }
   }
 
@@ -394,8 +459,8 @@ export class AnalyzerService {
     if (yRightSeries.length && yRightSeries.some(id => id === series.id)) {
       return 'right';
     }
-    const { compareSeries } = this.analyzerData;
-    const units = compareSeries.map(s => s.yAxisText);
+    const { compareSeries, analyzerSeries } = this.analyzerData;
+    const units = analyzerSeries.map(s => s.yAxisText);
     console.log('units', units)
     return !units.length || units[0] === series.yAxisText || this.analyzerData.indexed ? 'left' : 'right';
   }

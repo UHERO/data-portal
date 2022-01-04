@@ -39,12 +39,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartObject;
   indexed: boolean = false;
   compareSeriesSub;
-  chartCallback;
+  //chartCallback;
   analyzerData;
   compareSeries;
   displayChart = false;
   oneToOneFlag = false;
-
+ //chartOptions = {} as HighstockObject;
+  chartCallback = (chart) => {
+    if (!this.chartObject) {
+      this.chartObject = chart;
+    }
+  };
   chartOptions = {
     chart: {
       alignTicks: false,
@@ -59,6 +64,16 @@ export class AnalyzerHighstockComponent implements OnChanges {
     labels: {},
     rangeSelector: {},
     exporting: {},
+    xAxis: {
+      events: {
+        //setExtremes: null,
+      },
+      min: null,
+      max: null,
+      minRange: null,
+      ordinal: false,
+      labels: {}
+    },
     tooltip: {
       borderWidth: 0,
       shadow: false,
@@ -236,18 +251,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
         turboThreshold: 0,
       }
     },
-    xAxis: {
-      events: {
-        //setExtremes: null,
-      },
-      min: null,
-      max: null,
-      minRange: null,
-      ordinal: false,
-      labels: {
-
-      }
-    },
     yAxis: [],
     series: []
   }
@@ -257,26 +260,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
     private highstockHelper: HighstockHelperService,
     private analyzerService: AnalyzerService,
   ) {
-    // workaround to include exporting module in production build
-    exporting(this.Highcharts);
-    exportData(this.Highcharts);
-    offlineExport(this.Highcharts);
-    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
-      // Add metadata to top of CSV export
-      const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
-      let seriesMetaData = '';
-      this.userOptions.labels.items.forEach((label) => {
-        if (!result.includes(label.html)) {
-          seriesMetaData += label.html ? `${label.html} \n` : '';
-        }
-      });
-      return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
-    });
-    this.chartCallback = (chart) => {
-      if (!this.chartObject) {
-        this.chartObject = chart;
-      }
-    };
     this.analyzerData = this.analyzerService.analyzerData;
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
       [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
@@ -296,7 +279,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
             });
           });
           const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
-          console.log(chartOptionSeries)
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
@@ -316,7 +298,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
           if (!a.querySelector(`#chart-values-${seriesId}`)) {
             this.createChartSeriesValueSelector(seriesId, chartOptionSeries, changeChartValueItem);
           }
-          addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(chartOptionSeries));
+          addToComparisonChartItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+            analyzerService.makeCompareSeriesVisible(chartOptionSeries)
+          });
           removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
           removeFromAnalyzerItem.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -325,56 +310,55 @@ export class AnalyzerHighstockComponent implements OnChanges {
         }
       });
     });
+    // workaround to include exporting module in production build
+    exporting(this.Highcharts);
+    exportData(this.Highcharts);
+    offlineExport(this.Highcharts);
+    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
+    // Add metadata to top of CSV export
+    const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+    let seriesMetaData = '';
+    this.userOptions.labels.items.forEach((label) => {
+      if (!result.includes(label.html)) {
+        seriesMetaData += label.html ? `${label.html} \n` : '';
+      }
+    });
+      return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
+    });
   }
 
   ngOnChanges() {
-    if (this.chartOptions.xAxis) {
-      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
-      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
-      this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
-      this.setYMinMax();
-    }
-    const highestFrequency = this.analyzerService.getHighestFrequency(this.compareSeriesData).freq;
-    const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons, highestFrequency);
-    this.initChart(this.portalSettings, buttons, highestFrequency);
-    this.updateChartData(this.compareSeriesData);
-    this.updateChart = true;
-  }
-
-  updateChartData(series: Array<any>) {
-    series.sort(this.sortVisible); //visible series should be listed first
-    const chartSeries = [...series, {
-      className: 'navigator',
-      data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
-      levelData: [],
-      decimals: null,
-      tooltipName: '',
-      frequency: null,
-      geography: null,
-      yAxis: `right`,
-      dataGrouping: {
-        enabled: false
-      },
-      showInLegend: false,
-      showInNavigator: true,
-      includeInDataExport: false,
-      name: 'Navigator',
-      events: {
-        legendItemClick() {
-          return false;
-        }
-      },
-      unitsLabelShort: null,
-      seasonallyAdjusted: null,
-      pseudoZones: null,
-      visible: true,
-    }];
-    chartSeries.forEach((s, index) => {
-      //s.colorIndex = index;
+    console.log('on changes series', this.series)
+    const { indexed, baseYear, minDate } = this.analyzerData;
+    const startDate = this.start || null;
+    const endDate = this.end || null;
+    const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
+    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
+    const tableExtremes = this.tableExtremes;
+    const logo = this.logo;
+    const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
+    const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons, highestFreq);
+    this.chartOptions.series = this.series.map((s, index) => {
+      const chartValues = s.chartValues//s.observations.map(obs => obs.displayName);
+      const selectedChartTransformation = s.selectedChartTransformation//chartValues.find(name => name === 'Level') || chartValues[0];
+      const selectedTransformation = s.observations.find(t => t.displayName === selectedChartTransformation).values;
+      s.yAxisText = this.analyzerService.setYAxisLabel(indexed, baseYear, s, selectedChartTransformation);  
+      return {
+        ...s,
+        className: s.id,
+        colorIndex: index,
+      };
     });
-    const leftAxisLabel = this.createYAxisLabel(chartSeries, 'left');
-    const rightAxisLabel = this.createYAxisLabel(chartSeries, 'right');
-    this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
+    const leftAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'left');
+    const rightAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'right');
+    this.chartOptions.chart.events = {
+      load() {
+        if (logo.analyticsLogoSrc) {
+          this.renderer.image(logo.analyticsLogoSrc, 10, 0, 141 / 1.75, 68 / 1.75).add();
+        }
+      }
+    };
+    this.chartOptions.yAxis = this.chartOptions.series.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
           labels: {
@@ -399,18 +383,134 @@ export class AnalyzerHighstockComponent implements OnChanges {
           showFirstLabel: true,
           min: null,
           max: null,
-          visible: chartSeries.filter(series => series.yAxis === s.yAxis && series.className !== 'navigator').some(series => series.visible)
+          visible: this.chartOptions.series.filter(series => series.yAxis === s.yAxis && series.className !== 'navigator').some(series => series.visible)
         });
       }
       return axes;
     }, []);
-    this.chartOptions.series = chartSeries.map(series => Object.assign({}, series));
+    this.chartOptions.exporting = {
+      allowHTML: true,
+      buttons: {
+        contextButton: {
+          enabled: false
+        },
+        ...this.chartTransformationToggles(this.chartOptions.series),
+        exportButton: {
+          _titleKey: 'exportKey',
+          menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
+          text: 'Download'
+        },
+      },
+      csv: {
+        dateFormat: '%Y-%m-%d',
+      },
+      filename: 'chart',
+      chartOptions: {
+        events: null,
+        legend: {
+          labelFormatter() {
+            return `${this.name} (${this.userOptions.yAxis})`
+          }
+        },
+        chart: {
+          events: {
+            load() {
+              if (logo.analyticsLogoSrc) {
+                this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.75, 68 / 1.75).add();
+              }
+            }
+          },
+          styledMode: false,
+          spacingBottom: 40
+        },
+        navigator: {
+          enabled: false
+        },
+        scrollbar: {
+          enabled: false
+        },
+        rangeSelector: {
+          enabled: false
+        },
+        credits: {
+          enabled: true,
+          text: this.portalSettings.highstock.credits,
+          position: {
+            align: 'right',
+            x: -35,
+            y: -5
+          }
+        },
+        title: {
+          align: 'left',
+          text: null
+        },
+        subtitle: {
+          text: ''
+        }
+      }
+    };
+    this.chartOptions.rangeSelector = {
+      selected: !startDate && !endDate ? 2 : null,
+      buttons,
+      buttonPosition: {
+        x: 20,
+        y: 0
+      },
+      labelStyle: {
+        visibility: 'hidden'
+      },
+      inputEnabled: false,
+      /*inputDateFormat: setInputDateFormat(highestFreq),
+      inputEditDateFormat: setInputEditDateFormat(highestFreq),
+      inputDateParser(value) {
+        return setInputDateParser(value, highestFreq);
+      }
+      inputPosition: {
+        x: -30,
+        y: 5
+      }*/
+    };
+    this.chartOptions.xAxis = {
+      events: {
+        setExtremes: function(e) {
+          if (e.trigger === 'rangeSelectorButton') {
+            const userMin = new Date(e.min).toISOString().split('T')[0];
+            const userMax = new Date(e.max).toISOString().split('T')[0];
+            const selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
+            const selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
+            tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
+          }
+        },
+      },
+      minRange: this.calculateMinRange(highestFreq),
+      min: startDate ? Date.parse(startDate) : undefined,
+      max: endDate ? Date.parse(endDate) : undefined,
+      ordinal: false,
+      labels: {
+        formatter() {
+          return xAxisFormatter(this, highestFreq);
+        }
+      }
+    };
+    this.chartOptions.labels = {
+      items: [
+        { html: this.portalSettings.highstock.labels.portal },
+        { html: this.portalSettings.highstock.labels.portalLink },
+      ],
+      style: {
+        display: 'none'
+      }
+    };
+    this.updateChart = true;
+    if (this.chartOptions.xAxis) {
+      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
+      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+      this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
+      this.setYMinMax();
+    }
   }
-
-  sortVisible = (a, b) => b.visible - a.visible;
-
   createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator' && s.visible).map(s => s.yAxisText))].join(', ');
-
   createChartTypeSelector(seriesId: number, series: any, chartTypeMenuItem: HTMLElement) {
     if (series) {
       const chartTypeSelect = document.createElement('select');
@@ -454,144 +554,21 @@ export class AnalyzerHighstockComponent implements OnChanges {
     });
   }
 
-  initChart = (portalSettings, buttons, highestFreq) => {
-    const startDate = this.start || null;
-    const endDate = this.end || null;
-    const getChartExtremes = (chartObject) => this.highstockHelper.getAnalyzerChartExtremes(chartObject);
-    const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
-    const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
-    const setInputEditDateFormat = freq => this.highstockHelper.inputEditDateFormatter(freq);
-    const setInputDateParser = (value, freq) => this.highstockHelper.inputDateParserFormatter(value, freq);
-    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
-    const tableExtremes = this.tableExtremes;
-    const logo = this.logo;
-    const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
-    const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
-    const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
-    const chartTransformationButtons = (chart) => this.chartTransformationToggles(chart);
+  setYMinMax() {
+    this.chartOptions.yAxis.forEach((y) => {
+      y.min = y.min || null;
+      y.max = y.max || null;
+    });
+  }
 
-    this.chartOptions.chart.events = {
-      load() {
-        if (logo.analyticsLogoSrc) {
-          this.renderer.image(logo.analyticsLogoSrc, 10, 0, 141 / 1.75, 68 / 1.75).add();
-        }
-      }
-    }
-    this.chartOptions.labels = {
-      items: [
-        { html: portalSettings.highstock.labels.portal },
-        { html: portalSettings.highstock.labels.portalLink },
-      ],
-      style: {
-        display: 'none'
-      }
-    };
-    // incorrect indexing when using range selector
-    this.chartOptions.rangeSelector = {
-      selected: !startDate && !endDate ? 2 : null,
-      buttons,
-      buttonPosition: {
-        x: 20,
-        y: 0
-      },
-      labelStyle: {
-        visibility: 'hidden'
-      },
-      inputEnabled: false,
-      inputDateFormat: setInputDateFormat(highestFreq),
-      inputEditDateFormat: setInputEditDateFormat(highestFreq),
-      inputDateParser(value) {
-        return setInputDateParser(value, highestFreq);
-      },
-      inputPosition: {
-        x: -30,
-        y: 5
-      }
-    };
-    this.chartOptions.exporting = {
-      allowHTML: true,
-      buttons: {
-        contextButton: {
-          enabled: false
-        },
-        ...chartTransformationButtons(this.chartOptions.series),
-        exportButton: {
-          _titleKey: 'exportKey',
-          menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
-          text: 'Download'
-        },
-      },
-      csv: {
-        dateFormat: '%Y-%m-%d',
-      },
-      filename: 'chart',
-      chartOptions: {
-        events: null,
-        legend: {
-          labelFormatter() {
-            return `${this.name} (${this.userOptions.yAxis})`
-          }
-        },
-        chart: {
-          events: {
-            load() {
-              if (logo.analyticsLogoSrc) {
-                this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.75, 68 / 1.75).add();
-              }
-            }
-          },
-          styledMode: false,
-          spacingBottom: 40
-        },
-        navigator: {
-          enabled: false
-        },
-        scrollbar: {
-          enabled: false
-        },
-        rangeSelector: {
-          enabled: false
-        },
-        credits: {
-          enabled: true,
-          text: portalSettings.highstock.credits,
-          position: {
-            align: 'right',
-            x: -35,
-            y: -5
-          }
-        },
-        title: {
-          align: 'left',
-          text: null
-        },
-        subtitle: {
-          text: ''
-        }
-      }
-    };
-    this.chartOptions.xAxis = {
-      events: {
-        setExtremes: function(e) {
-          if (e.trigger === 'rangeSelectorButton') {
-          const userMin = new Date(e.min).toISOString().split('T')[0];
-          const userMax = new Date(e.max).toISOString().split('T')[0];
-          const selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
-          const selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
-          tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
-          }
-        },
-      },
-      minRange: this.calculateMinRange(highestFreq),
-      min: startDate ? Date.parse(startDate) : undefined,
-      max: endDate ? Date.parse(endDate) : undefined,
-      ordinal: false,
-      labels: {
-        formatter() {
-          return xAxisFormatter(this, highestFreq);
-        }
-      }
-    };
+  changeYAxisMin(e, axis) {
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null
+    this.updateChart = true;
+  }
+
+  changeYAxisMax(e, axis) {
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value || null
+    this.updateChart = true;
   }
 
   calculateMinRange = (freq: string) => {
@@ -618,9 +595,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
     transformations.forEach((t) => {
       buttons.push({
         text: t,
-        onclick: function() {
+        onclick: function(e) {
+          console.log('event', e)
          series.forEach((series) => {
             if (series.className !== 'navigator') {
+              console.log('series', series)
               updateTransformation(series.id, t);
             };
           });
@@ -628,7 +607,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       });
     });
     return buttons;
-  }
+  };
 
   formatChartButtons(buttons: Array<any>, highestFreq) {
     const chartButtons = buttons.reduce((allButtons, button) => {
@@ -646,22 +625,60 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return chartButtons;
   }
 
-  setYMinMax() {
-    this.chartOptions.yAxis.forEach((y) => {
-      y.min = y.min || null;
-      y.max = y.max || null;
-    });
+  sortVisible = (a, b) => b.visible - a.visible;
+
+  
+
+  
+
+  /*initChart = (portalSettings, buttons, highestFreq) => {
+    const startDate = this.start || null;
+    const endDate = this.end || null;
+    const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
+    const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
+    const setInputEditDateFormat = freq => this.highstockHelper.inputEditDateFormatter(freq);
+    const setInputDateParser = (value, freq) => this.highstockHelper.inputDateParserFormatter(value, freq);
+    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
+    const tableExtremes = this.tableExtremes;
+    const logo = this.logo;
+    const chartTransformationButtons = (chart) => this.chartTransformationToggles(chart);
+
+    
+    
+    // incorrect indexing when using range selector
+    this.chartOptions.rangeSelector = {
+      selected: !startDate && !endDate ? 2 : null,
+      buttons,
+      buttonPosition: {
+        x: 20,
+        y: 0
+      },
+      labelStyle: {
+        visibility: 'hidden'
+      },
+      inputEnabled: false,
+      inputDateFormat: setInputDateFormat(highestFreq),
+      inputEditDateFormat: setInputEditDateFormat(highestFreq),
+      inputDateParser(value) {
+        return setInputDateParser(value, highestFreq);
+      },
+      inputPosition: {
+        x: -30,
+        y: 5
+      }
+    };
+    
+    
+    this.chartOptions = {...this.chartOptions}
   }
 
-  changeYAxisMin(e, axis) {
-    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null
-    this.updateChart = true;
-  }
+  
 
-  changeYAxisMax(e, axis) {
-    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value || null
-    this.updateChart = true;
-  }
+  
+
+  
+
+  
 
   filterDatesForNavigator(allDates: Array<any>) {
     return allDates.map(date => date.date).filter((d, i, a) => {
@@ -669,5 +686,5 @@ export class AnalyzerHighstockComponent implements OnChanges {
       // also check if date range only contains a partial year
       return i > 0 ? a.indexOf(d) === i && d > a[i - 1] : a.indexOf(d) === i;
     });
-  }
+  } */
 }

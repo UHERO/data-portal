@@ -124,7 +124,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
     this.analyzerService.analyzerData.urlChartSeries = [];
-    //this.analyzerService.analyzerSeriesCompareSource.next([]);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, serie.seasonalAdjustment, freq);
     });
@@ -141,7 +140,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.compare).map(ids => ids.id).join('-');
       this.analyzerService.updateAnalyzerSeries(siblingIds);
       this.updateUrlLocation();
-      //this.router.navigate(['/analyzer'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     });
   }
 
@@ -161,8 +159,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     if (this.analyzerService.analyzerData.indexed) {
       this.analyzerService.updateBaseYear();
     }
-    //this.queryParams.start = e.seriesStart;
-    //this.queryParams.end = e.seriesEnd;
     this.updateUrlLocation();
   }
 
