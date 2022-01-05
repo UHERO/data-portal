@@ -1,25 +1,23 @@
 import { Injectable } from '@angular/core';
+import * as Highcharts from 'highcharts/highstock';
+/*declare var require: any;
+const Highcharts = require('highcharts/highstock');*/
 
-declare var require: any;
-const Highcharts = require('highcharts/highstock');
-
-Highcharts.dateFormats = {
-  Q(timestamp) {
-    const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
-    if (1 <= month && month <= 3) {
-      return 'Q1';
-    }
-    if (4 <= month && month <= 6) {
-      return 'Q2';
-    }
-    if (7 <= month && month <= 9) {
-      return 'Q3';
-    }
-    if (10 <= month && month <= 12) {
-      return 'Q4';
-    }
+Highcharts.dateFormats['Q'] = (timestamp) => {
+  const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
+  if (1 <= month && month <= 3) {
+    return 'Q1';
   }
-};
+  if (4 <= month && month <= 6) {
+    return 'Q2';
+  }
+  if (7 <= month && month <= 9) {
+    return 'Q3';
+  }
+  if (10 <= month && month <= 12) {
+    return 'Q4';
+  }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -137,8 +135,8 @@ export class HighstockHelperService {
     let s = '';
     const month = Highcharts.dateFormat('%b', chart.value);
     const year = Highcharts.dateFormat('%Y', chart.value);
-    const first = Highcharts.dateFormat('%Y', chart.axis.userMin);
-    const last = Highcharts.dateFormat('%Y', chart.axis.userMax);
+    const first: any = Highcharts.dateFormat('%Y', chart.axis.userMin);
+    const last: any = Highcharts.dateFormat('%Y', chart.axis.userMax);
     s = ((last - first) <= 5) && freq === 'Q' ? year + this.getQuarterLabel(month) : year;
     return freq === 'Q' ? s : chart.axis.defaultLabelFormatter.call(chart);
   }
