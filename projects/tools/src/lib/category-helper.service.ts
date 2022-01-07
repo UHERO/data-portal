@@ -107,7 +107,8 @@ export class CategoryHelperService {
   }
 
   setCategorySeriesAndDates(seriesData: Array<any>, cachedCategoryData, transformationForGrid: string, findMinMax: boolean) {
-    const displaySeries = this.filterSeriesResults(seriesData);
+    const { universe } = this.portal;
+    const displaySeries = this.filterSeriesResults(seriesData, universe);
     const dateWrapper = this.helperService.setDateWrapper(displaySeries);
     const { firstDate, endDate } = dateWrapper;
     const categoryDates = this.helperService.createDateArray(firstDate, endDate, cachedCategoryData.currentFreq.freq, []);
@@ -185,12 +186,12 @@ export class CategoryHelperService {
     });
   }
 
-  filterSeriesResults(results: Array<any>) {
+  filterSeriesResults = (results: Array<any>, universe: string) => {
     return results.map((res) => {
       const { dates: levelDates } = res.seriesObservations?.transformationResults[0];
       if (levelDates) {
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
-        res.displayName = res.title;
+        res.displayName = universe === 'nta' ? res.geography.name : res.title;
         return res;
       }
     });

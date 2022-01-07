@@ -105,7 +105,7 @@ export interface HighstockObject {
     alignTicks: boolean,
     animation?: boolean,
     events?: {
-      render: () => void,
+      render?: () => void,
       load?: () => void
     },
     className?: string,
@@ -130,9 +130,9 @@ export interface HighstockObject {
       visibility: string
     },
     inputEnabled: boolean,
-    inputDateFormat: string,
-    inputEditDateFormat: string,
-    inputDateParser: (args: any) => any,
+    inputDateFormat?: string,
+    inputEditDateFormat?: string,
+    inputDateParser?: (args: any) => any,
     inputPosition?: {
       x: number,
       y: number

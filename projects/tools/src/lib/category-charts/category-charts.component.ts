@@ -107,12 +107,12 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   addCompare(series) {
-    series.compare = true;
+    series.visible = true;
     this.analyzerService.makeCompareSeriesVisible(series)
   }
 
   removeCompare(series) {
-    series.compare = false;
+    series.visible = false;
     this.analyzerService.removeFromComparisonChart(series.id);
   }
 

@@ -1,5 +1,5 @@
-<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [callbackFunction]="chartCallback" [constructorType]="chartConstructor"
-  [options]="chartOptions" [(update)]="updateChart" [oneToOne]="true">
+<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [callbackFunction]="chartCallback"
+  [constructorType]="chartConstructor" [options]="chartOptions" [(update)]="updateChart" [oneToOne]="true">
 </highcharts-chart>
 <div id="customize-yAxis" class="d-flex mt-2 justify-content-center">
   <ng-template ngFor let-axis [ngForOf]="chartObject?.yAxis">
@@ -8,11 +8,13 @@
         <span class="d-block text-center">Y-Axis ({{axis.userOptions.id}})</span>
         <div class="d-flex justify-content-center align-items-center flex-row">
           <label class="mb-0" attr.for="min{{axis.userOptions.id}}">Min:</label>
-          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="min{{axis.userOptions.id}}" [(value)]="axis.userOptions.min"
-            (change)="changeYAxisMin($event, axis)" [placeholder]="Highcharts.numberFormat(axis.getExtremes().min, 2, '.', ',')">
+          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="min{{axis.userOptions.id}}"
+            [(value)]="axis.userOptions.min" (change)="changeYAxisMin($event, axis)"
+            [placeholder]="Highcharts.numberFormat(axis.getExtremes().min, 2, '.', ',')">
           <label class="mb-0" attr.for="max{{axis.userOptions.id}}">Max:</label>
-          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="max{{axis.userOptions.id}}" [(value)]="axis.userOptions.max"
-            (change)="changeYAxisMax($event, axis)" [placeholder]="Highcharts.numberFormat(axis.getExtremes().max, 2, '.', ',')">
+          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="max{{axis.userOptions.id}}"
+            [(value)]="axis.userOptions.max" (change)="changeYAxisMax($event, axis)"
+            [placeholder]="Highcharts.numberFormat(axis.getExtremes().max, 2, '.', ',')">
         </div>
       </div>
     </ng-template>

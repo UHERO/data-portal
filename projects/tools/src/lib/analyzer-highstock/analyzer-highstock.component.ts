@@ -26,30 +26,26 @@ import offlineExport from 'highcharts/modules/offline-exporting';
 })
 export class AnalyzerHighstockComponent implements OnChanges {
   @Input() series;
-  @Input() compareSeriesData;
   @Input() portalSettings;
   @Input() start;
   @Input() end;
   @Input() indexChecked;
   @Output() tableExtremes = new EventEmitter(true);
-  @Output() tooltipOptions = new EventEmitter();
+  @Output() updateUrl = new EventEmitter<any>();
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
   updateChart = false;
   chartObject;
   indexed: boolean = false;
-  compareSeriesSub;
-  //chartCallback;
   analyzerData;
-  compareSeries;
-  displayChart = false;
   oneToOneFlag = false;
- //chartOptions = {} as HighstockObject;
+
   chartCallback = (chart) => {
     if (!this.chartObject) {
       this.chartObject = chart;
     }
   };
+
   chartOptions = {
     chart: {
       alignTicks: false,
@@ -65,9 +61,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     rangeSelector: {},
     exporting: {},
     xAxis: {
-      events: {
-        //setExtremes: null,
-      },
+      events: {},
       min: null,
       max: null,
       minRange: null,
@@ -90,10 +84,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
           }
           if (frequency === 'Q') {
             const quarters = {
-              'Jan': ' Q1',
-              'Apr': ' Q2',
-              'Jul': ' Q3',
-              'Oct': ' Q4' 
+              Jan: ' Q1',
+              Apr: ' Q2',
+              Jul: ' Q3',
+              Oct: ' Q4' 
             }
             return year + ` ${quarters[month] || ''}`;
           }
@@ -103,8 +97,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
           if (frequency === 'W' || frequency === 'D') {
             return `${month} ${day}, ${year}`;
           }
-        } //this.highstockHelper.getTooltipFreqLabel(frequency, date);
-        const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
+        };
+        const filterFrequency = (cSeries: Array<any>, freq: string) => {
+          return cSeries.filter(series => series.userOptions.frequencyShort === freq && series.name !== 'Navigator 1');
+        }
         const getSeriesColor = (seriesIndex: number) => {
           // Get color of the line for a series & use for tooltip label
           const lineColor = getComputedStyle(document.querySelector(`.highcharts-markers.highcharts-color-${seriesIndex}`)).fill;
@@ -115,15 +111,20 @@ export class AnalyzerHighstockComponent implements OnChanges {
           const displayValue = Highcharts.numberFormat(value, decimals, '.', ',');
           return displayValue === '-0.00' ? '0.00' : displayValue;
         };
-        const formatSeriesLabel = (point, seriesValue: number, date: string, pointX, str: string) => {
-          const seriesColor = getSeriesColor(point.colorIndex);
-          const displayName = `${point.userOptions.title} (${point.userOptions.geography.name})`;
-          const value = formatObsValue(seriesValue, point.userOptions.decimals);
+        const formatSeriesLabel = (point, seriesValue: number, date: string, pointX) => {
+          let str = '';
+          const { colorIndex, userOptions } = point;
+          const { geography, decimals, title, chartData } = userOptions;
+          const seriesColor = getSeriesColor(colorIndex);
+          const displayName = `${title} (${geography.name})`;
+          const value = formatObsValue(seriesValue, decimals);
           const label = `${displayName} ${date}: ${value}`;
-          const pseudoZones = point.userOptions.chartData.pseudoZones;
+          const pseudoZones = chartData.pseudoZones;
           if (pseudoZones.length) {
             pseudoZones.forEach((zone) => {
-              return str += pointX < zone.value ? `${seriesColor}Pseudo History ${label}` : `${seriesColor}${label}`;
+              return str += pointX < zone.value ?
+                `${seriesColor}Pseudo History ${label}` :
+                `${seriesColor}${label}`;
             });
           }
           if (!pseudoZones.length) {
@@ -139,7 +140,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
               return obs ? Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x) : false;
             });
             if (yearObs) {
-              label += formatSeriesLabel(serie, yearObs.y, year, yearObs.x, '');
+              label += formatSeriesLabel(serie, yearObs.y, year, yearObs.x);
             }
           });
           // Return string of annual series with their values formatted for the tooltip
@@ -154,13 +155,12 @@ export class AnalyzerHighstockComponent implements OnChanges {
             });
             if (obsDate) {
               const qDate = `${Highcharts.dateFormat('%Y', obsDate.x)} ${pointQuarter} `;
-              label += formatSeriesLabel(serie, obsDate.y, qDate, obsDate.x, '');
+              label += formatSeriesLabel(serie, obsDate.y, qDate, obsDate.x);
             }
           });
           // Return string of quarterly series with their values formatted for the tooltip
           return label;
         };
-        const s = '';
         let tooltip = '';
         const chartSeries = args.chart.series;
         // Series in chart with an annual frequency
@@ -197,7 +197,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
             }
           }
           const dateLabel = getFreqLabel(point.series.userOptions.frequencyShort, point.x);
-          tooltip += formatSeriesLabel(point.series, point.y, dateLabel, point.x, s);
+          tooltip += formatSeriesLabel(point.series, point.y, dateLabel, point.x);
         });
         return tooltip;
       }
@@ -252,8 +252,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
     },
     yAxis: [],
-    series: []
-  }
+    series: [],
+  } as HighstockObject;
 
   constructor(
     @Inject('logo') private logo,
@@ -300,9 +300,15 @@ export class AnalyzerHighstockComponent implements OnChanges {
           }
           addToComparisonChartItem.addEventListener('click', (e) => {
             e.stopPropagation();
-            analyzerService.makeCompareSeriesVisible(chartOptionSeries)
+            if (chartOptionSeries) {
+              analyzerService.makeCompareSeriesVisible(chartOptionSeries);
+              this.updateUrl.emit(chartOptionSeries);
+            }
           });
-          removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
+          removeFromComparisonChartItem.addEventListener('click', () => {
+            analyzerService.removeFromComparisonChart(seriesId);
+            this.updateUrl.emit(chartOptionSeries);
+          });
           removeFromAnalyzerItem.addEventListener('click', (e) => {
             e.stopPropagation();
             analyzerService.removeFromAnalyzer(seriesId);
@@ -328,8 +334,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    console.log('on changes series', this.series)
-    const { indexed, baseYear, minDate } = this.analyzerData;
+    this.updateChartOptions(this.series);
+    this.updateChart = true;
+    if (this.chartOptions.xAxis) {
+      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
+      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+      this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
+      this.setYMinMax();
+    }
+  }
+
+  updateChartOptions(series) {
     const startDate = this.start || null;
     const endDate = this.end || null;
     const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
@@ -338,19 +353,14 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const logo = this.logo;
     const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
     const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons, highestFreq);
-    this.chartOptions.series = this.series.map((s, index) => {
-      const chartValues = s.chartValues//s.observations.map(obs => obs.displayName);
-      const selectedChartTransformation = s.selectedChartTransformation//chartValues.find(name => name === 'Level') || chartValues[0];
-      const selectedTransformation = s.observations.find(t => t.displayName === selectedChartTransformation).values;
-      s.yAxisText = this.analyzerService.setYAxisLabel(indexed, baseYear, s, selectedChartTransformation);  
+
+    this.chartOptions.series = series.map((s, index) => {
       return {
         ...s,
-        className: s.id,
         colorIndex: index,
       };
     });
-    const leftAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'left');
-    const rightAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'right');
+
     this.chartOptions.chart.events = {
       load() {
         if (logo.analyticsLogoSrc) {
@@ -358,6 +368,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
         }
       }
     };
+
+    const leftAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'left');
+    const rightAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'right');
     this.chartOptions.yAxis = this.chartOptions.series.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
@@ -388,6 +401,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
       return axes;
     }, []);
+
     this.chartOptions.exporting = {
       allowHTML: true,
       buttons: {
@@ -450,6 +464,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
         }
       }
     };
+
     this.chartOptions.rangeSelector = {
       selected: !startDate && !endDate ? 2 : null,
       buttons,
@@ -460,17 +475,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
       labelStyle: {
         visibility: 'hidden'
       },
-      inputEnabled: false,
-      /*inputDateFormat: setInputDateFormat(highestFreq),
-      inputEditDateFormat: setInputEditDateFormat(highestFreq),
-      inputDateParser(value) {
-        return setInputDateParser(value, highestFreq);
-      }
-      inputPosition: {
-        x: -30,
-        y: 5
-      }*/
+      inputEnabled: false
     };
+
     this.chartOptions.xAxis = {
       events: {
         setExtremes: function(e) {
@@ -493,24 +500,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
         }
       }
     };
-    this.chartOptions.labels = {
-      items: [
-        { html: this.portalSettings.highstock.labels.portal },
-        { html: this.portalSettings.highstock.labels.portalLink },
-      ],
-      style: {
-        display: 'none'
-      }
-    };
-    this.updateChart = true;
-    if (this.chartOptions.xAxis) {
-      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
-      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
-      this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
-      this.setYMinMax();
-    }
   }
+
   createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator' && s.visible).map(s => s.yAxisText))].join(', ');
+  
   createChartTypeSelector(seriesId: number, series: any, chartTypeMenuItem: HTMLElement) {
     if (series) {
       const chartTypeSelect = document.createElement('select');
@@ -531,7 +524,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
       this.addSelectorOptions(yAxisSelect, series.yAxisSides, series.yAxis);
       yAxisSideMenuItem.appendChild(yAxisSelect);
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
-      yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value));
+      yAxisSelect.addEventListener('change', (e) => {
+        this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value);
+        this.updateUrl.emit()
+      });
     }
   }
 
@@ -556,18 +552,18 @@ export class AnalyzerHighstockComponent implements OnChanges {
 
   setYMinMax() {
     this.chartOptions.yAxis.forEach((y) => {
-      y.min = y.min || null;
-      y.max = y.max || null;
+      y.min = y.min ?? null;
+      y.max = y.max ?? null;
     });
   }
 
   changeYAxisMin(e, axis) {
-    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value ?? null
     this.updateChart = true;
   }
 
   changeYAxisMax(e, axis) {
-    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value || null
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value ?? null
     this.updateChart = true;
   }
 
@@ -596,10 +592,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
       buttons.push({
         text: t,
         onclick: function(e) {
-          console.log('event', e)
-         series.forEach((series) => {
+          series.forEach((series) => {
             if (series.className !== 'navigator') {
-              console.log('series', series)
               updateTransformation(series.id, t);
             };
           });
@@ -626,65 +620,4 @@ export class AnalyzerHighstockComponent implements OnChanges {
   }
 
   sortVisible = (a, b) => b.visible - a.visible;
-
-  
-
-  
-
-  /*initChart = (portalSettings, buttons, highestFreq) => {
-    const startDate = this.start || null;
-    const endDate = this.end || null;
-    const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
-    const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
-    const setInputEditDateFormat = freq => this.highstockHelper.inputEditDateFormatter(freq);
-    const setInputDateParser = (value, freq) => this.highstockHelper.inputDateParserFormatter(value, freq);
-    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
-    const tableExtremes = this.tableExtremes;
-    const logo = this.logo;
-    const chartTransformationButtons = (chart) => this.chartTransformationToggles(chart);
-
-    
-    
-    // incorrect indexing when using range selector
-    this.chartOptions.rangeSelector = {
-      selected: !startDate && !endDate ? 2 : null,
-      buttons,
-      buttonPosition: {
-        x: 20,
-        y: 0
-      },
-      labelStyle: {
-        visibility: 'hidden'
-      },
-      inputEnabled: false,
-      inputDateFormat: setInputDateFormat(highestFreq),
-      inputEditDateFormat: setInputEditDateFormat(highestFreq),
-      inputDateParser(value) {
-        return setInputDateParser(value, highestFreq);
-      },
-      inputPosition: {
-        x: -30,
-        y: 5
-      }
-    };
-    
-    
-    this.chartOptions = {...this.chartOptions}
-  }
-
-  
-
-  
-
-  
-
-  
-
-  filterDatesForNavigator(allDates: Array<any>) {
-    return allDates.map(date => date.date).filter((d, i, a) => {
-      // If mixed frequencies are selected, filter out duplicated dates for annual observations,
-      // also check if date range only contains a partial year
-      return i > 0 ? a.indexOf(d) === i && d > a[i - 1] : a.indexOf(d) === i;
-    });
-  } */
 }

@@ -131,13 +131,13 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       res.forEach((siblings) => {
         siblings.forEach((sib) => {
           if (!siblingIds.some(s => s.id === sib.id) && sib.frequencyShort === freq) {
-            const drawInCompare = analyzerSeries.find(s => s.title === sib.title).compare === true;
+            const drawInCompare = analyzerSeries.find(s => s.title === sib.title).visible === true;
             siblingIds.push({ id: sib.id, compare: drawInCompare });
           }
         });
       });
       this.queryParams.analyzerSeries = siblingIds.map(ids => ids.id).join('-');
-      this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.compare).map(ids => ids.id).join('-');
+      this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.visible).map(ids => ids.id).join('-');
       this.analyzerService.updateAnalyzerSeries(siblingIds);
       this.updateUrlLocation();
     });
@@ -167,18 +167,19 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     const {
       analyzerSeries,
       minDate,
-      maxDate
+      maxDate,
+      yLeftSeries,
+      yRightSeries
     } = analyzerData;
     this.queryParams.start = minDate;
     this.queryParams.end = maxDate;
     this.queryParams.analyzerSeries = analyzerSeries.map(s => s.id).join('-');
-    //const compareSeries = 
-    this.queryParams.chartSeries = analyzerSeries.filter(s => s.compare).map(s => s.id).join('-') || null;
+    this.queryParams.chartSeries = analyzerSeries.filter(s => s.visible).map(s => s.id).join('-') || null;
+    this.queryParams.yright = yRightSeries.length ? yRightSeries.join('-') : null;
+    this.queryParams.yleft = yLeftSeries.length ? yLeftSeries.join('-') : null;
     const url = this.router.createUrlTree([], {
       relativeTo: this.route, queryParams: this.queryParams
     }).toString();
     this.location.go(url);
-
-    //this.router.navigate(['/analyzer'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
   }
 }

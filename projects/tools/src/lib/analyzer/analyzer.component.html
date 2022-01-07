@@ -3,13 +3,14 @@
   <ng-container *ngIf="analyzerSeries.length">
     <ng-template ngFor let-data [ngForOf]="analyzerData | async">
       <div id="view-toggle-share" class="ms-2">
-        <button type="button" class="btn btn-sm btn-outline-primary compare-btn"
-          (click)="toggleAnalyzerDisplay()">
-          <span><i class="bi" [class.bi-grid-3x3-gap-fill]="displayCompare" [class.bi-bar-chart-fill]="!displayCompare"></i>{{displayCompare ? ' Gallery View' : ' Compare'}}</span>
+        <button type="button" class="btn btn-sm btn-outline-primary compare-btn" (click)="toggleAnalyzerDisplay()">
+          <span><i class="bi" [class.bi-grid-3x3-gap-fill]="displayCompare"
+              [class.bi-bar-chart-fill]="!displayCompare"></i>{{displayCompare ? ' Gallery View' : ' Compare'}}</span>
         </button>
-        <lib-share-link *ngIf="data.analyzerSeries.length" [compareSeries]="data.compareSeries" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
+        <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
           [index]="indexSeries" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="data.minDate"
-          [endDate]="data.maxDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries" [displayCompare]="displayCompare">
+          [endDate]="data.maxDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries"
+          [displayCompare]="displayCompare">
         </lib-share-link>
       </div>
       <div id="analyzer-customizations">
@@ -21,10 +22,10 @@
             [attr.title]="!data.displayFreqSelector ? 'Unavailable for mixed frequencies' : ''" [checked]="indexSeries"
             [disabled]="!data.displayFreqSelector">Index
         </label>
-        <lib-date-slider *ngIf="data.requestComplete" class="sliders"
-          [portalSettings]="portalSettings" [dates]="data.sliderDates" [dateFrom]="data.minDate" [dateTo]="data.maxDate"
+        <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+          [dates]="data.sliderDates" [dateFrom]="data.minDate" [dateTo]="data.maxDate"
           [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
-          <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
+        <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
           (click)="removeAllAnalyzerSeries()">
           Remove All Series
         </button>
@@ -32,14 +33,13 @@
       <div class="w-100">
         <ng-template ngIf [ngIf]="data.requestComplete">
           <lib-category-charts *ngIf="!displayCompare && data.minDate" [portalSettings]="portalSettings"
-            [data]="data.analyzerSeries" [dates]="data.sliderDates"
-            [freq]="data.analyzerFrequency.freq" [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal"
-            [analyzerView]="true" [routeStart]="data.minDate" [routeEnd]="data.maxDate" [indexChecked]="indexSeries"
-            [indexBaseYear]="data.baseYear">
+            [data]="data.analyzerSeries" [dates]="data.sliderDates" [freq]="data.analyzerFrequency.freq"
+            [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true" [routeStart]="data.minDate"
+            [routeEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
           </lib-category-charts>
           <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-            [series]="data.analyzerSeries" [compareSeriesData]="data.compareSeries" [start]="data.minDate" [end]="data.maxDate" [indexChecked]="indexSeries"
-            (tableExtremes)="changeRange($event)">
+            [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate" [indexChecked]="indexSeries"
+            (tableExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation()">
           </lib-analyzer-highstock>
           <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="data.minDate" [maxDate]="data.maxDate"
             [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [indexChecked]="indexSeries"
