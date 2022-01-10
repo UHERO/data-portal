@@ -1,13 +1,11 @@
-import { Component, Input, Inject, OnChanges, OnDestroy } from '@angular/core';
-import { AnalyzerService } from '../analyzer.service';
-import { Subscription } from 'rxjs';
+import { Component, Input, Inject, OnChanges } from '@angular/core';
 
 @Component({
   selector: 'lib-share-link',
   templateUrl: './share-link.component.html',
   styleUrls: ['./share-link.component.scss']
 })
-export class ShareLinkComponent implements OnChanges, OnDestroy {
+export class ShareLinkComponent implements OnChanges {
   @Input() startDate;
   @Input() endDate;
   // View -- 'analyzer' or 'series'
@@ -15,7 +13,6 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
 
   // Series in the analyzer and series drawn in the analyzer chart
   @Input() analyzerSeries;
-
   @Input() yoy: boolean;
   @Input() ytd: boolean;
   @Input() c5ma: boolean;
@@ -27,25 +24,13 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
   @Input() seriesId: number;
   shareLink: string;
   embedCode: string;
-  compareSeriesSub: Subscription;
-  compareChartSeries;
   
   constructor(
     @Inject('environment') private environment,
-    private analyzerService: AnalyzerService,
-  ) {
-    this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
-      this.compareChartSeries = series.filter(s => s.visible);
-      this.updateShareAndEmbed(this.view);
-    });
-  }
+  ) { }
 
   ngOnChanges() {
     this.updateShareAndEmbed(this.view);
-  }
-
-  ngOnDestroy() {
-    this.compareSeriesSub.unsubscribe();
   }
 
   updateShareAndEmbed(view: string) {
@@ -91,7 +76,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     let cSeries = '&chartSeries=';
     if (this.analyzerSeries) {
       aSeries += this.analyzerSeries.map(s => s.id).join('-');
-      cSeries += this.compareChartSeries.map(s => s.className).join('-');
+      cSeries += this.analyzerSeries.filter(s => s.visible).map(s => s.className).join('-');
     }
     seriesUrl += aSeries + cSeries;
     seriesUrl += `&start=${start}&end=${end}`;

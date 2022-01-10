@@ -14,9 +14,9 @@
 					class="bi bi-star-fill analyzer-toggle remove-button" (click)="removeFromAnalyzer(serie)"></i>
 			</ng-template>
 			<ng-template ngIf [ngIf]="analyzerView">
-				<i *ngIf="!serie.compare" title="Add to Comparison" [class.add-compare-button]="!serie.compare"
+				<i *ngIf="!serie.visible" title="Add to Comparison" [class.add-compare-button]="!serie.visible"
 					class="bi bi-bar-chart analyzer-toggle" (click)="addCompare(serie)"></i>
-				<i *ngIf="serie.compare" title="Remove from Compaison" [class.remove-compare-button]="serie.compare"
+				<i *ngIf="serie.visible" title="Remove from Compaison" [class.remove-compare-button]="serie.visible"
 					class="bi bi-bar-chart-fill analyzer-toggle remove-button" (click)="removeCompare(serie)"></i>
 			</ng-template>
 		</div>

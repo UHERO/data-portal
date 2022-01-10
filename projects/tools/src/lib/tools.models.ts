@@ -105,7 +105,7 @@ export interface HighstockObject {
     alignTicks: boolean,
     animation?: boolean,
     events?: {
-      render: () => void,
+      render?: () => void,
       load?: () => void
     },
     className?: string,
@@ -130,9 +130,9 @@ export interface HighstockObject {
       visibility: string
     },
     inputEnabled: boolean,
-    inputDateFormat: string,
-    inputEditDateFormat: string,
-    inputDateParser: (args: any) => any,
+    inputDateFormat?: string,
+    inputEditDateFormat?: string,
+    inputDateParser?: (args: any) => any,
     inputPosition?: {
       x: number,
       y: number
@@ -147,13 +147,17 @@ export interface HighstockObject {
     labelFormatter: () => string
   };
   navigator: {
-    series: {
+    enabled?: boolean,
+    series?: {
       includeInDataExport: boolean
     }
   };
+  scrollbar?: {
+    enabled: boolean
+  };
   exporting: {
     allowHTML: boolean,
-    buttons: {
+    buttons?: {
       contextButton: {
         enabled: boolean
       },
@@ -161,6 +165,14 @@ export interface HighstockObject {
         text: string,
         _titleKey: string,
         menuItems: Array<any>
+      },
+      lvlButton?: {
+        text: string,
+        onclick: () => void
+      },
+      yoyButton?: {
+        text: string,
+        onclick: () => void
       }
     },
     csv: {
@@ -214,8 +226,8 @@ export interface HighstockObject {
   };
   xAxis: {
     events: {
-      afterSetExtremes: () => void,
-      setExtremes?: () => void
+      afterSetExtremes?: () => void,
+      setExtremes?: (e) => void
     },
     minRange?: number,
     min: number,

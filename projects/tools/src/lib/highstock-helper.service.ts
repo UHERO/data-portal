@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 import * as Highcharts from 'highcharts/highstock';
-/*declare var require: any;
-const Highcharts = require('highcharts/highstock');*/
 
 Highcharts.dateFormats['Q'] = (timestamp) => {
   const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
   if (1 <= month && month <= 3) {
     return 'Q1';
+  }
+  if (4 <= month && month <= 6) {
+    return 'Q2';
+  }
+  if (7 <= month && month <= 9) {
+    return 'Q3';
+  }
   }
   if (4 <= month && month <= 6) {
     return 'Q2';

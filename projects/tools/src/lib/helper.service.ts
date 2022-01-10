@@ -263,6 +263,12 @@ export class HelperService {
 
   formatSeriesForCharts = (series: any) => {
     let dateArray = [];
+    const observationNames = {
+      lvl: 'Level',
+      ytd: 'YTD',
+      pc1: 'YOY',
+      c5ma: 'Annual Change'
+    };
     const { observationStart, observationEnd, transformationResults } = series.seriesObservations;
     this.createDateArray(observationStart, observationEnd, series.frequencyShort, dateArray);
     return transformationResults.map((t) => {
@@ -271,7 +277,15 @@ export class HelperService {
       dateArray.forEach((date) => {
         dateValuePairs.push(this.createDateValuePairs(t.dates, date.date, t.values));
       })
-      return { name: t.transformation, values: dateValuePairs, pseudoZones, start: observationStart, end: observationEnd, dates: dateArray };
+      return {
+        name: t.transformation,
+        displayName: observationNames[t.transformation],
+        values: dateValuePairs, 
+        pseudoZones,
+        start: observationStart,
+        end: observationEnd,
+        dates: dateArray
+      };
     }, {});
   }
 

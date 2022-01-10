@@ -68,6 +68,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = [];
     // Display values in the range of dates selected
+
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
       const { level, yoy, ytd, c5ma } = transformations;
@@ -94,7 +95,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
 
   calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
     const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, startDate, endDate, indexed, indexBase);
-    stats.series = this.indexChecked ? series.indexDisplayName : series.displayName;
+    stats.series = this.analyzerService.formatDisplayName(series, this.indexChecked);
     return stats;
   }
 
@@ -163,7 +164,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     const indexBaseYearNotAvailable = !indexedValues.some(v => v !== Infinity);
     const indexDisplayName = indexBaseYearNotAvailable ? series.naIndex : series.indexDisplayName;
     const seriesData = {
-      series: this.indexChecked ? indexDisplayName : series.displayName,
+      series: this.analyzerService.formatDisplayName(series, this.indexChecked), //this.indexChecked ? indexDisplayName : series.displayName,
       lockPosition: true,
       saParam: series.saParam,
       seriesInfo: series,
