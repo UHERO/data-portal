@@ -20,12 +20,16 @@
         Adjusted
       </label>
     </div>
+    <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+    [dates]="data.sliderDates" [dateFrom]="startDate" [dateTo]="endDate"
+    [freq]="data.seriesDetail.frequencyShort" (updateRange)="changeRange($event)"></lib-date-slider>
+
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
     <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate"
       [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"
       (chartExtremes)="updateChartExtremes($event)"
-      (tableExtremes)="redrawTable($event, data, data.seriesTableData, data.chartData)">
+      (tableExtremes)="changeRange($event)">
     </lib-highstock>
     <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
       {{data.seriesDetail.source_description}}<br><a href="{{data.seriesDetail.source_link}}"

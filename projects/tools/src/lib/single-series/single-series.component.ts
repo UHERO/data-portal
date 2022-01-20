@@ -140,9 +140,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
   
   updateChartExtremes(e) {
-    this.chartStart = e.minDate;
-    this.chartEnd = e.endOfSample ? null : e.maxDate;
-    this.seriesShareLink = this.formatSeriesShareLink(this.chartStart, this.chartEnd);
+    //this.chartStart = e.minDate;
+    console.log('updateChartExtremes e', e)
+    //this.chartEnd = e.endOfSample ? null : e.maxDate;
+    //this.startDate = e.minDate;
+    //this.endDate = e.endOfSample ? null : e.maxDate
+    this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
   }
 
   // Update table when selecting new ranges in the chart
@@ -209,5 +212,11 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       seriesUrl += `&end=${end}`;
     }
     return seriesUrl;
+  }
+
+  changeRange(event) {
+    const { seriesStart, seriesEnd } = event;
+    this.startDate = seriesStart;
+    this.endDate = seriesEnd;
   }
 }

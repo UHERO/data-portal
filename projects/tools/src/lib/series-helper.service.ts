@@ -33,7 +33,10 @@ export class SeriesHelperService {
       currentFreq: {} as Frequency,
       chartData: [],
       seriesTableData: [],
+      minDate: null,
+      maxDate: null,
       siblings: [],
+      sliderDates: [],
       error: null,
       noData: '',
       requestComplete: false
@@ -78,12 +81,16 @@ export class SeriesHelperService {
         this.seriesData.noData = 'Data not available';
         this.seriesData.requestComplete = true;
       }
+      this.seriesData.sliderDates = this.seriesData.seriesTableData.map((d) => {
+        return { date: d.date }
+      });
     },
       (error) => {
         error = this.errorMessage = error;
         this.seriesData.eror = true;
         this.seriesData.requestComplete = true;
       });
+      console.log('seriesData', this.seriesData)
     return observableForkJoin([observableOf(this.seriesData)]);
   }
 
