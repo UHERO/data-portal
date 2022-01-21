@@ -33,10 +33,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   selectedForecast;
   selectedFreq: Frequency;
   displayFcSelector: boolean;
-
-  // Vars used in selectors
-  //public currentFreq: Frequency;
-  //public currentGeo: Geography;
   public seriesData;
 
   constructor(
@@ -138,24 +134,15 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     series.analyze = false;
     this.analyzerService.removeFromAnalyzer(series.id);
   }
-  
-  updateChartExtremes(e) {
-    //this.chartStart = e.minDate;
-    console.log('updateChartExtremes e', e)
-    //this.chartEnd = e.endOfSample ? null : e.maxDate;
-    //this.startDate = e.minDate;
-    //this.endDate = e.endOfSample ? null : e.maxDate
-    this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
-  }
 
   // Update table when selecting new ranges in the chart
-  redrawTable = (e, seriesData, tableData, chartData) => {
+  redrawTable = (startDate, endDate, seriesData, tableData, chartData) => {
     let minDate;
     let maxDate;
     let tableStart;
     let tableEnd;
-    minDate = e.minDate;
-    maxDate = e.maxDate;
+    minDate = startDate //e.minDate;
+    maxDate = endDate //e.maxDate;
     for (let i = 0; i < tableData.length; i++) {
       if (tableData[i].date === maxDate) {
         tableStart = i;
@@ -214,9 +201,10 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     return seriesUrl;
   }
 
-  changeRange(event) {
+  changeRange(event, data, tableData, chartData) {
     const { seriesStart, seriesEnd } = event;
     this.startDate = seriesStart;
     this.endDate = seriesEnd;
+    this.redrawTable(this.startDate, this.endDate, data, tableData, chartData);
   }
 }

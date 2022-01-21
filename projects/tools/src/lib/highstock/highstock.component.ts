@@ -23,8 +23,6 @@ export class HighstockComponent implements OnChanges {
   @Input() showTitle;
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() tableExtremes = new EventEmitter(true);
-  // When user updates range selected, emit chartExtremes to update URL params
-  @Output() chartExtremes = new EventEmitter(true);
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
   //chartOptions = {} as HighstockObject;
@@ -83,8 +81,6 @@ export class HighstockComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    console.log('start', this.start);
-    console.log('end', this.end)
     if (Object.keys(this.seriesDetail).length) {
       this.showChart = true;
       this.drawChart(this.chartData, this.seriesDetail, this.portalSettings);
@@ -172,6 +168,7 @@ export class HighstockComponent implements OnChanges {
       name: seriesLabels[portalSettings.highstock.series1Name],
       type: portalSettings.highstock.series1Type,
       data: series1,
+      color: '#9E9E9E',
       pointInterval: this.highstockHelper.freqInterval(freq.freq),
       pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
       pointStart: Date.parse(seriesStart),
@@ -185,13 +182,12 @@ export class HighstockComponent implements OnChanges {
       pointInterval: this.highstockHelper.freqInterval(freq.freq),
       pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
       pointStart: Date.parse(seriesStart),
+      color: 'none',
       includeInDataExport: freq.freq === 'A' ? false : true,
-      visible: true,
       dataGrouping: {
         enabled: false
       }
     }];
-    console.log('series', series)
     return series;
   }
 
@@ -221,12 +217,10 @@ export class HighstockComponent implements OnChanges {
     const units = seriesDetail.unitsLabel || seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange, freq.freq) : null;
-    console.log('chartRange', chartRange)
     const startDate = this.start ? this.start /* : chartRange ? chartRange.start*/ : null;
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
-    const chartExtremes = this.chartExtremes;
     const formatTooltip = (points, x, pseudoZ, dec, frequency) => this.formatTooltip(points, x, pseudoZ, dec, frequency);
     const getChartExtremes = (chartObject) => this.highstockHelper.getChartExtremes(chartObject);
     const xAxisFormatter = (chart, frequency) => this.highstockHelper.xAxisLabelFormatter(chart, frequency);
@@ -343,25 +337,6 @@ export class HighstockComponent implements OnChanges {
             const selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
             tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
           }
-          /* const extremes = this.getExtremes();
-          const userMin = new Date(extremes.min).toISOString().split('T')[0];
-          const userMax = new Date(extremes.max).toISOString().split('T')[0];
-          this._selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
-          this._selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
-          this._hasSetExtremes = true;
-          this._extremes = getChartExtremes(this);
-          const lastDate = seriesDetail.seriesObservations.observationEnd;
-          if (this._extremes) {
-            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
-            chartExtremes.emit({
-              //minDate: freq.freq === 'A' ? this._extremes.min.substr(0, 4) : this._extremes.min,
-              //minDate: this.selectedMin,
-              //maxDate: freq.freq === 'A' ? this._extremes.max.substr(0, 4) : this._extremes.max,
-              //endOfSample: lastDate === this._extremes.max ? true : false
-            });
-            // use setExtremes to snap dates to first of the month
-            this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
-          } */
         }
       },
       min: Date.parse(startDate),
@@ -384,6 +359,7 @@ export class HighstockComponent implements OnChanges {
         text: change
       },
       opposite: false,
+      gridLineColor: 'none',
       minPadding: 0,
       maxPadding: 0,
       minTickInterval: 0.01
@@ -398,6 +374,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       gridLineWidth: 0,
+      gridLineColor: 'none',
       minPadding: 0,
       maxPadding: 0,
       minTickInterval: 0.01,

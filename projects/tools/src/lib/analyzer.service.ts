@@ -240,7 +240,6 @@ export class AnalyzerService {
   removeFromAnalyzer(seriesID: number) {
     let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
     const { analyzerSeries } = this.analyzerData;
-    console.log('analyzerSeries', analyzerSeries)
     this.analyzerData.analyzerSeries = analyzerSeries.filter(s => s.id !== seriesID);
     this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker.filter(s => s.id !== seriesID));
     this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
