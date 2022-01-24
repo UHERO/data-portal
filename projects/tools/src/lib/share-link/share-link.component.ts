@@ -90,7 +90,6 @@ export class ShareLinkComponent implements OnChanges {
     return seriesUrl;
   }
 
-
   copyLink(inputValue, shareText) {
     $('.share-link').attr('title', 'Copied');
     inputValue.select();

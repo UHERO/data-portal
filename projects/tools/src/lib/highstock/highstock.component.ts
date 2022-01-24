@@ -23,14 +23,39 @@ export class HighstockComponent implements OnChanges {
   @Input() showTitle;
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() tableExtremes = new EventEmitter(true);
-  // When user updates range selected, emit chartExtremes to update URL params
-  @Output() chartExtremes = new EventEmitter(true);
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
-  chartOptions = {} as HighstockObject;
+  //chartOptions = {} as HighstockObject;
   updateChart = false;
   chartObject;
   showChart = false;
+
+  chartOptions = {
+    chart: {
+      alignTicks: false,
+      zoomType: 'x',
+      className: 'single-series-chart',
+      styledMode: true,
+    },
+    lang: {
+      exportKey: 'Download Chart'
+    },
+    navigator: {
+      enabled: false
+    },
+    scrollbar: {
+      enabled: false
+    },
+    credits: {
+      enabled: false
+    },
+    plotOptions:{
+      series: {
+        cropThreshold: 0,
+        turboThreshold: 0
+      }
+    }
+  } as HighstockObject;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -61,6 +86,11 @@ export class HighstockComponent implements OnChanges {
       this.drawChart(this.chartData, this.seriesDetail, this.portalSettings);
       this.updateChart = true;
     }
+    if (this.chartOptions.xAxis) {
+      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
+      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+      this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
+    }
   }
 
   // Gets buttons used in Highstock Chart
@@ -69,12 +99,12 @@ export class HighstockComponent implements OnChanges {
       if (freq === 'A') {
         // Do not display 1Year button for series with an annual frequency
         if (button !== 1 && button !== 'all') {
-          allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+          allButtons.push({ type: 'year', count: button, text: `${button}Y` });
         }
       }
       if (freq !== 'A') {
         if (button !== 'all') {
-          allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+          allButtons.push({ type: 'year', count: button, text: `${button}Y` });
         }
       }
       if (button === 'all') {
@@ -138,6 +168,7 @@ export class HighstockComponent implements OnChanges {
       name: seriesLabels[portalSettings.highstock.series1Name],
       type: portalSettings.highstock.series1Type,
       data: series1,
+      color: '#9E9E9E',
       pointInterval: this.highstockHelper.freqInterval(freq.freq),
       pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
       pointStart: Date.parse(seriesStart),
@@ -151,8 +182,8 @@ export class HighstockComponent implements OnChanges {
       pointInterval: this.highstockHelper.freqInterval(freq.freq),
       pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
       pointStart: Date.parse(seriesStart),
+      color: 'none',
       includeInDataExport: freq.freq === 'A' ? false : true,
-      visible: true,
       dataGrouping: {
         enabled: false
       }
@@ -186,53 +217,43 @@ export class HighstockComponent implements OnChanges {
     const units = seriesDetail.unitsLabel || seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange, freq.freq) : null;
-    const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
+    const startDate = this.start ? this.start /* : chartRange ? chartRange.start*/ : null;
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
-    const chartExtremes = this.chartExtremes;
     const formatTooltip = (points, x, pseudoZ, dec, frequency) => this.formatTooltip(points, x, pseudoZ, dec, frequency);
     const getChartExtremes = (chartObject) => this.highstockHelper.getChartExtremes(chartObject);
     const xAxisFormatter = (chart, frequency) => this.highstockHelper.xAxisLabelFormatter(chart, frequency);
-    const setInputDateFormat = frequency => this.highstockHelper.inputDateFormatter(frequency);
-    const setInputEditDateFormat = frequency => this.highstockHelper.inputEditDateFormatter(frequency);
-    const setInputDateParser = (value, frequency) => this.highstockHelper.inputDateParserFormatter(value, frequency);
     const setDateToFirstOfMonth = (frequency, date) => this.highstockHelper.setDateToFirstOfMonth(frequency, date);
     const logo = this.logo;
     const addToAnalyzer = (seriesId: number) => this.analyzerService.addToAnalyzer(seriesId);
     const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId);
-    this.chartOptions.chart = {
-      alignTicks: false,
-      zoomType: 'x',
-      description: freq.freq,
-      className: 'single-series-chart',
-      events: {
-        render() {
-          if (!this.chartObject || this.chartObject.series.length < 4) {
-            this.chartObject = Object.assign({}, this);
-          }
-          if (this.analyzerBtn) {
-            this.analyzerBtn.destroy();
-          }
-          const btnIcon = `<i class="analyzer-toggle bi ${!seriesDetail.analyze ? 'bi-star' : 'bi-star-fill'}"></i>`;
-          this.analyzerBtn = this.renderer.text(btnIcon, 10, this.renderer.height - 10, true)
-            .on('click', function() {
-            const btn = document.querySelector('.analyzer-toggle');
-            seriesDetail.analyze ? rmvFromAnalyzer(+seriesDetail.id) : addToAnalyzer(+seriesDetail.id);
-            seriesDetail.analyze = !seriesDetail.analyze;
-            btn.classList.toggle('bi-star');
-            btn.classList.toggle('bi-star-fill'); 
-          }).add();
-        },
-        load() {
-          if (logo.analyticsLogoSrc) {
-            this.renderer.image(logo.analyticsLogoSrc, 0, 0, 141 / 1.75, 68 / 1.75).add();
-          }
-          Highcharts.fireEvent(this.xAxis[0], 'afterSetExtremes');
+    this.chartOptions.chart.description = freq.freq;
+    this.chartOptions.chart.events = {
+      render() {
+        if (!this.chartObject || this.chartObject.series.length < 4) {
+          this.chartObject = Object.assign({}, this);
         }
+        if (this.analyzerBtn) {
+          this.analyzerBtn.destroy();
+        }
+        const btnIcon = `<i class="analyzer-toggle bi ${!seriesDetail.analyze ? 'bi-star' : 'bi-star-fill'}"></i>`;
+        this.analyzerBtn = this.renderer.text(btnIcon, 10, this.renderer.height - 10, true)
+          .on('click', function() {
+          const btn = document.querySelector('.analyzer-toggle');
+          seriesDetail.analyze ? rmvFromAnalyzer(+seriesDetail.id) : addToAnalyzer(+seriesDetail.id);
+          seriesDetail.analyze = !seriesDetail.analyze;
+          btn.classList.toggle('bi-star');
+          btn.classList.toggle('bi-star-fill'); 
+        }).add();
       },
-      styledMode: true,
-    };
+      load() {
+        if (logo.analyticsLogoSrc) {
+          this.renderer.image(logo.analyticsLogoSrc, 0, 0, 141 / 1.75, 68 / 1.75).add();
+        }
+        Highcharts.fireEvent(this.xAxis[0], 'afterSetExtremes');
+      }
+    }
     this.chartOptions.labels = labelItems;
     this.chartOptions.rangeSelector = {
       selected: null,
@@ -242,18 +263,8 @@ export class HighstockComponent implements OnChanges {
         y: 0
       },
       labelStyle: { visibility: 'hidden' },
-      inputEnabled: true,
-      inputDateFormat: setInputDateFormat(freq.freq),
-      inputEditDateFormat: setInputEditDateFormat(freq.freq),
-      inputDateParser(value) {
-        return setInputDateParser(value, freq.freq);
-      },
-      inputPosition: {
-        x: -30,
-        y: 0
-      }
+      inputEnabled: false,
     };
-    this.chartOptions.lang = { exportKey: 'Download Chart' };
     this.chartOptions.exporting = {
       allowHTML: true,
       buttons: {
@@ -267,7 +278,7 @@ export class HighstockComponent implements OnChanges {
       csv: {
         dateFormat: '%Y-%m-%d',
       },
-      filename: name + '_' + geo.name + '_' + freq.label,
+      filename: `${name}_${geo.name}_${freq.label}`,
       chartOptions: {
         events: null,
         chart: {
@@ -302,7 +313,10 @@ export class HighstockComponent implements OnChanges {
         title: {
           text: `${name} (${geo.name}, ${freq.label})`,
           align: 'left'
-        }
+        },
+        series: [{
+          color: '#1d667f'
+        }]
       }
     };
     this.chartOptions.tooltip = {
@@ -313,27 +327,15 @@ export class HighstockComponent implements OnChanges {
         return formatTooltip(this.points, this.x, pseudoZones, decimals, freq);
       }
     };
-    this.chartOptions.credits = { enabled: false };
     this.chartOptions.xAxis = {
       events: {
-        afterSetExtremes() {
-          const extremes = this.getExtremes();
-          const userMin = new Date(extremes.min).toISOString().split('T')[0];
-          const userMax = new Date(extremes.max).toISOString().split('T')[0];
-          this._selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
-          this._selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
-          this._hasSetExtremes = true;
-          this._extremes = getChartExtremes(this);
-          const lastDate = seriesDetail.seriesObservations.observationEnd;
-          if (this._extremes) {
-            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
-            chartExtremes.emit({
-              minDate: freq.freq === 'A' ? this._extremes.min.substr(0, 4) : this._extremes.min,
-              maxDate: freq.freq === 'A' ? this._extremes.max.substr(0, 4) : this._extremes.max,
-              endOfSample: lastDate === this._extremes.max ? true : false
-            });
-            // use setExtremes to snap dates to first of the month
-            this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
+        setExtremes(e) {
+          if (e.trigger === 'rangeSelectorButton') {
+            const userMin = new Date(e.min).toISOString().split('T')[0];
+            const userMax = new Date(e.max).toISOString().split('T')[0];
+            const selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
+            const selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
+            tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
           }
         }
       },
@@ -357,6 +359,7 @@ export class HighstockComponent implements OnChanges {
         text: change
       },
       opposite: false,
+      gridLineColor: 'none',
       minPadding: 0,
       maxPadding: 0,
       minTickInterval: 0.01
@@ -371,17 +374,12 @@ export class HighstockComponent implements OnChanges {
         }
       },
       gridLineWidth: 0,
+      gridLineColor: 'none',
       minPadding: 0,
       maxPadding: 0,
       minTickInterval: 0.01,
       showLastLabel: true
     }];
-    this.chartOptions.plotOptions = {
-      series: {
-        cropThreshold: 0,
-        turboThreshold: 0
-      }
-    };
     this.chartOptions.series = series;
     this.chartOptions.title = {
       text: this.showTitle ? `${name} (${geo.name}, ${freq.label})` : '',
@@ -398,7 +396,7 @@ export class HighstockComponent implements OnChanges {
         const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
         const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
         const seriesColor = `<br><span class='series-${point.colorIndex}'>\u25CF</span>`;
-        const seriesNameValue = point.series.name + ': ' + formattedValue;
+        const seriesNameValue =`${point.series.name}: ${formattedValue}`;
         const label = seriesColor + seriesNameValue;
         if (pseudoZones.length) {
           pseudoZones.forEach((zone) => {

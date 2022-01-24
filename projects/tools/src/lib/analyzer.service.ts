@@ -222,7 +222,9 @@ export class AnalyzerService {
     const { minDate, analyzerSeries } = this.analyzerData;
     const visibleCompareSeries = analyzerSeries.filter(s => s.visible);
     const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : analyzerSeries;
-    this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minDate);
+    if (seriesToCalcBaseYear.length) {
+      this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minDate);
+    }
     if (analyzerSeries) {
       this.updateCompareSeriesDataAndAxes(analyzerSeries);
     }

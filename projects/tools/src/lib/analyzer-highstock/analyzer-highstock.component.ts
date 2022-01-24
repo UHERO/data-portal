@@ -385,6 +385,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
             text: s.yAxis === 'right' ? rightAxisLabel : leftAxisLabel
           },
           opposite: s.yAxis === 'left' ? false : true,
+          gridLineColor: 'none',
           minPadding: 0,
           maxPadding: 0,
           minTickInterval: 0.01,
@@ -461,7 +462,21 @@ export class AnalyzerHighstockComponent implements OnChanges {
         },
         subtitle: {
           text: ''
-        }
+        },
+        series: [{
+          color: '#1d667f'
+        }, {
+          color: '#F6A01B'
+        },
+        {
+          color: '#9E9E9E'
+        },
+        {
+          color: '#9BBB59'
+        },
+        {
+          color: '#8064A2'
+        }]
       }
     };
 

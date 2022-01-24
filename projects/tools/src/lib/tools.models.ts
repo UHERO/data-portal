@@ -209,7 +209,8 @@ export interface HighstockObject {
       },
       subtitle?: {
         text: ''
-      }
+      },
+      series?: Array<any>
     }
   };
   tooltip: {
