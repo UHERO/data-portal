@@ -6,6 +6,7 @@ import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'lib-landing-page',
@@ -34,6 +35,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   portalSettings;
   seriesRange;
   private displaySeries;
+  displayHelp: boolean = false;
 
   // Variables for geo and freq selectors
   public categoryData;
@@ -166,6 +168,10 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.queryParams.ytd = e.target.checked;
       this.updateRoute();
     }, 10);
+  }
+
+  showHelp() {
+    this.displayHelp = true;
   }
 
   changeRange(e) {
