@@ -30,6 +30,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   queryParams: any = {};
   displayCompare: boolean = false;
   urlParams;
+  displayHelp: boolean = false;
 
 
   constructor(
@@ -141,6 +142,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       this.analyzerService.updateAnalyzerSeries(siblingIds);
       this.updateUrlLocation();
     });
+  }
+
+  showHelp() {
+    this.displayHelp = true;
   }
 
   removeAllAnalyzerSeries() {

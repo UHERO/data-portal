@@ -1,7 +1,30 @@
 <div *ngFor="let data of seriesData | async" class="single-series-view col-xs-12 col-sm-12 col-xl-11">
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
-    <h3 class="series-title">{{data.seriesDetail.title}}</h3>
+    <h3 class="series-title">{{data.seriesDetail.title}}</h3><i (click)="showHelp()"
+      class="bi bi-question-circle-fill"></i>
+    <p-dialog header="Series View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
+      [dismissableMask]="true">
+      <p>The series view plots a single indicator using a line measured on the right axis and the year-over-year percent
+        change (or absolute change) displayed as bars measured on the left axis.</p>
+      <p>At the top of the chart, in addition to the familiar selector boxes, you can also toggle whether the chart
+        displays seasonally-adjusted indicators or the non-seasonally-adjusted indicator if both are available. The
+        share button next to the frequency selector opens a dialog box containing a static URL to this series which can
+        be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen, as well as, an embed
+        code. As in each of the other views, to add an indicator to the Analyzer, toggle the star, located at the bottom
+        left corner of the chart.
+      </p>
+      <p>To control the selected sample of data, use the slider located above the chart. Like the other views, either
+        click and drag the handles of the slider or click on the input boxes to manaully select a date. There is also a
+        set of buttons at the top left-hand corner of the chart to set the range of data to 1 Year (for non-annual
+        series), 5 Years, or 10 Years from the selected starting date. The 'All' button will display all available data.
+      </p>
+      <p>Below the chart is the source of the data, a link to the source agency, and any relevant notes followed by a
+        row of summary statistics measured over the currently selected range and a table displaying the data with the
+        option of sorting by date either ascending or descending.</p>
+      <p>In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of
+        the selected data.</p>
+    </p-dialog>
     <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
       (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
       class="geo-selector"></lib-geo-selector>

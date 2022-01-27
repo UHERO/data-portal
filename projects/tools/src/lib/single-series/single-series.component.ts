@@ -33,6 +33,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   selectedForecast;
   selectedFreq: Frequency;
   displayFcSelector: boolean;
+  displayHelp: boolean = false;
   public seriesData;
 
   constructor(
@@ -123,6 +124,10 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     } else {
       this.noSelection = 'Selection Not Available';
     }
+  }
+
+  showHelp() {
+    this.displayHelp = true;
   }
 
   addToAnalyzer(series) {
