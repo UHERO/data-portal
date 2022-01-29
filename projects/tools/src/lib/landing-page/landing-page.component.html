@@ -2,7 +2,7 @@
 	<ng-template ngFor let-data [ngForOf]="categoryData | async">
 		<h2 *ngIf="data.requestComplete && !data.invalid" class="selected-category" [class.search-term]="search"
 			id="id_top">
-			{{data.selectedCategory.name}}</h2><i (click)="showHelp()" class="bi bi-question-circle-fill"></i>
+			{{data.selectedCategory.name}}</h2><i (click)="showHelp()" class="bi bi-question-circle display-help-icon"></i>
 		<p-dialog header="Category View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
 			[dismissableMask]="true">
 			<p>This is the category view of the Data Portal. Use the menu on the left hand side of the screen to display data

@@ -2,7 +2,7 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3><i (click)="showHelp()"
-      class="bi bi-question-circle-fill"></i>
+      class="bi bi-question-circle display-help-icon"></i>
     <p-dialog header="Series View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
       [dismissableMask]="true">
       <p>The series view plots a single indicator using a line measured on the right axis and the year-over-year percent
@@ -25,27 +25,29 @@
       <p>In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of
         the selected data.</p>
     </p-dialog>
-    <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
-      (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
-      class="geo-selector"></lib-geo-selector>
-    <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
-      (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
-      class="freq-selector"></lib-freq-selector>
-    <lib-forecast-selector *ngIf="displayFcSelector" [forecasts]="data.forecastList"
-      (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)"
-      class="selector"></lib-forecast-selector>
-    <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="startDate"
-      [endDate]="endDate" [seriesId]="data.seriesDetail.id"></lib-share-link>
-    <div class="form-check" *ngIf="data.saPairAvail">
-      <label class="form-check-inline">
-        <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
-          (ngModelChange)="goToSeries(data.siblings, selectedFreq.freq, selectedGeo.handle, $event)">Seasonally
-        Adjusted
-      </label>
+    <div class="filters">
+      <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
+        (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
+        class="geo-selector"></lib-geo-selector>
+      <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
+        (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
+        class="freq-selector"></lib-freq-selector>
+      <lib-forecast-selector *ngIf="displayFcSelector" [forecasts]="data.forecastList"
+        (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)"
+        class="selector"></lib-forecast-selector>
+      <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="startDate"
+        [endDate]="endDate" [seriesId]="data.seriesDetail.id"></lib-share-link>
+      <div class="form-check" *ngIf="data.saPairAvail">
+        <label class="form-check-inline">
+          <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
+            (ngModelChange)="goToSeries(data.siblings, selectedFreq.freq, selectedGeo.handle, $event)">Seasonally
+          Adjusted
+        </label>
+      </div>
+      <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+        [dates]="data.sliderDates" [dateFrom]="startDate" [dateTo]="endDate" [freq]="data.seriesDetail.frequencyShort"
+        (updateRange)="changeRange($event, data, data.seriesTableData, data.chartData)"></lib-date-slider>
     </div>
-    <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-      [dates]="data.sliderDates" [dateFrom]="startDate" [dateTo]="endDate" [freq]="data.seriesDetail.frequencyShort"
-      (updateRange)="changeRange($event, data, data.seriesTableData, data.chartData)"></lib-date-slider>
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
     <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate"

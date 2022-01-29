@@ -30,6 +30,7 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
   private loading = false;
   private userEvent;
   portalSettings;
+  displayHelp: boolean = true;
 
   constructor(
     @Inject('portal') private portal,
@@ -75,6 +76,10 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
       this.queryParams.m = event.name;
       this.updateRoute();
     }, 10);
+  }
+
+  showHelp() {
+    this.displayHelp = true;
   }
 
   switchView() {

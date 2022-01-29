@@ -4,7 +4,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { LandingPageComponent } from 'tools';
 import { SingleSeriesComponent } from 'tools';
 import { AnalyzerComponent } from 'tools';
-import { CcomHelpComponent } from './ccom-help/ccom-help.component';
 import { EmbedGraphComponent } from 'tools';
 
 const routes: Routes = [
@@ -28,10 +27,6 @@ const routes: Routes = [
   {
     path: 'analyzer',
     component: AnalyzerComponent
-  },
-  {
-    path: 'help',
-    component: CcomHelpComponent
   },
   {
     path: 'graph',

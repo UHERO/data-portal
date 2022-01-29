@@ -10,10 +10,8 @@
   }
 
   .filters {
-    display: inline-block;
+    display: block;
     margin-bottom: 5px;
-    //margin-right: 10px;
-    //vertical-align: middle;
 
     .sliders {
       display: inline-block;
@@ -79,7 +77,7 @@
   }
 
   .selected-category {
-    display: block;
+    display: inline-block;
     font-size: 1.4em;
     text-transform: capitalize;
     margin: 0;

@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { LandingPageComponent } from 'tools';
 import { SingleSeriesComponent } from 'tools';
 import { AnalyzerComponent } from 'tools';
-import { CohHelpComponent } from './coh-help/coh-help.component';
 import { EmbedGraphComponent } from 'tools';
 
 const routes: Routes = [
@@ -27,10 +26,6 @@ const routes: Routes = [
   {
     path: 'analyzer',
     component: AnalyzerComponent,
-  },
-  {
-    path: 'help',
-    component: CohHelpComponent,
   },
   {
     path: 'graph',

@@ -32,6 +32,12 @@ body {
     color: $primary;
   }
 
+  .display-help-icon {
+    padding: 0 0 0 .5em;
+    color: $primary;
+    cursor: pointer;
+  }
+
   .selected-category {
     color: $primary;
   }
@@ -105,6 +111,10 @@ body {
         }
       }
     }
+  }
+
+  .p-dialog .p-dialog-content {
+    font-size: 0.9em;
   }
 
   lib-search-bar {
