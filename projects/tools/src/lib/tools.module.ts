@@ -34,6 +34,7 @@ import { MeasurementLandingPageComponent } from './measurement-landing-page/meas
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
+import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
   declarations: [
@@ -72,6 +73,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     TableModule,
     SliderModule,
     PanelMenuModule,
+    DialogModule,
     CalendarModule,
     HighchartsChartModule,
     AgGridModule.withComponents([

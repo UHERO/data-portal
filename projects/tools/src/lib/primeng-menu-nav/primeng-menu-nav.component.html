@@ -26,8 +26,6 @@
     <lib-search-bar (onSearch)="onSearch($event)"></lib-search-bar>
     <p-panelMenu [model]="navMenuItems"></p-panelMenu>
     <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer">&nbsp; Analyzer ({{analyzerSeries}})</a>
-    <a class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"
-      routerLink="/help">&nbsp; About</a>
     <hr *ngIf="portalSettings.otherDashboardLinks && portalSettings.otherDashboardLinks.length" />
     <ng-template ngFor let-dashboard [ngForOf]="portalSettings.otherDashboardLinks">
       <a *ngIf="dashboard.name" class="list-item" [attr.href]="dashboard.url">{{dashboard.name}}</a>  

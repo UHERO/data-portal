@@ -4,11 +4,10 @@ import { environment } from "../environments/environment";
 import { ToolsModule } from "tools";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { UheroHelpComponent } from "./uhero-help/uhero-help.component";
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
-  declarations: [AppComponent, UheroHelpComponent],
+  declarations: [AppComponent],
   imports: [BrowserModule, ToolsModule, AppRoutingModule, ServiceWorkerModule.register('./ngsw-worker.js', { enabled: environment.production })],
   providers: [
     {

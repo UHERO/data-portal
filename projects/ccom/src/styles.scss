@@ -32,6 +32,12 @@ body {
     color: $primary;
   }
 
+  .display-help-icon {
+    padding: 0 0 0 .5em;
+    color: $primary;
+    cursor: pointer;
+  }
+
   .selected-category {
     color: $primary;
   }
@@ -113,6 +119,10 @@ body {
     }
   }
 
+  .p-dialog .p-dialog-content {
+    font-size: 0.9em;
+  }
+
   lib-search-bar {
     .btn {
       background-color: $primary;
@@ -185,7 +195,7 @@ body {
   
     .content-links {
       padding-left: 0px;
-      display: inline-block;
+      display: block;
       margin-top: 10px;
       margin-bottom: 0;
   

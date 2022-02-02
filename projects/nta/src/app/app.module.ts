@@ -4,13 +4,11 @@ import { environment } from '../environments/environment';
 import { ToolsModule } from 'tools';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NtaHelpComponent } from './nta-help/nta-help.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NtaHelpComponent,
   ],
   imports: [
     BrowserModule,
