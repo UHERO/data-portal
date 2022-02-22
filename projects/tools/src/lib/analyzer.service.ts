@@ -163,7 +163,7 @@ export class AnalyzerService {
   findSelectedCompareSeries = (seriesId) => {
     const { analyzerSeries } = this.analyzerData;
     const compareSeries = analyzerSeries.filter(s => s.visible);
-    return compareSeries.find(s => s.className = seriesId);
+    return compareSeries.find(s => s.className === seriesId);
   }
 
   updateCompareChartType(seriesId: number, chartType: string) {
