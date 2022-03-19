@@ -16,6 +16,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   tableYoy;
   tableYtd;
   tableC5ma;
+  tableMom;
   startDate;
   endDate;
   private noCache: boolean;
@@ -118,6 +119,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     if (e.label === 'c5ma') {
       this.tableC5ma = e.value;
       this.queryParams.c5ma = e.value || null;
+    }
+    if (e.label === 'mom') {
+      this.tableMom = e.value;
+      this.queryParams.mom = e.value || null;
     }
     this.updateUrlLocation();
   }

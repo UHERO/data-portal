@@ -22,7 +22,7 @@ export class AnalyzerService {
     analyzerSeries: [],
     displayFreqSelector: false,
     siblingFreqs: [],
-    analyzerFrequency: {},
+    analyzerFrequency: null,
     y0Series: null,
     yRightSeries: [],
     yLeftSeries: [],
@@ -270,10 +270,44 @@ export class AnalyzerService {
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ?
         this.getCurrentAnalyzerFrequency(series, this.analyzerData.siblingFreqs) :
         this.getHighestFrequency(this.analyzerData.analyzerSeries);
-      this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      this.analyzerData.requestComplete = true;
+    if (this.allowMoMTransformation(this.analyzerData.analyzerFrequency.freq)) {
+      console.log('MOM TRANSFORMATION')
+      this.apiService.fetchPackageMomTransformation(ids, noCache).subscribe((results) => {
+        const { series: momSeries } = results;
+        const { analyzerSeries } = this.analyzerData;
+        momSeries.forEach((m) => {
+          m.observations = this.helperService.formatSeriesForCharts(m);
+        });
+        console.log('momSeries', momSeries)
+
+        analyzerSeries.forEach((series) => {
+          if (!series.chartValues.includes('MOM')) {
+            series.chartValues.push('MOM');
+          }
+          if (series.observations.findIndex(ob => ob.name === 'mom') === -1) {
+            const seriesMatch = momSeries.find(s => s.id === series.id);
+            series.observations.push(seriesMatch.observations[0]);
+            series.seriesObservations.transformationResults.push(seriesMatch.seriesObservations.transformationResults[0])
+          }
+        });
+        console.log(analyzerSeries);
+        this.createAnalyzerTable(this.analyzerData.analyzerSeries);
+        this.analyzerData.requestComplete = true;
+
+      });
+      console.log('ANALYZER DATA', this.analyzerData)
+
+    }
     });
+    
     return observableForkJoin([observableOf(this.analyzerData)]);
+  }
+
+  allowMoMTransformation(analyzerFrequency) {
+    if (analyzerFrequency === 'M' || analyzerFrequency === 'W' || analyzerFrequency === 'D') {
+      return true;
+    }
+    return false;
   }
 
   addSeriesToAnalyzerData(series: any, analyzerSeries: Array<any>) {
@@ -324,7 +358,7 @@ export class AnalyzerService {
       analyzerSeries: [],
       displayFreqSelector: false,
       siblingFreqs: [],
-      analyzerFrequency: {},
+      analyzerFrequency: null,
       y0Series: null,
       yRightSeries: [],
       yLeftSeries: [],
@@ -440,6 +474,7 @@ export class AnalyzerService {
   createSeriesTable = (transformations, tableDates) => {
     const categoryTable = {};
     transformations.forEach((t) => {
+      console.log('t', t)
       const { transformation, dates, values } = t;
       if (dates && values) {
         categoryTable[`${transformation}`] = tableDates.map((date) => {

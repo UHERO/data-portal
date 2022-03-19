@@ -21,6 +21,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() yoyChecked;
   @Input() ytdChecked;
   @Input() c5maChecked;
+  @Input() momChecked;
   @Input() indexChecked: boolean;
   @Input() indexBaseYear: string;
   portalSettings;
@@ -71,7 +72,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
 
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
-      const { level, yoy, ytd, c5ma } = transformations;
+      const { level, yoy, ytd, c5ma, mom } = transformations;
       const seriesData = this.formatLvlData(series, level, this.minDate);
       const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
       this.summaryRows.push(summaryStats)
@@ -87,6 +88,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       if (this.c5maChecked && c5ma) {
         const c5maData = this.formatTransformationData(series, c5ma);
         this.rows.push(c5maData);
+      }
+      if (this.momChecked && mom) {
+        const momData = this.formatTransformationData(series, mom);
+        this.rows.push(momData);
       }
     });
     // Check if the summary statistics for a series has NA values
@@ -195,7 +200,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     const transformationLabel = {
       pc1: 'YOY',
       ytd: 'YTD',
-      c5ma: 'Annual'
+      c5ma: 'Annual',
+      mom: 'MOM'
     };
     return `${transformationLabel[transformation]} (${percent ? 'ch.' : '%'})`;
   }
@@ -229,6 +235,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   c5maActive(e) {
     this.c5maChecked = e.target.checked;
     this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });
+  }
+  momActive(e, series) {
+    console.log('e', e);
+    console.log('series', series);
+    this.momChecked = e.target.checked;
+    this.tableTransform.emit({ value: e.target.checked, lavel: 'mom' });
   }
 
   switchChartYAxes(series) {

@@ -25,6 +25,7 @@ export class ApiService {
   private cachedPackageAnalyzer = [];
   private cachedObservations = [];
   private cachedSibSeriesByIdAndGeo = [];
+  private cachedMomTransformations = [];
 
   constructor(
     @Inject('environment') private environment,
@@ -238,6 +239,24 @@ export class ApiService {
           analyzer$ = null;
         }), );
       return analyzer$;
+    }
+  }
+
+  fetchPackageMomTransformation(ids: string, noCache: boolean) {
+    if (this.cachedMomTransformations[ids]) {
+      return observableOf(this.cachedMomTransformations[ids]);
+    } else {
+      const caching = noCache ? '&nocache' : '';
+      const url = `${this.baseUrl}/package/analyzermom?ids=${ids}&u=${this.portal.universe}${caching}`;
+      let momTransformation$ = this.http.get(url, this.httpOptions).pipe(
+        map(mapData),
+        tap(val => {
+          this.cachedMomTransformations[ids] = val;
+          momTransformation$ = null;
+        }), );
+        console.log(this.cachedMomTransformations)
+
+      return momTransformation$;
     }
   }
 
