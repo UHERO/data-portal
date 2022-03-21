@@ -254,8 +254,6 @@ export class ApiService {
           this.cachedMomTransformations[ids] = val;
           momTransformation$ = null;
         }), );
-        console.log(this.cachedMomTransformations)
-
       return momTransformation$;
     }
   }

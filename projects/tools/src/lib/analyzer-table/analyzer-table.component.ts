@@ -24,6 +24,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() momChecked;
   @Input() indexChecked: boolean;
   @Input() indexBaseYear: string;
+  @Input() freq;
+  displayMomCheck: boolean;
   portalSettings;
   missingSummaryStat = false;
   private gridApi;
@@ -63,6 +65,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    this.displayMomCheck = this.freq === 'M' || this.freq === 'W' || this.freq === 'D';
     const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
     this.columnDefs = this.setTableColumns(tableDateCols);
     this.rows = [];
@@ -77,25 +80,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
       this.summaryRows.push(summaryStats)
       this.rows.push(seriesData);
-      if (this.yoyChecked && yoy) {
-        const yoyData = this.formatTransformationData(series, yoy);
-        this.rows.push(yoyData);
-      }
-      if (this.ytdChecked && ytd) {
-        const ytdData = this.formatTransformationData(series, ytd);
-        this.rows.push(ytdData);
-      }
-      if (this.c5maChecked && c5ma) {
-        const c5maData = this.formatTransformationData(series, c5ma);
-        this.rows.push(c5maData);
-      }
-      if (this.momChecked && mom) {
-        const momData = this.formatTransformationData(series, mom);
-        this.rows.push(momData);
-      }
+      this.addTransformationToTableRows(this.yoyChecked, yoy, series);
+      this.addTransformationToTableRows(this.ytdChecked, ytd, series);
+      this.addTransformationToTableRows(this.c5maChecked, c5ma, series);
+      this.addTransformationToTableRows(this.momChecked, mom, series);
     });
     // Check if the summary statistics for a series has NA values
     this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
+  }
+
+  addTransformationToTableRows = (checked, transformation, series) => {
+    if (checked && transformation) {
+      this.rows.push(this.formatTransformationData(series, transformation));
+    }
   }
 
   calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
@@ -236,11 +233,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.c5maChecked = e.target.checked;
     this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });
   }
+
   momActive(e, series) {
-    console.log('e', e);
-    console.log('series', series);
     this.momChecked = e.target.checked;
-    this.tableTransform.emit({ value: e.target.checked, lavel: 'mom' });
+    this.tableTransform.emit({ value: e.target.checked, label: 'mom' });
   }
 
   switchChartYAxes(series) {
