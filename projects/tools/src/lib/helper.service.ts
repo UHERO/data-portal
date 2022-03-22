@@ -194,7 +194,8 @@ export class HelperService {
       level: transformations.find(obj => obj.transformation === 'lvl'),
       yoy: transformations.find(obj => obj.transformation === 'pc1'),
       ytd: transformations.find(obj => obj.transformation === 'ytd'),
-      c5ma: transformations.find(obj => obj.transformation === 'c5ma')
+      c5ma: transformations.find(obj => obj.transformation === 'c5ma'),
+      mom: transformations.find(obj => obj.transformation === 'mom')
     };
   }
 
@@ -267,7 +268,8 @@ export class HelperService {
       lvl: 'Level',
       ytd: 'YTD',
       pc1: 'YOY',
-      c5ma: 'Annual Change'
+      c5ma: 'Annual Change',
+      mom: 'MOM'
     };
     const { observationStart, observationEnd, transformationResults } = series.seriesObservations;
     this.createDateArray(observationStart, observationEnd, series.frequencyShort, dateArray);

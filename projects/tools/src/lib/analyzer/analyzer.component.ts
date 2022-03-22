@@ -16,6 +16,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   tableYoy;
   tableYtd;
   tableC5ma;
+  tableMom;
   startDate;
   endDate;
   private noCache: boolean;
@@ -65,9 +66,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         this.tableYoy = this.evalParamAsTrue(params['yoy']);
         this.tableYtd = this.evalParamAsTrue(params['ytd']);
         this.tableC5ma = this.evalParamAsTrue(params['c5ma']);
+        this.tableMom = this.evalParamAsTrue(params['mom']);
         if (this.tableYoy) { this.queryParams.yoy = this.tableYoy } else { delete this.queryParams.yoy };
         if (this.tableYtd) { this.queryParams.ytd = this.tableYtd } else { delete this.queryParams.ytd };
         if (this.tableC5ma) { this.queryParams.c5ma = this.tableC5ma } else { delete this.queryParams.c5ma };
+        if (this.tableMom) { this.queryParams.mom = this.tableMom } else { delete this.queryParams.mom };
         if (this.displayCompare) { this.queryParams.compare = this.displayCompare } else { delete this.queryParams.compare };
         if (this.indexSeries) { this.queryParams.index = this.indexSeries } else { delete this.queryParams.index };
         this.yRightSeries = params['yright'];
@@ -118,6 +121,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     if (e.label === 'c5ma') {
       this.tableC5ma = e.value;
       this.queryParams.c5ma = e.value || null;
+    }
+    if (e.label === 'mom') {
+      this.tableMom = e.value;
+      this.queryParams.mom = e.value || null;
     }
     this.updateUrlLocation();
   }

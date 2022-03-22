@@ -96,6 +96,7 @@ export class DataPortalSettingsService {
       transformations: {
         yoy: true,
         ytd: true,
+        mom: true,
         c5ma: false
       },
       sliderInteraction: true,
@@ -151,6 +152,7 @@ export class DataPortalSettingsService {
       transformations: {
         yoy: true,
         ytd: true,
+        mom: true,
         c5ma: false
       },
       sliderInteraction: true,
@@ -210,6 +212,7 @@ export class DataPortalSettingsService {
       transformations: {
         yoy: true,
         ytd: true,
+        mom: true,
         c5ma: false
       },
       sliderInteraction: true,
@@ -260,6 +263,7 @@ export class DataPortalSettingsService {
       transformations: {
         yoy: true,
         ytd: true,
+        mom: true,
         c5ma: false
       },
       sliderInteraction: true,

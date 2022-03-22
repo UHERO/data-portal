@@ -9,7 +9,8 @@
       be a dropdown selector above to change the frequency. Next to that is a checkbox to toggle indexing (all
       indicators must be the same frequency to utilize this). This is followed by a date slider to control the sample
       size and a 'Remove All Series' button to clear all indicators from the analyzer. At the bottom left corner of all
-      the charts is an <i class="bi bi-bar-chart-fill"></i> icon that toggles whether an indicator is added to the 'Compare'
+      the charts is an <i class="bi bi-bar-chart-fill"></i> icon that toggles whether an indicator is added to the
+      'Compare'
       view of the analyzer (more on that view below). By default, the first 2 indicators are added to the comparison. If
       the index checkbox is selected, series will be indexed to the selected starting date. If data is not available for
       all comparison indicators at the selected start date, indexing will be based on the earliest common date of the
@@ -80,8 +81,9 @@
             (tableExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation()">
           </lib-analyzer-highstock>
           <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="data.minDate" [maxDate]="data.maxDate"
-            [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [indexChecked]="indexSeries"
-            [series]="data.analyzerSeries" [indexBaseYear]="data.baseYear" (tableTransform)="checkTransforms($event)">
+            [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom"
+            [indexChecked]="indexSeries" [series]="data.analyzerSeries" [freq]="data.analyzerFrequency.freq"
+            [indexBaseYear]="data.baseYear" (tableTransform)="checkTransforms($event)">
           </lib-analyzer-table>
         </ng-template>
       </div>

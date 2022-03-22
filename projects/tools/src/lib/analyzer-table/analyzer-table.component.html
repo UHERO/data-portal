@@ -5,6 +5,9 @@
   <label *ngIf="portalSettings.transformations.ytd" class="form-check-inline">
     <input type="checkbox" (change)="ytdActive($event)" [checked]="ytdChecked">Year-to-Date
   </label>
+  <label *ngIf="portalSettings.transformations.mom && displayMomCheck" class="form-check-inline">
+    <input type="checkbox" (change)="momActive($event, series)" [checked]="momChecked">Month/Month
+  </label>
   <label *ngIf="portalSettings.transformations.c5ma" class="form-check-inline">
     <input type="checkbox" (change)="c5maActive($event)" [checked]="c5maChecked">Annual Change
   </label>
