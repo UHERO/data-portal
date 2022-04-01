@@ -373,6 +373,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const rightAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'right');
     this.chartOptions.yAxis = this.chartOptions.series.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
+        const currentMin = this.chartOptions.yAxis.find(a => a.id === s.yAxis)?.min;
+        const currentMax = this.chartOptions.yAxis.find(a => a.id === s.yAxis)?.max;
         axes.push({
           labels: {
             formatter() {
@@ -395,8 +397,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
           styleOrder: s.yAxis === 'left' ? 1 : 2,
           showLastLabel: true,
           showFirstLabel: true,
-          min: null,
-          max: null,
+          min: currentMin ? currentMin : 0,
+          max: currentMax ? currentMax : null,
           visible: this.chartOptions.series.filter(series => series.yAxis === s.yAxis && series.className !== 'navigator').some(series => series.visible)
         });
       }
@@ -573,12 +575,12 @@ export class AnalyzerHighstockComponent implements OnChanges {
   }
 
   changeYAxisMin(e, axis) {
-    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value ?? null
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value ?? null;
     this.updateChart = true;
   }
 
   changeYAxisMax(e, axis) {
-    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value ?? null
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value ?? null;
     this.updateChart = true;
   }
 
