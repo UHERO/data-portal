@@ -136,6 +136,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, serie.seasonalAdjustment, freq);
     });
     forkJoin(siblingsList).subscribe((res: any) => {
+      console.log('res', res)
       res.forEach((siblings) => {
         siblings.forEach((sib) => {
           if (!siblingIds.some(s => s.id === sib.id) && sib.frequencyShort === freq) {
@@ -144,6 +145,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
           }
         });
       });
+      console.log(siblingIds)
       this.queryParams.analyzerSeries = siblingIds.map(ids => ids.id).join('-');
       this.queryParams.chartSeries = siblingIds.filter(sib =>  sib.visible).map(ids => ids.id).join('-');
       this.analyzerService.updateAnalyzerSeries(siblingIds);

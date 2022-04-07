@@ -1,5 +1,5 @@
-<div class="analyzer-view col-xs-12 col-xl-11 d-flex flex-wrap">
-  <h2 id="analyzer-header">Analyzer</h2><i (click)="showHelp()" class="bi bi-question-circle display-help-icon"></i>
+<div class="analyzer-view col-xs-12 col-xl-11" [class.d-flex]="analyzerSeries.length" [class.flex-wrap]="analyzerSeries.length">
+  <div><h2 id="analyzer-header">Analyzer</h2><i (click)="showHelp()" class="bi bi-question-circle display-help-icon"></i></div>
   <p-dialog header="Analyzer View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
     [dismissableMask]="true">
     <p>The Data Portal's Analyzer consists of 2 views: Gallery and Compare.</p>
@@ -94,4 +94,5 @@
       </div>
     </ng-template>
   </ng-container>
+    <p *ngIf="!analyzerSeries.length" id="no-data-msg">Selection not available.</p>
 </div>
