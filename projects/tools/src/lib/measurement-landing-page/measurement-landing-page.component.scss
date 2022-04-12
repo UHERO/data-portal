@@ -18,6 +18,11 @@
     }
   }
 
+  p-tabView p-tabPanel img {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
   .selected-category {
     display: inline-block;
     font-size: 1.4em;

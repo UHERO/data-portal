@@ -194,6 +194,35 @@ body {
   }
 
   lib-landing-page, lib-analyzer, lib-single-series {
+    .p-tabview .p-tabview-panels {
+      border: none;
+    }
+
+    .p-tabview-nav-container, .p-tabview-panels {
+      font-size: 0.9em;
+    }
+
+    .p-tabview .p-tabview-nav {
+      border-bottom: 1px solid $gray;
+
+      li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
+        border-bottom: 2px solid $dark-gray;
+        background: none;
+      }
+    }
+
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+      border: 0;
+      background: none;
+    }
+
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+      background: none;
+      border-bottom: 2px solid $primary;
+      background-color: unset;
+      color: $primary;
+    }
+
     .content-links:before {
       display: block;
       content: ' ';
