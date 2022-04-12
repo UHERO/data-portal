@@ -1,43 +1,53 @@
-<div class="analyzer-view col-xs-12 col-xl-11 d-flex flex-wrap">
-  <h2 id="analyzer-header">Analyzer</h2><i (click)="showHelp()" class="bi bi-question-circle display-help-icon"></i>
+<div class="analyzer-view col-xs-12 col-xl-11" [class.d-flex]="analyzerSeries.length"
+  [class.flex-wrap]="analyzerSeries.length">
+  <div>
+    <h2 id="analyzer-header">Analyzer</h2><i (click)="showHelp()" class="bi bi-question-circle display-help-icon"></i>
+  </div>
   <p-dialog header="Analyzer View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
     [dismissableMask]="true">
-    <p>The Data Portal's Analyzer consists of 2 views: Gallery and Compare.</p>
-    <p><strong>Gallery</strong><br />
-      By default, the analyzer loads into the Gallery view. The upper half contains small charts of all the series that
-      have been selected for the analyzer. If all the indicators in the analyzer are of the same frequency, there will
-      be a dropdown selector above to change the frequency. Next to that is a checkbox to toggle indexing (all
-      indicators must be the same frequency to utilize this). This is followed by a date slider to control the sample
-      size and a 'Remove All Series' button to clear all indicators from the analyzer. At the bottom left corner of all
-      the charts is an <i class="bi bi-bar-chart-fill"></i> icon that toggles whether an indicator is added to the
-      'Compare'
-      view of the analyzer (more on that view below). By default, the first 2 indicators are added to the comparison. If
-      the index checkbox is selected, series will be indexed to the selected starting date. If data is not available for
-      all comparison indicators at the selected start date, indexing will be based on the earliest common date of the
-      indicators selected for comparison.</p>
-    <p>The lower half of the Analyzer contains two tables. The first table lists each indicator that was selected with
-      all the data for the current selected date range. Similar to the category table view, there are controls above
-      this table to toggle the display of growth rates and a link to download the data in CSV format. The second table
-      contains the following summary statistics for each indicator: selected date range, minimum value, maximum value,
-      percent change, change, total, average, and compound annual growth rate.
-    </p>
-    <p><strong>Compare</strong><br />
-      At the very top of the Analyzer is a button to toggle between the 'Compare' and 'Gallery View' of the Analyzer.
-      By clicking on 'Compare,' the view updates to display a single chart drawing all the series that were selected for
-      'Add to Comparison.' There is a set of buttons at the top left-hand corner of the chart to set the range of data
-      to 1 Year, 5 Years, or 10 Years from the selected starting date. The 'All' button will display all available data.
-      In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of
-      the selected data. Next to the Download is a set of buttons to update the chart to draw growth rates or the
-      default level data for the selected indicators.
-    </p>
-    <p>The chart legend lists all indicators currently in the analyzer. To the left of each name is an <i
-        class="bi bi-gear-fill"></i> icon. Click on this icon to open a set of options available for the indicator.
-      These options include drawing the indicator on either a left or right y-axis, changing the chart type (line,
-      column, or area), changing the value drawn (level or growth rates), and removing an indicator from the compre view
-      or analyzer.</p>
-    <p>The share button at the top opens a dialog box containing a static URL which can
-      be bookmarked, shared or otherwise used to reproduce the analyzer set up as it appears on the screen, as well as,
-      an embed code to embed the chart from the 'Compare' view.</p>
+    <p-tabView>
+      <p-tabPanel header="Analyzer">
+        <p>The Data Portal's Analyzer consists of 2 views: Gallery and Compare. Click on the Compare/Gallery button at
+          the top to toggle between them. See the Gallery View and Compare View tabs for more details on each.
+        </p>
+        <img src="assets/analyzer_tables.png" alt="Analyzer tables">
+        <p>The lower half of both Analyzer views contains two tables. The first table lists each indicator that was
+          selected with all the data for the current selected date range. Similar to the category table view, there are
+          controls above this table to toggle the display of growth rates and a link to download the data in CSV format.
+          The second table contains the following summary statistics for each indicator: selected date range, minimum
+          value, maximum value, percent change, change, total, average, and compound annual growth rate.</p>
+      </p-tabPanel>
+      <p-tabPanel header="Gallery View">
+        <img src="assets/analyzer_gallery.png" alt="Analyzer gallery view">
+        <p>By default, the analyzer loads into the Gallery view. The upper half contains small charts of all the series
+          that have been selected for the analyzer. If all the indicators in the analyzer are of the same frequency,
+          there will be a dropdown selector above to change the frequency. Next to that is a checkbox to toggle indexing
+          (all indicators must be the same frequency to utilize this). This is followed by a date slider to control the
+          sample size and a 'Remove All Series' button to clear all indicators from the analyzer. At the bottom left
+          corner of all the charts is an <i class="bi bi-bar-chart-fill"></i> icon that toggles whether an indicator is
+          added to the 'Compare' view of the analyzer (more on that view below). By default, the first 2 indicators are
+          added to the comparison. If the index checkbox is selected, series will be indexed to the selected starting
+          date. If data is not available for all comparison indicators at the selected start date, indexing will be
+          based on the earliest common date of the indicators selected for comparison.</p>
+      </p-tabPanel>
+      <p-tabPanel header="Compare View">
+        <img src="assets/analyzer_compare.png" alt="Analyzer compare view">
+        <p>The compare view displays a single chart drawing all the series that were selected for 'Add to Comparison.'
+          There is a set of buttons at the top left-hand corner of the chart to set the range of data to 1 Year, 5
+          Years, or 10 Years from the selected starting date. The 'All' button will display all available data. In the
+          top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of the
+          selected data. Next to the Download is a set of buttons to update the chart to draw growth rates or the
+          default level data for the selected indicators.</p>
+        <p>The chart legend lists all indicators currently in the analyzer. To the left of each name is an <i
+            class="bi bi-gear-fill"></i> icon. Click on this icon to open a set of options available for the indicator.
+          These options include drawing the indicator on either a left or right y-axis, changing the chart type (line,
+          column, or area), changing the value drawn (level or growth rates), and removing an indicator from the compre
+          view or analyzer.</p>
+        <p>The share button at the top opens a dialog box containing a static URL which can be bookmarked, shared or
+          otherwise used to reproduce the analyzer set up as it appears on the screen, as well as, an embed code to
+          embed the chart from the 'Compare' view.</p>
+      </p-tabPanel>
+    </p-tabView>
   </p-dialog>
   <ng-container *ngIf="analyzerSeries.length">
     <ng-template ngFor let-data [ngForOf]="analyzerData | async">
@@ -94,4 +104,5 @@
       </div>
     </ng-template>
   </ng-container>
+  <p *ngIf="displaySelectionNA" id="no-data-msg">Selection not available.</p>
 </div>

@@ -30,7 +30,7 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
   private loading = false;
   private userEvent;
   portalSettings;
-  displayHelp: boolean = true;
+  displayHelp: boolean = false;
 
   constructor(
     @Inject('portal') private portal,

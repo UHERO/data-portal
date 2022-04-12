@@ -7,6 +7,7 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
 import { DialogModule } from 'primeng/dialog';
+import { TabViewModule } from 'primeng/tabview';
 
 @Component({
   selector: 'lib-landing-page',

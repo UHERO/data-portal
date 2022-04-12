@@ -380,6 +380,11 @@
               "projects/nta/src/outage.html",
               "projects/nta/src/manifest.webmanifest"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets"
+              ]
+            },
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/nova/theme.css",
