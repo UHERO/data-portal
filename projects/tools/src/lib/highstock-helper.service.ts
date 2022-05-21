@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as Highcharts from 'highcharts/highstock';
 
 Highcharts.dateFormats['Q'] = (timestamp) => {
-  const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
+  const month = +new Date(timestamp).toISOString().split('T')[0].substring(5, 8);
   if (1 <= month && month <= 3) {
     return 'Q1';
   }
@@ -91,13 +91,13 @@ export class HighstockHelperService {
   }
 
   setDateToFirstOfMonth = (freq, date) => {
-    const month = +date.substr(5, 2);
-    const year = +date.substr(0, 4);
+    const month = +date.substring(5, 8);
+    const year = +date.substring(0, 5);
     const firstOfMonth = {
       'A': `${year}-01-01`,
       'Q': `${year}-${this.getQuarterMonths(month)}-01`,
-      'M': `${date.substr(0, 7)}-01`,
-      'S': `${date.substr(0, 7)}-01`
+      'M': `${date.substring(0, 8)}-01`,
+      'S': `${date.substring(0, 8)}-01`
     }
     return firstOfMonth[freq] || date;
   }
@@ -153,57 +153,5 @@ export class HighstockHelperService {
       'Oct': ' Q4' 
     }
     return quarters[month] || '';
-  }
-
-  inputDateFormatter = (freq: string) => {
-    const dateFormat = {
-      'A': '%Y',
-      'Q': '%Y %Q',
-      'W': '%b %d %Y',
-      'D': '%b %d %Y'
-    }
-    return dateFormat[freq] || '%b %Y';
-  }
-
-  inputEditDateFormatter = (freq: string) => {
-    const inputDateFormat = {
-      'A': '%Y',
-      'Q': '%Y %Q',
-      'W': '%Y-%m-%d',
-      'D': '%Y-%m-%d'
-    }
-    return inputDateFormat[freq] || '%Y-%m';
-  }
-
-  inputDateParserFormatter = (value: string, freq: string) => {
-    const year = value.substr(0, 4);
-    if (freq === 'Q') {
-      const quarter = value.toUpperCase();
-      if (quarter.includes('Q1')) {
-        return Date.parse(`${year}-01-01`);
-      }
-      if (quarter.includes('Q2')) {
-        return Date.parse(`${year}-04-01`);
-      }
-      if (quarter.includes('Q3')) {
-        return Date.parse(`${year}-07-01`);
-      }
-      if (quarter.includes('Q4')) {
-        return Date.parse(`${year}-10-01`);
-      }
-    }
-    if (freq === 'A') {
-      return Date.parse(`${year}-01-01`);
-    }
-    if (freq === 'M' || freq === 'S') {
-      if (!value.includes('-')) { // i.e. monthly frequency where user removes '-'
-        const month = value.substr(4, 2);
-        return Date.parse(`${year}-${month}-01`);
-      }
-      return Date.parse(`${value}-01`);
-    }
-    if (freq === 'W' || freq === 'D') {
-      return Date.parse(`${value}`);
-    }
   }
 }
