@@ -12,12 +12,6 @@ Highcharts.dateFormats['Q'] = (timestamp) => {
   if (7 <= month && month <= 9) {
     return 'Q3';
   }
-  if (4 <= month && month <= 6) {
-    return 'Q2';
-  }
-  if (7 <= month && month <= 9) {
-    return 'Q3';
-  }
   if (10 <= month && month <= 12) {
     return 'Q4';
   }

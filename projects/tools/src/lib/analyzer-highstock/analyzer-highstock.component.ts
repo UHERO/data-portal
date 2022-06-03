@@ -89,7 +89,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
               Jul: ' Q3',
               Oct: ' Q4' 
             }
-            return year + ` ${quarters[month] || ''}`;
+            return `${year} ${quarters[month] || ''}`;
           }
           if (frequency === 'M' || frequency === 'S') {
             return `${Highcharts.dateFormat('%b', date)} ${year}`;
@@ -352,7 +352,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
-    const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons, highestFreq);
+    const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
 
     this.chartOptions.series = series.map((s, index) => {
       return {
@@ -620,7 +620,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return buttons;
   };
 
-  formatChartButtons(buttons: Array<any>, highestFreq) {
+  formatChartButtons(buttons: Array<any>) {
     const chartButtons = buttons.reduce((allButtons, button) => {
         allButtons.push(button !== 'all' ? {
           type: 'year',
