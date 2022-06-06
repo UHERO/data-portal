@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToolsComponent } from './tools.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HeaderComponent } from './header/header.component';
 import { SliderModule } from 'primeng/slider';
 import { TableModule } from 'primeng/table';
@@ -36,6 +36,8 @@ import { MeasurementSelectorComponent } from './measurement-selector/measurement
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
 import { DialogModule } from 'primeng/dialog';
+import { RequestCache } from './request-cache';
+import { CacheInterceptor } from './cache.interceptor';
 
 @NgModule({
   declarations: [
@@ -106,6 +108,10 @@ import { DialogModule } from 'primeng/dialog';
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
+  ],
+  providers: [
+    RequestCache,
+    { provide: HTTP_INTERCEPTORS, useClass: CacheInterceptor, multi: true }
   ]
 })
 export class ToolsModule { }

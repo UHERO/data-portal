@@ -143,7 +143,7 @@ export class HelperService {
       const monthStr = this.paddedMonthDateString(start.getUTCMonth() + 1);
       const dateStr = this.paddedMonthDateString(start.getUTCDate())
       const q = this.getQuarter(monthStr);
-      const dateStrFormat = this.parseISOString(`${yearStr}-${monthStr}-${dateStr}`).toISOString().substr(0, 10);
+      const dateStrFormat = this.parseISOString(`${yearStr}-${monthStr}-${dateStr}`).toISOString().substring(0, 10);
       const tableDate = this.getTableDate(start, currentFreq, q, dateStrFormat);
       dateArray.push({ date: dateStrFormat , tableDate });
       if (currentFreq === 'A') {
@@ -390,8 +390,8 @@ export class HelperService {
   formattedValue = (value, decimals) => (value === null || value === Infinity) ? '' : this.formatNum(+value, decimals);
 
   formatDate(date: string, freq: string) {
-    const year = date.substr(0, 4);
-    const month = date.substr(5, 2);
+    const year = date.substring(0, 4);
+    const month = date.substring(5, 7);
     if (freq === 'A') {
       return year;
     }
@@ -413,7 +413,7 @@ export class HelperService {
     if (freq === 'M' || freq === 'S') {
       return `${year}-${month}`;
     }
-    return date.substr(0, 10);
+    return date.substring(0, 11);
   }
 
   formatNum(num: number, decimal: number) {

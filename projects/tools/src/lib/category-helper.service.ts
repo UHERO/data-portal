@@ -40,7 +40,7 @@ export class CategoryHelperService {
     return observableOf([this.categoryData[cacheId]]);
   }
 
-  getCategoryData(cachedCategoryData, noCache: boolean, catId: any, routeParams/*selectedCatId: number, noCache: boolean, routeParams, cachedCategoryData*/) {
+  getCategoryData(cachedCategoryData, noCache: boolean, catId: any, routeParams: any) {
     this.apiService.fetchCategories().pipe(
       tap(categories => {
         const { dataListId } = routeParams;
