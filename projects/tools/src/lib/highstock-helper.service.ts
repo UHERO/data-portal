@@ -86,7 +86,7 @@ export class HighstockHelperService {
 
   setDateToFirstOfMonth = (freq, date) => {
     const month = +date.substring(5, 8);
-    const year = +date.substring(0, 5);
+    const year = +date.substring(0, 4);
     const firstOfMonth = {
       'A': `${year}-01-01`,
       'Q': `${year}-${this.getQuarterMonths(month)}-01`,
