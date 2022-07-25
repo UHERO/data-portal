@@ -437,7 +437,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
               }
             }
           },
-          styledMode: false,
+          styledMode: true,
           spacingBottom: 40
         },
         navigator: {
@@ -464,21 +464,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
         },
         subtitle: {
           text: ''
-        },
-        series: [{
-          color: '#1d667f'
-        }, {
-          color: '#F6A01B'
-        },
-        {
-          color: '#9E9E9E'
-        },
-        {
-          color: '#9BBB59'
-        },
-        {
-          color: '#8064A2'
-        }]
+        }
       }
     };
 
