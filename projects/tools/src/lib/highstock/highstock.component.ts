@@ -289,7 +289,7 @@ export class HighstockComponent implements OnChanges {
               }
             }
           },
-          styledMode: false,
+          styledMode: true,
           spacingBottom: 40
         },
         navigator: {
@@ -313,10 +313,7 @@ export class HighstockComponent implements OnChanges {
         title: {
           text: `${name} (${geo.name}, ${freq.label})`,
           align: 'left'
-        },
-        series: [{
-          color: '#1d667f'
-        }]
+        }
       }
     };
     this.chartOptions.tooltip = {
