@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as Highcharts from 'highcharts/highstock';
 
 Highcharts.dateFormats['Q'] = (timestamp) => {
-  const month = +new Date(timestamp).toISOString().split('T')[0].substring(5, 8);
+  const month = +new Date(timestamp).toISOString().split('T')[0].substring(5, 7);
   if (1 <= month && month <= 3) {
     return 'Q1';
   }
@@ -21,6 +21,58 @@ Highcharts.dateFormats['Q'] = (timestamp) => {
   providedIn: 'root'
 })
 export class HighstockHelperService {
+  static getTooltipFreqLabel(frequency: string, date: any): string {
+    const year = Highcharts.dateFormat('%Y', date);
+    const month = Highcharts.dateFormat('%b', date);
+    const day = Highcharts.dateFormat('%d', date);
+    if (frequency === 'A') {
+      return year;
+    }
+    if (frequency === 'Q') {
+      return `${year} ${Highcharts.dateFormat('%Q', date)}`;
+    }
+    if (frequency === 'M' || frequency === 'S') {
+      return `${Highcharts.dateFormat('%b', date)} ${year}`;
+    }
+    if (frequency === 'W' || frequency === 'D') {
+      return `${month} ${day}, ${year}`;
+    }
+  }
+
+  static rangeSelectorSetExtremesEvent(eventMin, eventMax, frequency: string, tableExtremes: any) {
+    const userMin = new Date(eventMin).toISOString().split('T')[0];
+    const userMax = new Date(eventMax).toISOString().split('T')[0];
+    const selectedMin = this.setDateToFirstOfMonth(frequency, userMin);
+    const selectedMax = this.setDateToFirstOfMonth(frequency, userMax);
+    tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
+  }
+
+  static setDateToFirstOfMonth(freq: any, date: string) {
+    const month = +date.substring(5, 7);
+    const year = +date.substring(0, 4);
+    const firstOfMonth = {
+      'A': `${year}-01-01`,
+      'Q': `${year}-${this.getQuarterMonths(month)}-01`,
+      'M': `${date.substring(0, 7)}-01`,
+      'S': `${date.substring(0, 7)}-01`
+    }
+    return firstOfMonth[freq] || date;
+  }
+  
+  static getQuarterMonths(month: number) {
+    if (month >= 1 && month <= 3) {
+      return '01';
+    }
+    if (month >= 4 && month <= 6) {
+      return '04';
+    }
+    if (month >= 7 && month <= 9) {
+      return '07';
+    }
+    if (month >= 10 && month <= 12) {
+      return '10';
+    }
+  }
   constructor() { }
 
   freqInterval = (freq: string) => {
@@ -41,111 +93,12 @@ export class HighstockHelperService {
     return unit[freq] || 'month';
   }
 
-  getChartExtremes = (chartObject) => {
-    // Gets range of x values to emit
-    // Used to redraw table in the single series view
-    let selectedRange = null;
-    if (!chartObject.series[0].points) {
-      return { min: null, max: null };
-    }
-    if (chartObject.series[0].points) {
-      selectedRange = chartObject.series[0].points;
-    }
-    if (selectedRange.length && chartObject._selectedMin && chartObject._selectedMax) {
-      return this.findVisibleMinMax(selectedRange, chartObject);
-    }
-  }
-
-  getAnalyzerChartExtremes = chartObject => {
-    let selectedRange = null;
-    if (chartObject) {
-      selectedRange = chartObject.series.find(s => s.name === 'Navigator').points;
-    }
-    return selectedRange ? this.findVisibleMinMax(selectedRange, chartObject) :
-     {
-      min: new Date(chartObject._selectedMin).toISOString().split('T')[0],
-      max: new Date(chartObject._selectedMax).toISOString().split('T')[0]
-    }
-  }
-
-  findVisibleMinMax = (selectedRange, chartObject) => {
-    let maxCounter = selectedRange.length - 1;
-    let minCounter = 0;
-    let xMin;
-    let xMax;
-    while (!xMax || xMax > chartObject._selectedMax) {
-      xMax = new Date(selectedRange[maxCounter].x).toISOString().split('T')[0];
-      maxCounter--;
-    }
-    while (!xMin || xMin < chartObject._selectedMin) {
-      xMin = new Date(selectedRange[minCounter].x).toISOString().split('T')[0];
-      minCounter++;
-    }
-    return { min: xMin, max: xMax };
-  }
-
-  setDateToFirstOfMonth = (freq, date) => {
-    const month = +date.substring(5, 8);
-    const year = +date.substring(0, 4);
-    const firstOfMonth = {
-      'A': `${year}-01-01`,
-      'Q': `${year}-${this.getQuarterMonths(month)}-01`,
-      'M': `${date.substring(0, 8)}-01`,
-      'S': `${date.substring(0, 8)}-01`
-    }
-    return firstOfMonth[freq] || date;
-  }
-
-  getQuarterMonths = (month) => {
-    if (month >= 1 && month <= 3) {
-      return '01';
-    }
-    if (month >= 4 && month <= 6) {
-      return '04';
-    }
-    if (month >= 7 && month <= 9) {
-      return '07';
-    }
-    if (month >= 10 && month <= 12) {
-      return '10';
-    }
-  }
-
-  getTooltipFreqLabel = (frequency, date) => {
-    const year = Highcharts.dateFormat('%Y', date);
-    const month = Highcharts.dateFormat('%b', date);
-    const day = Highcharts.dateFormat('%d', date);
-    if (frequency === 'A') {
-      return year;
-    }
-    if (frequency === 'Q') {
-      return year + this.getQuarterLabel(month);
-    }
-    if (frequency === 'M' || frequency === 'S') {
-      return `${Highcharts.dateFormat('%b', date)} ${year}`;
-    }
-    if (frequency === 'W' || frequency === 'D') {
-      return `${month} ${day}, ${year}`;
-    }
-  }
-
   xAxisLabelFormatter = (chart, freq) => {
     let s = '';
-    const month = Highcharts.dateFormat('%b', chart.value);
     const year = Highcharts.dateFormat('%Y', chart.value);
     const first: any = Highcharts.dateFormat('%Y', chart.axis.userMin);
     const last: any = Highcharts.dateFormat('%Y', chart.axis.userMax);
-    s = ((last - first) <= 5) && freq === 'Q' ? year + this.getQuarterLabel(month) : year;
+    s = ((last - first) <= 5) && freq === 'Q' ? `${year} ${Highcharts.dateFormat('%Q', chart.value)}` : year;
     return freq === 'Q' ? s : chart.axis.defaultLabelFormatter.call(chart);
-  }
-
-  getQuarterLabel = (month: string) => {
-    const quarters = {
-      'Jan': ' Q1',
-      'Apr': ' Q2',
-      'Jul': ' Q3',
-      'Oct': ' Q4' 
-    }
-    return quarters[month] || '';
   }
 }

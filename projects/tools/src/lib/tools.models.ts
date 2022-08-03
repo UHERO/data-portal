@@ -32,6 +32,7 @@ export interface HighchartsObject {
     className: string,
     events: {
       render: () => void,
+      redraw?: () => void,
       load?: () => void
     },
     styledMode: true,
@@ -106,6 +107,7 @@ export interface HighstockObject {
     animation?: boolean,
     events?: {
       render?: () => void,
+      redraw?: () => void,
       load?: () => void
     },
     className?: string,

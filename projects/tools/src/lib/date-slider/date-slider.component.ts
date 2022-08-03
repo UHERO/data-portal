@@ -39,14 +39,18 @@ export class DateSliderComponent implements OnChanges {
   ) { }
 
   ngOnChanges() {
+    console.log('slider change')
     if (this.dates && this.dates.length) {
       const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.dateFrom, this.dateTo, this.freq, this.defaultRange);
       // Start and end used for 'from' and 'to' inputs in slider
       // If start/end exist in values array, position handles at start/end; otherwise, use default range
       this.start = defaultRanges.seriesStart;
       this.end = defaultRanges.seriesEnd;
+      console.log('defaultstart', this.start);
+      console.log('default end', this.end)
       this.sliderDates = this.dates.map(d => d.date);
       this.sliderSelectedRange = [this.start, this.end];
+      console.log('sliderSelectedRange', this.sliderSelectedRange)
       this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
       /* Date picker inputs */
       this.displayMonthNavigator = this.freq === 'W' || this.freq === 'D';
@@ -228,6 +232,7 @@ export class DateSliderComponent implements OnChanges {
   slideChange(e) {
     this.start = e.values[0];
     this.end = e.values[1];
+    console.log('slideChange e', e)
     // workaround for onSlideEnd not firing when not using the slide handles
     this.sliderSelectedRange = [this.start, this.end];
     this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
@@ -239,6 +244,13 @@ export class DateSliderComponent implements OnChanges {
     this.calendarEndDate = new Date(endDate.replace(/-/g, '/'));
     this.calendarEndDateFormat = this.setCalendarDateFormat(this.freq, this.calendarEndDate);
     this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
+  }
+
+  onChange(e) {
+    console.log('onchange e', e)
+    if (e.event.type === 'click') {
+      this.slideChange(e)
+    }
   }
 
   updateChartsAndTables(from, to) {

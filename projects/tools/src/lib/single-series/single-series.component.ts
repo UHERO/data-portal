@@ -207,6 +207,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   changeRange(event, data, tableData, chartData) {
+    console.log('event', event)
     const { seriesStart, seriesEnd } = event;
     this.startDate = seriesStart;
     this.endDate = seriesEnd;
