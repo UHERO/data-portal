@@ -241,6 +241,12 @@ export class DateSliderComponent implements OnChanges {
     this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
   }
 
+  onChange(e) {
+    if (e.event.type === 'click') {
+      this.slideChange(e)
+    }
+  }
+
   updateChartsAndTables(from, to) {
     const seriesStart = from;
     const seriesEnd = to;

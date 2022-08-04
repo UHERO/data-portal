@@ -75,29 +75,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       split: false,
       followPointer: true,
       formatter: function (args: any) {
-        const getFreqLabel = (frequency, date) => {
-          const year = Highcharts.dateFormat('%Y', date);
-          const month = Highcharts.dateFormat('%b', date);
-          const day = Highcharts.dateFormat('%d', date);
-          if (frequency === 'A') {
-            return year;
-          }
-          if (frequency === 'Q') {
-            const quarters = {
-              Jan: ' Q1',
-              Apr: ' Q2',
-              Jul: ' Q3',
-              Oct: ' Q4' 
-            }
-            return `${year} ${quarters[month] || ''}`;
-          }
-          if (frequency === 'M' || frequency === 'S') {
-            return `${Highcharts.dateFormat('%b', date)} ${year}`;
-          }
-          if (frequency === 'W' || frequency === 'D') {
-            return `${month} ${day}, ${year}`;
-          }
-        };
+        const getFreqLabel = (frequency, date) => HighstockHelperService.getTooltipFreqLabel(frequency, date);
         const filterFrequency = (cSeries: Array<any>, freq: string) => {
           return cSeries.filter(series => series.userOptions.frequencyShort === freq && series.name !== 'Navigator 1');
         }
@@ -348,7 +326,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const startDate = this.start || null;
     const endDate = this.end || null;
     const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
-    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
@@ -485,11 +462,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       events: {
         setExtremes: function(e) {
           if (e.trigger === 'rangeSelectorButton') {
-            const userMin = new Date(e.min).toISOString().split('T')[0];
-            const userMax = new Date(e.max).toISOString().split('T')[0];
-            const selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
-            const selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
-            tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
+            HighstockHelperService.rangeSelectorSetExtremesEvent(e.min, e.max, highestFreq, tableExtremes);
           }
         },
       },

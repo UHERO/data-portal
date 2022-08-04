@@ -25,7 +25,6 @@ export class HighstockComponent implements OnChanges {
   @Output() tableExtremes = new EventEmitter(true);
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
-  //chartOptions = {} as HighstockObject;
   updateChart = false;
   chartObject;
   showChart = false;
@@ -90,7 +89,12 @@ export class HighstockComponent implements OnChanges {
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
       this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
       this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
+      this.updateChart = true;
     }
+  }
+
+  saveChartInstance(chart: Highcharts.Chart) {
+    this.chartObject = chart;
   }
 
   // Gets buttons used in Highstock Chart
@@ -206,6 +210,7 @@ export class HighstockComponent implements OnChanges {
   }
 
   drawChart = (chartData: HighchartChartData, seriesDetail: Series, portalSettings) => {
+    let chartObject = this.chartObject
     const decimals = seriesDetail.decimals || 1;
     const geo: Geography = seriesDetail.geography;
     const freq: Frequency = { freq: seriesDetail.frequencyShort, label: seriesDetail.frequency };
@@ -222,9 +227,7 @@ export class HighstockComponent implements OnChanges {
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
     const formatTooltip = (points, x, pseudoZ, dec, frequency) => this.formatTooltip(points, x, pseudoZ, dec, frequency);
-    const getChartExtremes = (chartObject) => this.highstockHelper.getChartExtremes(chartObject);
     const xAxisFormatter = (chart, frequency) => this.highstockHelper.xAxisLabelFormatter(chart, frequency);
-    const setDateToFirstOfMonth = (frequency, date) => this.highstockHelper.setDateToFirstOfMonth(frequency, date);
     const logo = this.logo;
     const addToAnalyzer = (seriesId: number) => this.analyzerService.addToAnalyzer(seriesId);
     const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId);
@@ -232,7 +235,7 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.chart.events = {
       render() {
         if (!this.chartObject || this.chartObject.series.length < 4) {
-          this.chartObject = Object.assign({}, this);
+          chartObject = Object.assign({}, this);
         }
         if (this.analyzerBtn) {
           this.analyzerBtn.destroy();
@@ -328,11 +331,7 @@ export class HighstockComponent implements OnChanges {
       events: {
         setExtremes(e) {
           if (e.trigger === 'rangeSelectorButton') {
-            const userMin = new Date(e.min).toISOString().split('T')[0];
-            const userMax = new Date(e.max).toISOString().split('T')[0];
-            const selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
-            const selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
-            tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
+            HighstockHelperService.rangeSelectorSetExtremesEvent(e.min, e.max, freq.freq, tableExtremes);
           }
         }
       },
@@ -385,7 +384,7 @@ export class HighstockComponent implements OnChanges {
   }
 
   formatTooltip = (points, x, pseudoZones, decimals, freq) => {
-    const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
+    const getFreqLabel = (frequency, date) => HighstockHelperService.getTooltipFreqLabel(frequency, date);
     const pseudo = 'Pseudo History ';
     let s = `<b>${getFreqLabel(freq.freq, x)}</b>`;
     points.forEach((point) => {
