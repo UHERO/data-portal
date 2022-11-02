@@ -167,24 +167,24 @@ export class SeriesHelperService {
     const values = indexed ? this.analyzerService.getChartIndexedValues(level, indexBase) : level;
     const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
     const valuesInRange = values.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
-    // if the selected range includes missing values, do not calculate stats
-    if (valuesInRange.includes(null) || !valuesInRange.length) {
+    const min = this.findMinAndIndex(valuesInRange.filter(val => val !== null));
+    const max = this.findMaxAndIndex(valuesInRange.filter(val => val !== null));
+    const sum = valuesInRange.reduce((a, b) => a + b, 0);
+    formattedStats.total = formatNum(sum, decimals);
+    formattedStats.avg = formatNum(sum / valuesInRange.length, decimals);
+    formattedStats.minValue = `${formatNum(min.value, decimals)} (${formatDate(datesInRange[min.index].date, freq)})`;
+    formattedStats.maxValue = `${formatNum(max.value, decimals)} (${formatDate(datesInRange[max.index].date, freq)})`;
+    // if starting and ending values are missing, do not calculate change or % change
+    if (valuesInRange[valuesInRange.length - 1] === null || valuesInRange[0] === null) {
       formattedStats.missing = true;
       return formattedStats;
     }
-    const min = this.findMinAndIndex(valuesInRange);
-    const max = this.findMaxAndIndex(valuesInRange);
     const diff = valuesInRange[valuesInRange.length - 1] - valuesInRange[0];
-    const percChange = formatNum((diff / valuesInRange[0]) * 100, decimals);
-    const sum = valuesInRange.reduce((a, b) => a + b, 0);
+    const percChange = valuesInRange[0] !== null ? formatNum((diff / valuesInRange[0]) * 100, decimals) : 'N/A';
     const periods = valuesInRange.length - 1;
     const cagr = this.calculateCAGR(valuesInRange[0], valuesInRange[valuesInRange.length - 1], freq, periods);
-    formattedStats.minValue = `${formatNum(min.value, decimals)} (${formatDate(datesInRange[min.index].date, freq)})`;
-    formattedStats.maxValue = `${formatNum(max.value, decimals)} (${formatDate(datesInRange[max.index].date, freq)})`;
     formattedStats.percChange = percent ? null : percChange;
     formattedStats.levelChange = formatNum(diff, decimals);
-    formattedStats.total = formatNum(sum, decimals);
-    formattedStats.avg = formatNum(sum / valuesInRange.length, decimals);
     formattedStats.cagr = formatNum(cagr, decimals);
     return formattedStats;
   }

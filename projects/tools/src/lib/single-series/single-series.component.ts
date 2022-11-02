@@ -146,8 +146,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     let maxDate;
     let tableStart;
     let tableEnd;
-    minDate = startDate //e.minDate;
-    maxDate = endDate //e.maxDate;
+    minDate = startDate;
+    maxDate = endDate;
     for (let i = 0; i < tableData.length; i++) {
       if (tableData[i].date === maxDate) {
         tableStart = i;
