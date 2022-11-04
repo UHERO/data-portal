@@ -158,7 +158,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
 
   navigate(catId, subId?) {
     // If a popover from the category tables is open, remove when navigating to another category
-    const popover = $('.popover');
+    const popover = document.querySelector('.popover') //$('.popover');
     if (popover) {
       popover.remove();
     }

@@ -32,6 +32,7 @@ export class DateSliderComponent implements OnChanges {
   invalidStartDates: Array<any>;
   invalidEndDates: Array<any>
   displayMonthNavigator: boolean;
+  placeholderStr: string;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -58,8 +59,21 @@ export class DateSliderComponent implements OnChanges {
       this.calendarEndDateFormat = this.setCalendarDateFormat(this.freq, this.calendarEndDate);
       this.invalidStartDates = this.setInvalidDates(this.calendarStartDate.getFullYear(), this.freq, this.calendarStartDate.getMonth() + 1);
       this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
+      this.placeholderStr = this.setPlaceholderText(this.freq);
       this.setMinMaxDates();
     }
+  }
+
+  setPlaceholderText = (freq: string) => {
+    const placeholderFormats = {
+      A: 'YYYY',
+      S: 'YYYY-MM',
+      Q: 'YYYY Q#',
+      M: 'YYYY-MM',
+      W: 'YYYY-MM-DD',
+      D: 'YYYY-MM-DD'
+    };
+    return placeholderFormats[freq];
   }
 
   setInvalidDates = (year: number, freq: string, month?: number) => {
@@ -119,21 +133,27 @@ export class DateSliderComponent implements OnChanges {
 
   onCalendarInput(e: any, calendar: string, freq: string) {
     const isValidInput = this.checkValidCalendarInput(e.target.value.toUpperCase(), freq);
+    console.log(isValidInput)
     if (isValidInput) {
       this.updateCalendarDate(e.target.value.toUpperCase(), calendar, freq);
     }
   }
 
-  checkValidCalendarInput = (value: string, freq: string) => {
-    const valueLength = {
-      A: 4,
-      S: 7,
-      Q: 7,
-      M: 7,
-      W: 10,
-      D: 10
+  getDate = (date: string, freq: string, separator: string) => {
+    const qMonths = { 'Q1': '01', 'Q2': '04', 'Q3': '07', 'Q4': '10' };
+    const newDate = {
+      A: `${date}${separator}01${separator}01`,
+      S: `${date}${separator}01`,
+      Q: `${date.slice(0, 4)}${separator}${qMonths[date.slice(5, 7)]}${separator}01`,
+      M: `${date}${separator}01`,
+      W:  date,
+      D:  date
     };
-    return valueLength[freq] === value.length && this.sliderDates.indexOf(value) > -1;
+    return newDate[freq];
+  }
+
+  checkValidCalendarInput = (value: string, freq: string) => {
+    return this.sliderDates.indexOf(this.getDate(value, freq, '-')) > -1
   }
 
   onCalendarBlur(calendar: string, selectedDate) {
@@ -147,16 +167,9 @@ export class DateSliderComponent implements OnChanges {
   }
 
   updateCalendarDate(value: string, calendar: string, freq: string) {
-    const qMonths = { 'Q1': '01', 'Q2': '04', 'Q3': '07', 'Q4': '10' };
-    const newDate = {
-      A: `${value}/01/01`,
-      S: `${value}/01`,
-      Q: `${value.slice(0, 4)}/${qMonths[value.slice(5, 7)]}/01`,
-      M: `${value}/01`,
-      W:  value,
-      D:  value
-    };
-    calendar === 'calendar-start' ? this.setCalendarStartVars(newDate[freq], freq) : this.setCalendarEndVars(newDate[freq], freq);
+    calendar === 'calendar-start' ?
+      this.setCalendarStartVars(this.getDate(value, freq, '/'), freq) :
+      this.setCalendarEndVars(this.getDate(value, freq, '/'), freq);
     this.sliderSelectedRange = [this.start, this.end];
     this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
   }
