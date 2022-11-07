@@ -1,7 +1,6 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, AfterViewInit, ViewChild } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
-import * as $ from 'jquery';
 
 declare var gtag: (str: string, gaId: string, path: object) => void;
 
@@ -10,10 +9,11 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   private isBrowser;
   displayBrowserAlert: boolean = true;
   viewFullUI: boolean = true;
+  @ViewChild('browserAlert') browserAlert;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: object,
@@ -32,16 +32,18 @@ export class AppComponent {
     }
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     if (this.isBrowser) {
       if (navigator.userAgent.search('Chrome') === -1) {
-        $('.browser').show();
+        this.browserAlert.nativeElement.style.display = 'block';
         setTimeout(() => {
-          $('.browser').hide();
+          this.browserAlert.nativeElement.style.display = 'none';
         }, 5000);
       } else {
         this.displayBrowserAlert = false;
-        $('.browser').hide();
+        this.browserAlert.nativeElement.style.display = 'none';
       }
     }
-  }}
+  }
+
+}

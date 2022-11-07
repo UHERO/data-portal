@@ -1,5 +1,5 @@
 <p-calendar #calendarStart [class.annual-calendar]="freq === 'A'" inputId="calendar-start" [view]="calendarView"
-  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarStartDate"
+  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarStartDate" [placeholder]="placeholderStr"
   [dateFormat]="calendarStartDateFormat" [yearNavigator]="true" [monthNavigator]="displayMonthNavigator"
   [disabledDates]="invalidStartDates" [yearRange]="calendarYearRange"
   (onSelect)="onCalendarSelect($event, calendarStart.inputId, freq)"
@@ -9,12 +9,13 @@
   (onClose)="onCalendarClose(calendarStart.inputId, calendarStartDate)"
   (onBlur)="onCalendarBlur(calendarStart.inputId, calendarStartDate)">
 </p-calendar>
-<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true" (onChange)="onChange($event)"
-  (onSlideEnd)="slideChange($event)"></p-slider>
+<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true"
+  (onChange)="onChange($event)" (onSlideEnd)="slideChange($event)"></p-slider>
 <p-calendar #calendarEnd [class.annual-calendar]="freq === 'A'" inputId="calendar-end" [view]="calendarView"
-  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarEndDate" [dateFormat]="calendarEndDateFormat"
-  [yearNavigator]="true" [monthNavigator]="displayMonthNavigator" [disabledDates]="invalidEndDates"
-  [yearRange]="calendarYearRange" (onSelect)="onCalendarSelect($event, calendarEnd.inputId, freq)"
+  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarEndDate" [placeholder]="placeholderStr"
+  [dateFormat]="calendarEndDateFormat" [yearNavigator]="true" [monthNavigator]="displayMonthNavigator"
+  [disabledDates]="invalidEndDates" [yearRange]="calendarYearRange"
+  (onSelect)="onCalendarSelect($event, calendarEnd.inputId, freq)"
   (onYearChange)="onYearChange($event, calendarEnd.inputId, freq)"
   (onMonthChange)="onMonthChange($event, calendarEnd.inputId, freq)"
   (onInput)="onCalendarInput($event, calendarEnd.inputId, freq)"

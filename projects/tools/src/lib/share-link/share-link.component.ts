@@ -91,7 +91,8 @@ export class ShareLinkComponent implements OnChanges {
   }
 
   copyLink(inputValue, shareText) {
-    $('.share-link').attr('title', 'Copied');
+    // $('.share-link').attr('title', 'Copied');
+    document.querySelector<HTMLElement>('.share-link').setAttribute('title', 'Copied');
     inputValue.select();
     if (!navigator.clipboard) {
       // execCommand is deprecated
@@ -104,7 +105,8 @@ export class ShareLinkComponent implements OnChanges {
     }
     setTimeout(() => {
       // Reset share link title
-      $('.share-link').attr('title', 'Copy');
+      document.querySelector<HTMLElement>('.share-link').setAttribute('title', 'Copy');
+      //$('.share-link').attr('title', 'Copy');
     }, 3000);
   }
 }
