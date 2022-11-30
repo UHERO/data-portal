@@ -64,14 +64,6 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
           this.yoy = params[`yoy`] || 'false';
           this.ytd = params[`ytd`] || 'false';
           this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this.router.url);
-          this.navMenuItems.forEach((item) => {
-            if (this.id) {
-              item.expanded = item.id === this.id ? true : false;
-            }
-            if (!this.id && this.selectedCategory !== 'analyzer' && this.selectedCategory !== 'help') {
-              item.expanded = +item.id === this.defaultCategory ? true : false;
-            }
-          });
         });
       });
     this.router.events.subscribe((event) => {
@@ -88,13 +80,30 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   }
 
   addMenuItem = (navMenuItems: Array<any>, category: any) => {
+    console.log('category', category)
+    const catQParams = {
+      id: category.id,
+      data_list_id: category.children ? category.children[0].id : category.id,
+      analyzerSeries: null,
+      chartSeries: null,
+      start: null,
+      end: null,
+      name: null,
+      units: null,
+      geography: null
+    };
+
     const menuItem = {
       id: `${category.id}`,
       label: category.name,
       icon: 'pi pi-pw',
+      routerLink: '/category',
+      queryParams: catQParams,
+      queryParamsHandling: 'merge',
       ...(category.children && { items: this.createSubmenuItems(category.children, category.id) }),
       command: (event) => {
-        this.navToFirstDataList(event.item, category.id);
+        console.log('event', event)
+       this.navToFirstDataList(event.item, category.id);
       }
     }
     navMenuItems.push(menuItem);
@@ -103,6 +112,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   // navigate to Summary or first data list when clicking on a category
   navToFirstDataList(menuItem, categoryId) {
     if (!menuItem.items) {
+      console.log('menuItem', menuItem)
       this.navigate(categoryId, menuItem.id);
     }
     if (menuItem.items) {
@@ -111,12 +121,28 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   }
 
   createSubmenuItems(subcategories, categoryId) {
+    
+
     const subMenu = [];
     subcategories.forEach((sub) => {
+      const catQParams = {
+        id: categoryId,
+        data_list_id: sub.id,
+        analyzerSeries: null,
+        chartSeries: null,
+        start: null,
+        end: null,
+        name: null,
+        units: null,
+        geography: null
+      };
       const subMenuItem: MenuItem = {};
       subMenuItem.label = sub.name;
       subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
       subMenuItem.id = sub.id;
+      subMenuItem.routerLink = '/category';
+      subMenuItem.queryParams = catQParams;
+      subMenuItem.queryParamsHandling = 'merge';
       if (sub.children) {
         subMenuItem.command = (event) => {
           this.navToFirstDataList(event.item, categoryId);
@@ -158,13 +184,14 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
 
   navigate(catId, subId?) {
     // If a popover from the category tables is open, remove when navigating to another category
-    const popover = document.querySelector('.popover') //$('.popover');
+    const popover = document.querySelector('.popover');
     if (popover) {
       popover.remove();
     }
     this.loading = true;
+    console.log('this.selectedCategory', this.selectedCategory)
     this.selectedCategory = catId;
-    setTimeout(() => {
+    /* setTimeout(() => {
       const catQParams = {
         id: catId,
         data_list_id: subId,
@@ -179,7 +206,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
         this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
 
       this.loading = false;
-    }, 15);
+    }, 15); */
   }
 
   onSearch(event) {
