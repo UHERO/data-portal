@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, AfterContentChecked } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { ApiService } from '../api.service';
@@ -72,6 +72,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
               item.expanded = +item.id === this.defaultCategory ? true : false;
             }
           });
+          
         });
       });
     this.router.events.subscribe((event) => {
@@ -87,6 +88,20 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     this.analyzerSeriesCount.unsubscribe();
   }
 
+  setQueryParams = (categoryId, subcategoryId) => {
+    return {
+      id: categoryId,
+      data_list_id: subcategoryId,
+      analyzerSeries: null,
+      chartSeries: null,
+      start: null,
+      end: null,
+      name: null,
+      units: null,
+      geography: null
+    };
+  }
+
   addMenuItem = (navMenuItems: Array<any>, category: any) => {
     const menuItem = {
       id: `${category.id}`,
@@ -94,19 +109,23 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       icon: 'pi pi-pw',
       ...(category.children && { items: this.createSubmenuItems(category.children, category.id) }),
       command: (event) => {
-        this.navToFirstDataList(event.item, category.id);
+        const popover = document.querySelector('.popover');
+        if (popover) {
+          popover.remove();
+        }
+        this.loading = true;
       }
     }
     navMenuItems.push(menuItem);
   }
 
   // navigate to Summary or first data list when clicking on a category
-  navToFirstDataList(menuItem, categoryId) {
+  findFirstDataList(menuItem, categoryId) {
     if (!menuItem.items) {
-      this.navigate(categoryId, menuItem.id);
+      this.menuClickHandler(categoryId, menuItem.id);
     }
     if (menuItem.items) {
-      return this.navToFirstDataList(menuItem.items[0], categoryId);
+      return this.findFirstDataList(menuItem.items[0], categoryId);
     }
   }
 
@@ -117,15 +136,19 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       subMenuItem.label = sub.name;
       subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
       subMenuItem.id = sub.id;
+      subMenuItem.routerLink = '/category';
+      subMenuItem.queryParams = this.setQueryParams(categoryId, sub.id);
+      subMenuItem.queryParamsHandling = 'merge';
+      subMenuItem.routerLinkActiveOptions = { exact: true }
       if (sub.children) {
         subMenuItem.command = (event) => {
-          this.navToFirstDataList(event.item, categoryId);
+          this.findFirstDataList(event.item, categoryId);
         };
         subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
       }
       if (!sub.children) {
         subMenuItem.command = (event) => {
-          this.navigate(categoryId, sub.id);
+          this.menuClickHandler(categoryId, sub.id);
         };
       }
       subMenu.push(subMenuItem);
@@ -138,12 +161,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     if (id === undefined) {
       return this.defaultCategory;
     }
-    if (id && isNaN(id)) {
-      return null;
-    }
-    if (id && +id) {
-      return +id;
-    }
+    return isNaN(id) ? null : +id;
   }
 
   checkRoute(id, url) {
@@ -156,30 +174,14 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     return this.findSelectedCategory(id);
   }
 
-  navigate(catId, subId?) {
+  menuClickHandler(catId, subId?) {
     // If a popover from the category tables is open, remove when navigating to another category
-    const popover = document.querySelector('.popover') //$('.popover');
+    const popover = document.querySelector('.popover');
     if (popover) {
       popover.remove();
     }
     this.loading = true;
     this.selectedCategory = catId;
-    setTimeout(() => {
-      const catQParams = {
-        id: catId,
-        data_list_id: subId,
-        analyzerSeries: null,
-        chartSeries: null,
-        start: null,
-        end: null,
-        name: null,
-        units: null,
-        geography: null
-      };
-        this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
-
-      this.loading = false;
-    }, 15);
   }
 
   onSearch(event) {
