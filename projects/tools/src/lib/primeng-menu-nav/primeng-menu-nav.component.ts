@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, AfterContentChecked } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { ApiService } from '../api.service';
@@ -64,6 +64,15 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
           this.yoy = params[`yoy`] || 'false';
           this.ytd = params[`ytd`] || 'false';
           this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this.router.url);
+          this.navMenuItems.forEach((item) => {
+            if (this.id) {
+              item.expanded = item.id === this.id ? true : false;
+            }
+            if (!this.id && this.selectedCategory !== 'analyzer' && this.selectedCategory !== 'help') {
+              item.expanded = +item.id === this.defaultCategory ? true : false;
+            }
+          });
+          
         });
       });
     this.router.events.subscribe((event) => {
@@ -79,11 +88,10 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     this.analyzerSeriesCount.unsubscribe();
   }
 
-  addMenuItem = (navMenuItems: Array<any>, category: any) => {
-    console.log('category', category)
-    const catQParams = {
-      id: category.id,
-      data_list_id: category.children ? category.children[0].id : category.id,
+  setQueryParams = (categoryId, subcategoryId) => {
+    return {
+      id: categoryId,
+      data_list_id: subcategoryId,
       analyzerSeries: null,
       chartSeries: null,
       start: null,
@@ -92,66 +100,55 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       units: null,
       geography: null
     };
+  }
 
+  addMenuItem = (navMenuItems: Array<any>, category: any) => {
     const menuItem = {
       id: `${category.id}`,
       label: category.name,
       icon: 'pi pi-pw',
-      routerLink: '/category',
-      queryParams: catQParams,
-      queryParamsHandling: 'merge',
       ...(category.children && { items: this.createSubmenuItems(category.children, category.id) }),
       command: (event) => {
-        console.log('event', event)
-       this.navToFirstDataList(event.item, category.id);
+        const popover = document.querySelector('.popover');
+        if (popover) {
+          popover.remove();
+        }
+        this.loading = true;
       }
     }
     navMenuItems.push(menuItem);
   }
 
   // navigate to Summary or first data list when clicking on a category
-  navToFirstDataList(menuItem, categoryId) {
+  findFirstDataList(menuItem, categoryId) {
     if (!menuItem.items) {
-      console.log('menuItem', menuItem)
-      this.navigate(categoryId, menuItem.id);
+      this.menuClickHandler(categoryId, menuItem.id);
     }
     if (menuItem.items) {
-      return this.navToFirstDataList(menuItem.items[0], categoryId);
+      return this.findFirstDataList(menuItem.items[0], categoryId);
     }
   }
 
   createSubmenuItems(subcategories, categoryId) {
-    
-
     const subMenu = [];
     subcategories.forEach((sub) => {
-      const catQParams = {
-        id: categoryId,
-        data_list_id: sub.id,
-        analyzerSeries: null,
-        chartSeries: null,
-        start: null,
-        end: null,
-        name: null,
-        units: null,
-        geography: null
-      };
       const subMenuItem: MenuItem = {};
       subMenuItem.label = sub.name;
       subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
       subMenuItem.id = sub.id;
       subMenuItem.routerLink = '/category';
-      subMenuItem.queryParams = catQParams;
+      subMenuItem.queryParams = this.setQueryParams(categoryId, sub.id);
       subMenuItem.queryParamsHandling = 'merge';
+      subMenuItem.routerLinkActiveOptions = { exact: true }
       if (sub.children) {
         subMenuItem.command = (event) => {
-          this.navToFirstDataList(event.item, categoryId);
+          this.findFirstDataList(event.item, categoryId);
         };
         subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
       }
       if (!sub.children) {
         subMenuItem.command = (event) => {
-          this.navigate(categoryId, sub.id);
+          this.menuClickHandler(categoryId, sub.id);
         };
       }
       subMenu.push(subMenuItem);
@@ -164,12 +161,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     if (id === undefined) {
       return this.defaultCategory;
     }
-    if (id && isNaN(id)) {
-      return null;
-    }
-    if (id && +id) {
-      return +id;
-    }
+    return isNaN(id) ? null : +id;
   }
 
   checkRoute(id, url) {
@@ -182,31 +174,14 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     return this.findSelectedCategory(id);
   }
 
-  navigate(catId, subId?) {
+  menuClickHandler(catId, subId?) {
     // If a popover from the category tables is open, remove when navigating to another category
     const popover = document.querySelector('.popover');
     if (popover) {
       popover.remove();
     }
     this.loading = true;
-    console.log('this.selectedCategory', this.selectedCategory)
     this.selectedCategory = catId;
-    /* setTimeout(() => {
-      const catQParams = {
-        id: catId,
-        data_list_id: subId,
-        analyzerSeries: null,
-        chartSeries: null,
-        start: null,
-        end: null,
-        name: null,
-        units: null,
-        geography: null
-      };
-        this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
-
-      this.loading = false;
-    }, 15); */
   }
 
   onSearch(event) {
