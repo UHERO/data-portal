@@ -1,5 +1,37 @@
 <div class="multi-charts-row">
-	<ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
+	<ng-template ngFor let-measurement [ngForOf]="newData | keyvalue: measurementOrderFunc">
+		<!-- <div class="multi-charts">
+			<ng-template ngFor let-series [ngForOf]="measurement.value">
+				<a href="#" [routerLink]="['/series']"
+					[queryParams]="{id: series.id, sa: series.saParam}" queryParamsHandling='merge' *ngIf="series.id && series.display">
+					<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
+						[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="series" [indexChecked]="indexChecked"
+						[baseYear]="indexBaseYear">
+					</lib-highchart>
+				</a>
+				<a *ngIf="series.displaySeasonalMessage">
+					{{series.displayName}}
+					<p>Test</p>
+				</a>
+			</ng-template>
+		</div> -->
+		<ng-template ngFor let-series [ngForOf]="measurement.value">
+			<div class="multi-charts" *ngIf="series.display || series.displaySeasonalMessage">
+				<a href="#" [routerLink]="['/series']"
+					[queryParams]="{id: series.id, sa: series.saParam}" queryParamsHandling='merge' *ngIf="series.id && series.display">
+					<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
+						[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="series" [indexChecked]="indexChecked"
+						[baseYear]="indexBaseYear">
+					</lib-highchart>
+				</a>
+				<a *ngIf="series.displaySeasonalMessage">
+					{{series.displayName}}
+					<p>Data only available as {{showSeasonal ? 'Non-seasonally adjusted' : 'Seasonally adjusted'}}.</p>
+				</a>
+			</div>
+		</ng-template>
+	</ng-template>
+	<!-- <ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
 		<div *ngIf="serie.display" class="multi-charts">
 			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.id, sa: serie.saParam}"
 				queryParamsHandling='merge' *ngIf="serie.id">
@@ -20,5 +52,5 @@
 					class="bi bi-bar-chart-fill analyzer-toggle remove-button" (click)="removeCompare(serie)"></i>
 			</ng-template>
 		</div>
-	</ng-template>
+	</ng-template> -->
 </div>

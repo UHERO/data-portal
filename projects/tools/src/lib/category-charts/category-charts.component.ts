@@ -1,3 +1,4 @@
+import { KeyValue } from '@angular/common';
 import { Component, Input, OnChanges, Inject, Output, EventEmitter } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
@@ -10,6 +11,8 @@ import { HelperService } from '../helper.service';
 export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
   @Input() data;
+  @Input() newData: {};
+  @Input() measurementOrder: Array<string>
   @Input() findMinMax;
   @Input() freq;
   @Input() noSeries;
@@ -40,7 +43,18 @@ export class CategoryChartsComponent implements OnChanges {
   ) { }
 
   ngOnChanges() {
-    if (this.data) {
+    
+    if (this.newData) {
+      Object.keys(this.newData).forEach((measurement) => {
+        this.toggleSeriesDisplay(this.showSeasonal, this.newData[measurement]);
+      });
+      const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
+      this.chartStart = this.dates[seriesStart].date;
+      this.chartEnd = this.dates[seriesEnd].date;
+
+    }
+    console.log('newData', this.newData)
+    /* if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
@@ -50,7 +64,7 @@ export class CategoryChartsComponent implements OnChanges {
           this.chartEnd = this.dates[seriesEnd].date;
         }
       });
-    }
+    } */
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
@@ -63,6 +77,27 @@ export class CategoryChartsComponent implements OnChanges {
         this.minValue = this.findMin(this.data, start, end);
         this.maxValue = this.findMax(this.data, start, end);
       }
+    }
+  }
+
+  measurementOrderFunc = (a: KeyValue<string, Array<any>>, b: KeyValue<string, Array<any>>): number => {
+    return this.measurementOrder.indexOf(a.key) - this.measurementOrder.indexOf(b.key);
+  }
+
+  toggleSeriesDisplay = (showSeasonal: boolean, measurementSeries: Array<any>) => { 
+    measurementSeries.forEach((series) => {
+      const { seasonalAdjustment } = series;
+      const display = (showSeasonal && seasonalAdjustment === 'seasonally_adjusted') ||
+        (showSeasonal && seasonalAdjustment === 'not_applicable') ||
+        (!showSeasonal && seasonalAdjustment === 'not_seasonally_adjusted') ||
+        seasonalAdjustment === 'not_applicable';
+      series.display = display;
+      series.displaySeasonalMessage = false;
+    });
+    if (!measurementSeries.some(series => series.display)) {
+      measurementSeries.forEach((series) => {
+        series.displaySeasonalMessage = true;
+      });
     }
   }
 

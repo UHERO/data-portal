@@ -116,12 +116,26 @@ export class CategoryHelperService {
       serie.observations = this.helperService.formatSeriesForCharts(serie);
       serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', transformationForGrid);
     });
+    console.log('displaySeries', displaySeries)
+    const newDisplaySeries = {};
+    displaySeries.forEach((series) => {
+      if (newDisplaySeries[series.measurementName]) {
+        newDisplaySeries[series.measurementName].push(series);
+      }
+      if (!newDisplaySeries[series.measurementName]) {
+        newDisplaySeries[series.measurementName] = [series];
+      }
+    });
+    const measurementOrder = [...new Set(displaySeries.map(series => series.measurementName))];
+    cachedCategoryData.measurementOrder = measurementOrder;
+    cachedCategoryData.newDisplaySeries = newDisplaySeries;
     cachedCategoryData.displaySeries = displaySeries.length ? displaySeries : null;
     cachedCategoryData.dateWrapper = dateWrapper;
     cachedCategoryData.categoryDates = categoryDates;
     cachedCategoryData.hasSeasonal = this.findSeasonalSeries(displaySeries);
     cachedCategoryData.findMinMax = findMinMax;
     cachedCategoryData.requestComplete = true;
+    console.log('cachedCategoryData', cachedCategoryData)
   }
 
   processSeriesData(seriesData: Array<any>, cachedCategoryData, transformation: string, findMinMax: boolean) {
