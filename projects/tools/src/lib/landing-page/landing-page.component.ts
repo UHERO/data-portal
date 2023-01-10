@@ -70,8 +70,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
-      this.id = this.helperService.getIdParam(params[`id`]);//this.getIdParam(params[`id`]);
-      this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);//this.getIdParam(params[`data_list_id`]);
+      this.id = this.helperService.getIdParam(params[`id`]);
+      this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeGeo = params[`geo`];
       this.routeFreq = params[`freq`];

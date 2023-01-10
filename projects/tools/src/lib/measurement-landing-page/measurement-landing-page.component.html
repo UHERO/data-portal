@@ -69,7 +69,7 @@
 				<input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event)">Annual
 				Change
 			</label>
-			<lib-date-slider class="sliders" *ngIf="data.displaySeries" [portalSettings]="portalSettings"
+			<lib-date-slider class="sliders" *ngIf="data.displayedMeasurements" [portalSettings]="portalSettings"
 				[dates]="data.categoryDates" [dateFrom]="data?.seriesStart || null" [dateTo]="data?.seriesEnd || null"
 				[freq]="data.currentFreq?.freq" (updateRange)="changeRange($event, data)"></lib-date-slider>
 		</div>
@@ -80,14 +80,16 @@
 		</div>
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && data.seriesStart && data.seriesEnd">
 			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings"
-				[dates]="data.categoryDates" [tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd"
-				[data]="data.displaySeries" [tableId]="data.selectedDataList" [selectedCategory]="data.selectedCategory"
+				[measurementOrder]="data.measurementOrder" [dates]="data.categoryDates" [tableStart]="data.seriesStart"
+				[tableEnd]="data.seriesEnd" [displayedMeasurements]="data.displayedMeasurements"
+				[tableId]="data.selectedDataList" [selectedCategory]="data.selectedCategory"
 				[c5maActive]="queryParams.c5ma === 'true'" [noSeries]="data.noData" [params]="queryParams">
 			</lib-category-table-view>
 			<lib-category-charts *ngIf="routeView !== 'table'" [search]="search" [portalSettings]="portalSettings"
-				[routeStart]="data.seriesStart" [routeEnd]="data.seriesEnd" [dates]="data.categoryDates"
-				[data]="data.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="data.noData"
-				[findMinMax]="data.findMinMax" (updateURLFragment)="updateRoute()">
+				[measurementOrder]="data.measurementOrder" [routeStart]="data.seriesStart" [routeEnd]="data.seriesEnd"
+				[dates]="data.categoryDates" [displayedMeasurements]="data.displayedMeasurements"
+				[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [findMinMax]="data.findMinMax"
+				(updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && data.noData && !search">

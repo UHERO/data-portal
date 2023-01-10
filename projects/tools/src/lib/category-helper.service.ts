@@ -26,7 +26,7 @@ export class CategoryHelperService {
   
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent = (catId: any, noCache: boolean, routeParams): Observable<any> => {
+  initContent = (catId: any, noCache: boolean, routeParams: any): Observable<any> => {
     const cacheId = this.helperService.setCacheId(catId, routeParams);
     if (this.categoryData.hasOwnProperty(cacheId)) {
       this.updateSelectors(this.categoryData[cacheId], this.portal.universe);
@@ -40,7 +40,7 @@ export class CategoryHelperService {
     return observableOf([this.categoryData[cacheId]]);
   }
 
-  getCategoryData(cachedCategoryData, noCache: boolean, catId: any, routeParams: any) {
+  getCategoryData(cachedCategoryData: any, noCache: boolean, catId: any, routeParams: any) {
     this.apiService.fetchCategories().pipe(
       tap(categories => {
         const { dataListId } = routeParams;
@@ -64,7 +64,7 @@ export class CategoryHelperService {
           if (this.portalSettings.selectors.includes('forecast')) {
             cachedCategoryData.forecasts = forecasts || [];
             const defaultFc = (cachedCategoryData.selectedDataList.defaults?.fc) || (cachedCategoryData.forecasts && cachedCategoryData.forecasts[0]);
-            let routeFcExists
+            let routeFcExists;
             if (routeParams.fc) {
               routeFcExists = cachedCategoryData.forecasts.find(fc => fc === routeParams.fc);
             }
@@ -90,7 +90,7 @@ export class CategoryHelperService {
     });
   }
 
-  updateSelectors(cachedCategoryData, portal: string) {
+  updateSelectors(cachedCategoryData: any, portal: string) {
     const { updateCurrentFrequency, updateCurrentForecast, updateCurrentGeography } = this.helperService;
     if (portal !== 'nta') {
       updateCurrentGeography(cachedCategoryData.currentGeo);
@@ -101,44 +101,39 @@ export class CategoryHelperService {
     updateCurrentFrequency(cachedCategoryData.currentFreq);
   }
 
-  setNoCategoryCata(cachedCategoryData) {
+  setNoCategoryCata(cachedCategoryData: any) {
     cachedCategoryData.noData = true;
     cachedCategoryData.requestComplete = true;
   }
 
-  setCategorySeriesAndDates(seriesData: Array<any>, cachedCategoryData, transformationForGrid: string, findMinMax: boolean) {
+  setCategorySeriesAndDates(seriesData: Array<any>, cachedCategoryData: any, transformationForGrid: string, findMinMax: boolean) {
     const { universe } = this.portal;
     const displaySeries = this.filterSeriesResults(seriesData, universe);
     const dateWrapper = this.helperService.setDateWrapper(displaySeries);
     const { firstDate, endDate } = dateWrapper;
     const categoryDates = this.helperService.createDateArray(firstDate, endDate, cachedCategoryData.currentFreq.freq, []);
-    displaySeries.forEach((serie) => {
-      serie.observations = this.helperService.formatSeriesForCharts(serie);
-      serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', transformationForGrid);
-    });
-    console.log('displaySeries', displaySeries)
-    const newDisplaySeries = {};
+    const displayedMeasurements = {}
     displaySeries.forEach((series) => {
-      if (newDisplaySeries[series.measurementName]) {
-        newDisplaySeries[series.measurementName].push(series);
+      series.observations = this.helperService.formatSeriesForCharts(series);
+      series.gridDisplay = this.helperService.formatGridDisplay(series, 'lvl', transformationForGrid);
+      if (displayedMeasurements[series.measurementName]) {
+        displayedMeasurements[series.measurementName].push(series);
       }
-      if (!newDisplaySeries[series.measurementName]) {
-        newDisplaySeries[series.measurementName] = [series];
+      if (!displayedMeasurements[series.measurementName]) {
+        displayedMeasurements[series.measurementName] = [series];
       }
     });
     const measurementOrder = [...new Set(displaySeries.map(series => series.measurementName))];
     cachedCategoryData.measurementOrder = measurementOrder;
-    cachedCategoryData.newDisplaySeries = newDisplaySeries;
-    cachedCategoryData.displaySeries = displaySeries.length ? displaySeries : null;
+    cachedCategoryData.displayedMeasurements = Object.keys(displayedMeasurements).length ? displayedMeasurements : null;
     cachedCategoryData.dateWrapper = dateWrapper;
     cachedCategoryData.categoryDates = categoryDates;
     cachedCategoryData.hasSeasonal = this.findSeasonalSeries(displaySeries);
     cachedCategoryData.findMinMax = findMinMax;
     cachedCategoryData.requestComplete = true;
-    console.log('cachedCategoryData', cachedCategoryData)
   }
 
-  processSeriesData(seriesData: Array<any>, cachedCategoryData, transformation: string, findMinMax: boolean) {
+  processSeriesData(seriesData: Array<any>, cachedCategoryData: any, transformation: string, findMinMax: boolean) {
     if (seriesData?.length) {
       this.setCategorySeriesAndDates(seriesData, cachedCategoryData, transformation, findMinMax);
     }
@@ -151,7 +146,7 @@ export class CategoryHelperService {
     return regions.find(region => region.handle === routeGeo) && freqs.find(frequency => frequency.freq === routeFreq) ? true : false;
   }
 
-  findCategoryAndStoreDataLists(portalCategories: Array<any>, selectedCatId: number, datalistId: number, cachedCategoryData) {
+  findCategoryAndStoreDataLists(portalCategories: Array<any>, selectedCatId: number, datalistId: number, cachedCategoryData: any) {
     // default to first category if one isn't selected
     selectedCatId = selectedCatId || portalCategories[0].id;
     const category = portalCategories.find(c => c.id === selectedCatId);  

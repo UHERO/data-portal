@@ -17,6 +17,7 @@ export class AnalyzerService {
 
   public analyzerData = {
     analyzerTableDates: [],
+    analyzerMeasurements: {},
     sliderDates: [],
     analyzerDateWrapper: { firstDate: '', endDate: '' },
     analyzerSeries: [],
@@ -249,11 +250,13 @@ export class AnalyzerService {
 
   getAnalyzerData(aSeriesTracker: Array<any>, noCache: boolean) {
     this.analyzerData.analyzerSeries = [];
+    this.analyzerData.analyzerMeasurements = {}
     this.analyzerData.requestComplete = false;
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
+      console.log('results', results)
       const series = results.series;
       const analyzerDateWrapper = { } as DateWrapper;
       analyzerDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
@@ -265,8 +268,9 @@ export class AnalyzerService {
       series.forEach((s) => {
         s.observations = this.helperService.formatSeriesForCharts(s);
         s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', series1Name); 
-        this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries);
+        this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries, this.analyzerData.analyzerMeasurements);
       });
+      console.log(this.analyzerData.analyzerMeasurements)
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ?
         this.getCurrentAnalyzerFrequency(series, this.analyzerData.siblingFreqs) :
         this.getHighestFrequency(this.analyzerData.analyzerSeries);
@@ -277,6 +281,7 @@ export class AnalyzerService {
         this.analyzerData.requestComplete = true;
       }
     });
+    console.log('analyzerData', this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
@@ -309,13 +314,20 @@ export class AnalyzerService {
     });
   }
 
-  addSeriesToAnalyzerData(series: any, analyzerSeries: Array<any>) {
+  addSeriesToAnalyzerData(series: any, analyzerSeries: Array<any>, analyzerMeasurements) {
     const seriesExists = analyzerSeries.find(s => series.id === s.id);
     if (!seriesExists) {
       const seriesData = this.formatSeriesForAnalyzer(series);
       seriesData.visible = this.isVisible(series, analyzerSeries);
       analyzerSeries.push(seriesData);
       this.setCompareChartSeriesObject(seriesData);
+
+      if (analyzerMeasurements[seriesData.measurementName]) {
+        analyzerMeasurements[seriesData.measurementName].push(seriesData);
+      }
+      if (!analyzerMeasurements[seriesData.measurementName]) {
+        analyzerMeasurements[seriesData.measurementName] = [seriesData];
+      }
     }
   }
 
@@ -352,6 +364,7 @@ export class AnalyzerService {
   resetAnalyzerData = () => {
     return {
       analyzerTableDates: [],
+      analyzerMeasurements: {},
       sliderDates: [],
       analyzerDateWrapper: { firstDate: '', endDate: '' },
       analyzerSeries: [],

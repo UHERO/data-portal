@@ -45,8 +45,8 @@ export class MeasurementLandingPageComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
-      this.id = this.helperService.getIdParam(params[`id`]);//this.getIdParam(params[`id`]);
-      this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);//this.getIdParam(params[`data_list_id`]);
+      this.id = this.helperService.getIdParam(params[`id`]);
+      this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params[`view`];
       this.routeC5ma = params[`c5ma`];
