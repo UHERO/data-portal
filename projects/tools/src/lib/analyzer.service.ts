@@ -256,7 +256,6 @@ export class AnalyzerService {
     this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
-      console.log('results', results)
       const series = results.series;
       const analyzerDateWrapper = { } as DateWrapper;
       analyzerDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
@@ -270,7 +269,6 @@ export class AnalyzerService {
         s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', series1Name); 
         this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries, this.analyzerData.analyzerMeasurements);
       });
-      console.log(this.analyzerData.analyzerMeasurements)
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ?
         this.getCurrentAnalyzerFrequency(series, this.analyzerData.siblingFreqs) :
         this.getHighestFrequency(this.analyzerData.analyzerSeries);
@@ -281,7 +279,6 @@ export class AnalyzerService {
         this.analyzerData.requestComplete = true;
       }
     });
-    console.log('analyzerData', this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
