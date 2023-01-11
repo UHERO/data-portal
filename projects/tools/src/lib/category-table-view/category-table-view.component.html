@@ -5,8 +5,9 @@
   <button class="csv-export-button" type="button" (click)="onExport()">Download CSV
     <i class="bi bi-file-earmark-excel"></i>
   </button>
-  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs"
-    domLayout="autoHeight" [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true"
+  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowClassRules]="rowClassRules" [rowData]="rows"
+    [columnDefs]="columnDefs" [enableBrowserTooltips]="true" domLayout="autoHeight"
+    [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true"
     (gridReady)="onGridReady($event)">
   </ag-grid-angular>
 </ng-template>
