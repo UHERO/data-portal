@@ -25,8 +25,10 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   routeView: string;
   private routeYoy;
   private routeYtd;
+  private routeC5ma;
   private routeSa;
   private noCache: boolean;
+  private selectedMeasure;
   routeStart;
   routeEnd;
   search = false;
@@ -79,11 +81,14 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.routeView = params[`view`];
       this.routeYoy = params[`yoy`];
       this.routeYtd = params[`ytd`];
+      this.routeC5ma = params[`c5ma`];
+      this.selectedMeasure = params[`m`];
       this.routeSa = params[`sa`];
       this.routeStart = params[`start`] || null;
       this.routeEnd = params[`end`] || null;
       this.noCache = params[`nocache`] === 'true';
       if (this.id) { this.queryParams.id = this.id; }
+      if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; }
       if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; }
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; }
@@ -92,12 +97,16 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.routeSa) { this.queryParams.sa = this.routeSa; } else { this.queryParams.sa = 'true'; }
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
+      if (this.routeC5ma && this.portal.universe === 'nta') { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       const dataListId = this.dataListId;
       const geo = this.routeGeo;
       const freq = this.routeFreq;
-      const fc = this.routeFc
-      this.categoryData = this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq, fc })
+      const fc = this.routeFc;
+      const selectedMeasure = this.selectedMeasure;
+      this.categoryData = this.portal.universe === 'nta' ?
+        this.catHelper.initContent(this.id, this.noCache, { dataListId, selectedMeasure }) :
+        this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq, fc })
     });
   }
 
@@ -110,6 +119,16 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
+  }
+
+  // Redraw series when a new measurement is selected
+  redrawSeriesMeasurements(event) {
+    this.displaySeries = false;
+    this.loading = true;
+    setTimeout(() => {
+      this.queryParams.m = event.name;
+      this.updateRoute();
+    }, 10);
   }
 
   // Redraw series when a new region is selected
@@ -171,11 +190,21 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }, 10);
   }
 
+  c5maActive(e) {
+    this.loading = true;
+    setTimeout(() => {
+      this.queryParams.c5ma = e.target.checked;
+      this.updateRoute();
+    }, 10);
+  }
+
   showHelp() {
     this.displayHelp = true;
   }
 
-  changeRange(e) {
+  changeRange(e, category) {
+    category.seriesStart = e.seriesStart;
+    category.seriesEnd = e.seriesEnd;
     this.routeStart = e.seriesStart;
     this.routeEnd = e.endOfSample ? null : e.seriesEnd;
     this.seriesRange = e;
