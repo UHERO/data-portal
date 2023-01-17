@@ -136,10 +136,6 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       subMenuItem.label = sub.name;
       subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
       subMenuItem.id = sub.id;
-      subMenuItem.routerLink = '/category';
-      subMenuItem.queryParams = this.setQueryParams(categoryId, sub.id);
-      subMenuItem.queryParamsHandling = 'merge';
-      subMenuItem.routerLinkActiveOptions = { exact: true }
       if (sub.children) {
         subMenuItem.command = (event) => {
           this.findFirstDataList(event.item, categoryId);
@@ -147,6 +143,10 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
         subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
       }
       if (!sub.children) {
+        subMenuItem.routerLink = '/category';
+        subMenuItem.queryParams = this.setQueryParams(categoryId, sub.id);
+        subMenuItem.queryParamsHandling = 'merge';
+        subMenuItem.routerLinkActiveOptions = { exact: true };  
         subMenuItem.command = (event) => {
           this.menuClickHandler(categoryId, sub.id);
         };

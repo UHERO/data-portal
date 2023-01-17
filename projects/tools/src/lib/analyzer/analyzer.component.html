@@ -83,8 +83,8 @@
         <ng-template ngIf [ngIf]="data.requestComplete">
           <lib-category-charts *ngIf="!displayCompare && data.minDate" [portalSettings]="portalSettings"
             [displayedMeasurements]="data.analyzerMeasurements" [dates]="data.sliderDates" [freq]="data.analyzerFrequency.freq"
-            [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true" [routeStart]="data.minDate"
-            [routeEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
+            [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true" [chartStart]="data.minDate"
+            [chartEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
           </lib-category-charts>
           <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
             [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate" [indexChecked]="indexSeries"

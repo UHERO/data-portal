@@ -127,8 +127,8 @@
 				[params]="queryParams" [c5maActive]="queryParams.c5ma === 'true'" [showSeasonal]="queryParams.sa === 'true'"
 				[hasSeasonal]="data.hasSeasonal">
 			</lib-category-table-view>
-			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [routeStart]="routeStart"
-				[routeEnd]="routeEnd" [displayedMeasurements]="data.displayedMeasurements"
+			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings"
+				[chartStart]="data.seriesStart" [chartEnd]="data.seriesEnd" [displayedMeasurements]="data.displayedMeasurements"
 				[measurementOrder]="data.measurementOrder" [dates]="data.categoryDates"
 				[freq]="selectedFreq?.freq || data.currentFreq.freq" [noSeries]="data.noData"
 				[showSeasonal]="queryParams.sa === 'true'" [findMinMax]="data.findMinMax" [hasSeasonal]="data.hasSeasonal"

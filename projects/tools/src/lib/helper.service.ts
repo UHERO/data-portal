@@ -84,7 +84,7 @@ export class HelperService {
     return false;
   }
 
-  checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
+  checkIfSeriesAvailable = (noData: boolean, data: Object) => {
     const allSeries = Object.keys(data).reduce((dataArr, measurement) => {
       return dataArr.concat(data[measurement]);
     }, []);
