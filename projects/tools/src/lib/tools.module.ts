@@ -31,7 +31,6 @@ import { AnalyzerHighstockComponent } from './analyzer-highstock/analyzer-highst
 import { AnalyzerTableComponent } from './analyzer-table/analyzer-table.component';
 import { AnalyzerStatsRendererComponent } from './analyzer-stats-renderer/analyzer-stats-renderer.component';
 import { AnalyzerTableRendererComponent } from './analyzer-table-renderer/analyzer-table-renderer.component';
-import { MeasurementLandingPageComponent } from './measurement-landing-page/measurement-landing-page.component';
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
@@ -62,7 +61,6 @@ import { CacheInterceptor } from './cache.interceptor';
     AnalyzerTableComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
-    MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
     EmbedGraphComponent,
     SearchResultsComponent,
@@ -106,7 +104,6 @@ import { CacheInterceptor } from './cache.interceptor';
     AnalyzerTableComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
-    MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
   ],
   providers: [

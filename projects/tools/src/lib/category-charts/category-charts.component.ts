@@ -10,27 +10,23 @@ import { HelperService } from '../helper.service';
 })
 export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
-  @Input() displayedMeasurements;
-  @Input() measurementOrder: Array<string>
-  @Input() findMinMax;
-  @Input() freq;
-  @Input() noSeries;
-  @Input() showSeasonal;
-  @Input() hasSeasonal;
-  @Input() routeStart;
-  @Input() routeEnd;
-  @Input() search;
-  @Input() dates;
+  @Input() displayedMeasurements: any;
+  @Input() measurementOrder: Array<string>;
+  @Input() findMinMax: boolean;
+  @Input() freq: string;
+  @Input() noSeries: boolean;
+  @Input() showSeasonal: boolean;
+  @Input() hasSeasonal: boolean;
+  @Input() chartStart: string;
+  @Input() chartEnd: string;
+  @Input() dates: Array<{date: string, tableDate: string}>;
   @Input() analyzerView: boolean;
-  @Input() indexChecked;
-  @Input() indexBaseYear;
+  @Input() indexChecked: boolean;
+  @Input() indexBaseYear: string;
   @Output() updateURLFragment = new EventEmitter();
-  minValue;
-  maxValue;
-  noSeriesToDisplay;
-  routeSubscription;
-  chartStart;
-  chartEnd;
+  minValue: number;
+  maxValue: number;
+  noSeriesToDisplay: boolean;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -44,14 +40,11 @@ export class CategoryChartsComponent implements OnChanges {
         this.helperService.toggleSeriesDisplay(this.hasSeasonal, this.showSeasonal, this.displayedMeasurements[measurement], this.analyzerView);
         this.isSeriesInAnalyzer(this.displayedMeasurements[measurement]);
       });
-      const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
-      this.chartStart = this.dates[seriesStart].date;
-      this.chartEnd = this.dates[seriesEnd].date;
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.displayedMeasurements);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
-    if (this.portalSettings.highcharts.setYAxes && !this.search) {
+    if (this.portalSettings.highcharts.setYAxes) {
       const defaultStartEnd = this.defaultRange.find(ranges => ranges.freq === this.freq);
       const start = this.chartStart || Date.parse(defaultStartEnd.start);
       const end = this.chartEnd || Date.parse(defaultStartEnd.end);
@@ -64,10 +57,9 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   measurementOrderFunc = (a: KeyValue<string, Array<any>>, b: KeyValue<string, Array<any>>): number => {
-    if (!this.measurementOrder) {
-      return null;
-    }
-    return this.measurementOrder.indexOf(a.key) - this.measurementOrder.indexOf(b.key);
+    return !this.measurementOrder ?
+      null :
+      this.measurementOrder.indexOf(a.key) - this.measurementOrder.indexOf(b.key);
   }
 
   isSeriesInAnalyzer = (measurementSeries: Array<any>) => {

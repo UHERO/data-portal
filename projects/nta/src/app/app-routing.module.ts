@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { MeasurementLandingPageComponent } from 'tools';
+import { LandingPageComponent } from 'tools';
 import { SingleSeriesComponent } from 'tools';
 import { AnalyzerComponent } from 'tools';
 import { EmbedGraphComponent } from 'tools';
@@ -9,15 +9,15 @@ const routes: Routes = [
   // map / to the landing page
   {
     path: '',
-    component: MeasurementLandingPageComponent,
+    component: LandingPageComponent,
   },
   {
     path: 'category',
-    component: MeasurementLandingPageComponent,
+    component: LandingPageComponent,
   },
   {
     path: 'search',
-    component: MeasurementLandingPageComponent,
+    component: LandingPageComponent,
   },
   {
     path: 'series',

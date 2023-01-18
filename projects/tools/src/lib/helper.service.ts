@@ -72,7 +72,7 @@ export class HelperService {
     /* series at the annual frequency or where seasonality is not applicable should be displayed
     series should also be displayed if no seasonality is applicable to the entire category or
     if the user is in the analyzer */
-    if (seasonalAdjustment === 'not_applicable' || analyzerView || frequencyShort === 'A' || !hasSeasonal) {
+    if (!seasonalAdjustment || seasonalAdjustment === 'not_applicable' || analyzerView || frequencyShort === 'A' || !hasSeasonal) {
       return true;
     }
     if (showSeasonal && seasonalAdjustment === 'seasonally_adjusted') {
@@ -84,7 +84,7 @@ export class HelperService {
     return false;
   }
 
-  checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
+  checkIfSeriesAvailable = (noData: boolean, data: Object) => {
     const allSeries = Object.keys(data).reduce((dataArr, measurement) => {
       return dataArr.concat(data[measurement]);
     }, []);

@@ -299,14 +299,14 @@ export class AnalyzerHighstockComponent implements OnChanges {
     exportData(this.Highcharts);
     offlineExport(this.Highcharts);
     Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
-    // Add metadata to top of CSV export
-    const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
-    let seriesMetaData = '';
-    this.userOptions.labels.items.forEach((label) => {
-      if (!result.includes(label.html)) {
-        seriesMetaData += label.html ? `${label.html} \n` : '';
-      }
-    });
+      // Add metadata to top of CSV export
+      const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+      let seriesMetaData = '';
+      this.userOptions.labels.items.forEach((label) => {
+        if (!result.includes(label.html)) {
+          seriesMetaData += label.html ? `${label.html} \n` : '';
+        }
+      });
       return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
     });
   }
@@ -322,6 +322,19 @@ export class AnalyzerHighstockComponent implements OnChanges {
     }
   }
 
+  // Labels used for metadata in CSV download
+  formatChartLabels = (portalSettings) => {
+    const { portal, portalLink } = portalSettings.highstock.labels;
+    const labelItems = [
+      {
+        html: portal
+      }, {
+        html: portalLink
+      }
+    ];
+    return { items: labelItems, style: { display: 'none' } };
+  }
+
   updateChartOptions(series) {
     const startDate = this.start || null;
     const endDate = this.end || null;
@@ -330,7 +343,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const logo = this.logo;
     const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
     const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-
+    this.chartOptions.labels = this.formatChartLabels(this.portalSettings)
     this.chartOptions.series = series.map((s, index) => {
       return {
         ...s,

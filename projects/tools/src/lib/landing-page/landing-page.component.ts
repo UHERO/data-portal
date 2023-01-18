@@ -16,16 +16,9 @@ import { TabViewModule } from 'primeng/tabview';
 })
 export class LandingPageComponent implements OnInit, OnDestroy {
   private sub;
-  private defaultCategory;
   private id: number;
   private dataListId: number;
-  private routeGeo: string;
-  private routeFreq: string;
-  private routeFc: string;
   routeView: string;
-  private routeYoy;
-  private routeYtd;
-  private routeSa;
   private noCache: boolean;
   routeStart;
   routeEnd;
@@ -35,12 +28,10 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   seriesEnd = null;
   portalSettings;
   seriesRange;
-  private displaySeries;
   displayHelp: boolean = false;
 
   // Variables for geo and freq selectors
   public categoryData;
-  private loading = false;
   freqSub: Subscription;
   fcSub: Subscription;
   geoSub: Subscription;
@@ -70,34 +61,40 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
+      const {
+        m: measurement, // only for NTA portal
+        geo,
+        freq,
+        fc, // only for forecast portal (beta)
+        sa,
+        yoy,
+        ytd,
+        c5ma // only for NTA portal
+      } = params;
       this.id = this.helperService.getIdParam(params[`id`]);
       this.dataListId = this.helperService.getIdParam(params[`data_list_id`]);
       this.search = typeof this.id === 'string' ? true : false;
-      this.routeGeo = params[`geo`];
-      this.routeFreq = params[`freq`];
-      this.routeFc = params[`fc`];
       this.routeView = params[`view`];
-      this.routeYoy = params[`yoy`];
-      this.routeYtd = params[`ytd`];
-      this.routeSa = params[`sa`];
       this.routeStart = params[`start`] || null;
       this.routeEnd = params[`end`] || null;
       this.noCache = params[`nocache`] === 'true';
       if (this.id) { this.queryParams.id = this.id; }
+      if (measurement) { this.queryParams.m = measurement; }
       if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
-      if (this.routeGeo) { this.queryParams.geo = this.routeGeo; }
-      if (this.routeFreq) { this.queryParams.freq = this.routeFreq; }
-      if (this.routeFc) { this.queryParams.fc = this.routeFc; }
+      if (geo) { this.queryParams.geo = geo; }
+      if (freq) { this.queryParams.freq = freq; }
+      if (fc) { this.queryParams.fc = fc; }
       if (this.routeView) { this.queryParams.view = this.routeView; }
-      if (this.routeSa) { this.queryParams.sa = this.routeSa; } else { this.queryParams.sa = 'true'; }
-      if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
-      if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
+      if (sa) { this.queryParams.sa = sa; } else { this.queryParams.sa = 'true'; }
+      if (yoy) { this.queryParams.yoy = yoy; } else { delete this.queryParams.yoy; }
+      if (ytd) { this.queryParams.ytd = ytd; } else { delete this.queryParams.ytd; }
+      if (c5ma && this.portal.universe === 'nta') { this.queryParams.c5ma = c5ma; } else { delete this.queryParams.c5ma; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       const dataListId = this.dataListId;
-      const geo = this.routeGeo;
-      const freq = this.routeFreq;
-      const fc = this.routeFc
-      this.categoryData = this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq, fc })
+      const selectedMeasure = params[`m`];
+      this.categoryData = this.portal.universe === 'nta' ?
+        this.catHelper.initContent(this.id, this.noCache, { dataListId, selectedMeasure }) :
+        this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq, fc })
     });
   }
 
@@ -112,74 +109,64 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.geoSub.unsubscribe();
   }
 
+  // Redraw series when a new measurement is selected
+  redrawSeriesMeasurements(event) {
+    this.queryParams.m = event.name;
+    this.updateRoute();
+  }
+
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq: Frequency, currentFc: string) {
-    this.displaySeries = false;
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.geo = event.handle;
-      this.queryParams.freq = currentFreq.freq;
-      this.queryParams.fc = currentFc;
-      this.updateRoute();
-    }, 20);
+    this.queryParams.geo = event.handle;
+    this.queryParams.freq = currentFreq.freq;
+    this.queryParams.fc = currentFc;
+    this.updateRoute();
   }
 
   redrawSeriesFreq(event, currentGeo: Geography, currentFc: string) {
-    this.displaySeries = false;
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.geo = currentGeo.handle;
-      this.queryParams.freq = event.freq;
-      this.queryParams.fc = currentFc;
-      this.updateRoute();
-    }, 10);
+    this.queryParams.geo = currentGeo.handle;
+    this.queryParams.freq = event.freq;
+    this.queryParams.fc = currentFc;
+    this.updateRoute();
   }
 
   redrawSeriesFc(event, currentGeo: Geography, currentFreq: Frequency) {
-    this.displaySeries = false;
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.geo = currentGeo.handle;
-      this.queryParams.freq = currentFreq.freq;
-      this.queryParams.fc = event
-      this.updateRoute();
-    }, 10);
+    this.queryParams.geo = currentGeo.handle;
+    this.queryParams.freq = currentFreq.freq;
+    this.queryParams.fc = event
+    this.updateRoute();
   }
 
   switchView() {
-    this.loading = true;
-    this.displaySeries = false;
-    setTimeout(() => {
-      this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
-      this.updateRoute();
-    });
+    this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
+    this.updateRoute();
   }
 
   yoyActive(e) {
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.yoy = e.target.checked;
-      this.updateRoute();
-    }, 10);
+    this.queryParams.yoy = e.target.checked;
+    this.updateRoute();
   }
 
   ytdActive(e) {
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.ytd = e.target.checked;
-      this.updateRoute();
-    }, 10);
+    this.queryParams.ytd = e.target.checked;
+    this.updateRoute();
+  }
+
+  c5maActive(e) {
+    this.queryParams.c5ma = e.target.checked;
+    this.updateRoute();
   }
 
   showHelp() {
     this.displayHelp = true;
   }
 
-  changeRange(e) {
+  changeRange(e, category) {
+    category.seriesStart = e.seriesStart;
+    category.seriesEnd = e.seriesEnd;
     this.routeStart = e.seriesStart;
     this.routeEnd = e.endOfSample ? null : e.seriesEnd;
     this.seriesRange = e;
-    this.displaySeries = true;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;
     this.updateRoute();
@@ -190,16 +177,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this.router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
-    this.loading = false;
-    this.displaySeries = true;
   }
 
   toggleSASeries(e) {
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.sa = e.target.checked;
-      this.updateRoute();
-    }, 10);
+    this.queryParams.sa = e.target.checked;
+    this.updateRoute();
   }
 
   // navigate to Summary or first data list when clicking on a category

@@ -121,21 +121,25 @@ export class HighstockComponent implements OnChanges {
 
   // Labels used for metadata in CSV download
   formatChartLabels = (seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) => {
-    const labelItems = [{
-        html: `Series: ${seriesDetail.title} (${geo.name}, ${freq.label})`
+    const { title, sourceDescription, sourceLink, sourceDetails, id } = seriesDetail;
+    const { portal, portalLink, seriesLink } = portalSettings.highstock.labels;
+    const labelItems = [
+      {
+        html: `Series: ${title} (${geo.name}, ${freq.label})`
       }, {
-        html: seriesDetail.sourceDescription
+        html: sourceDescription
       }, {
-        html: seriesDetail.sourceLink
+        html: sourceLink
       }, {
-        html: seriesDetail.sourceDetails
+        html: sourceDetails
       }, {
-        html: `${seriesDetail.title}: ${portalSettings.highstock.labels.seriesLink}${seriesDetail.id}`
+        html: `${title}: ${seriesLink}${id}`
       }, {
-        html: portalSettings.highstock.labels.portal
+        html: portal
       }, {
-        html: portalSettings.highstock.labels.portalLink
-      }];
+        html: portalLink
+      }
+    ];
     return { items: labelItems, style: { display: 'none' } };
   }
 
