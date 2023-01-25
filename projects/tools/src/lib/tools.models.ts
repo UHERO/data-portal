@@ -102,6 +102,9 @@ export interface HighchartChartData {
 }
 
 export interface HighstockObject {
+  accessibility: {
+    description: string
+  },
   chart: {
     alignTicks: boolean,
     animation?: boolean,
