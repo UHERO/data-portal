@@ -1,6 +1,6 @@
 <ng-template ngIf [ngIf]="params.data.lvlData">
   <span>
-    <a class="{{params.data.seriesInfo.indent ? 'indent' + params.data.seriesInfo.indent : ''}}"
+    <a [class.disabledLink]="params.data.seriesInfo.displaySeasonalMessage ? true : null" class="{{params.data.seriesInfo.indent ? 'indent' + params.data.seriesInfo.indent : ''}}"
       [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id, sa: params.data.seriesInfo.saParam }"
       queryParamsHandling='merge'>{{params.value}}</a>
   </span>
@@ -16,7 +16,6 @@
       data-bs-toggle="popover">
       <i class="bi bi-info-circle"></i>
     </a>
-    <!-- <a type="button" tabindex="0" id="{{params.data.seriesInfo.id}}" class="info" data-bs-toggle="popover" data-container="body" title="test" data-bs-content="test"><i class="material-icons info-icon">&#xE88F;</i></a>-->
   </div>
 
 </ng-template>

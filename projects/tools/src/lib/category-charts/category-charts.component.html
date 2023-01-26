@@ -1,24 +1,33 @@
 <div class="multi-charts-row">
-	<ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
-		<div *ngIf="serie.display" class="multi-charts">
-			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.id, sa: serie.saParam}"
-				queryParamsHandling='merge' *ngIf="serie.id">
-				<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
-					[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [indexChecked]="indexChecked" [baseYear]="indexBaseYear">
-				</lib-highchart>
-			</a>
-			<ng-template ngIf [ngIf]="!analyzerView">
-				<i *ngIf="!serie.analyze" title="Add to Analyzer" [class.add-analyze-button]="!serie.analyze"
-					class="bi bi-star analyzer-toggle" (click)="addToAnalyzer(serie)"></i>
-				<i *ngIf="serie.analyze" title="Remove from Analyzer" [class.remove-analyze-button]="serie.analyze"
-					class="bi bi-star-fill analyzer-toggle remove-button" (click)="removeFromAnalyzer(serie)"></i>
-			</ng-template>
-			<ng-template ngIf [ngIf]="analyzerView">
-				<i *ngIf="!serie.visible" title="Add to Comparison" [class.add-compare-button]="!serie.visible"
-					class="bi bi-bar-chart analyzer-toggle" (click)="addCompare(serie)"></i>
-				<i *ngIf="serie.visible" title="Remove from Compaison" [class.remove-compare-button]="serie.visible"
-					class="bi bi-bar-chart-fill analyzer-toggle remove-button" (click)="removeCompare(serie)"></i>
-			</ng-template>
-		</div>
+	<ng-template ngFor let-measurement [ngForOf]="displayedMeasurements | keyvalue: measurementOrderFunc">
+		<ng-template ngFor let-series [ngForOf]="measurement.value">
+			<div [class.seasonal-alert-container]="series.displaySeasonalMessage" class="multi-charts"
+				*ngIf="series.display || series.displaySeasonalMessage">
+				<a href="#" [routerLink]="['/series']" [queryParams]="{id: series.id, sa: series.saParam}"
+					queryParamsHandling='merge' *ngIf="series.id && series.display">
+					<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
+						[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="series" [indexChecked]="indexChecked"
+						[baseYear]="indexBaseYear">
+					</lib-highchart>
+				</a>
+				<a *ngIf="series.displaySeasonalMessage">
+					<span class="series-name">{{series.displayName}}</span>
+					<p class="seasonal-alert-text">Data only available as {{showSeasonal ? 'non-seasonally adjusted' : 'seasonally
+						adjusted'}}.</p>
+				</a>
+				<ng-template ngIf [ngIf]="!analyzerView">
+					<i *ngIf="!series.analyze" title="Add to Analyzer" [class.add-analyze-button]="!series.analyze"
+						class="bi bi-star analyzer-toggle" (click)="addToAnalyzer(series)"></i>
+					<i *ngIf="series.analyze" title="Remove from Analyzer" [class.remove-analyze-button]="series.analyze"
+						class="bi bi-star-fill analyzer-toggle remove-button" (click)="removeFromAnalyzer(series)"></i>
+				</ng-template>
+				<ng-template ngIf [ngIf]="analyzerView">
+					<i *ngIf="!series.visible" title="Add to Comparison" [class.add-compare-button]="!series.visible"
+						class="bi bi-bar-chart analyzer-toggle" (click)="addCompare(series)"></i>
+					<i *ngIf="series.visible" title="Remove from Compaison" [class.remove-compare-button]="series.visible"
+						class="bi bi-bar-chart-fill analyzer-toggle remove-button" (click)="removeCompare(series)"></i>
+				</ng-template>
+			</div>
+		</ng-template>
 	</ng-template>
 </div>

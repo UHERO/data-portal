@@ -5,6 +5,11 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+
+  &.disabledLink {
+    pointer-events: none;
+    cursor: not-allowed; 
+  }
 }
 
 span {

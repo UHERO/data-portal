@@ -54,19 +54,41 @@ export class HelperService {
     }
   }
 
-  toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean) => {
-    const seasonalAdjustment = series.seasonalAdjustment;
-    if (!hasSeasonal) {
-      return true;
+  toggleSeriesDisplay = (hasSeasonal: boolean, showSeasonal: boolean, measurement: Array<any>, analyzerView: boolean) => { 
+    measurement.forEach((series) => {
+      const display = this.shouldDisplay(series, showSeasonal, hasSeasonal, analyzerView);
+      series.display = display;
+      series.displaySeasonalMessage = false;
+    });
+    if (!measurement.some(series => series.display)) {
+      measurement.forEach((series) => {
+        series.displaySeasonalMessage = true;
+      });
     }
-    if (!showSeasonal && (seasonalAdjustment !== 'seasonally_adjusted' || seasonalAdjustment === 'not_applicable')) {
-      return true;
-    }
-    return showSeasonal && (seasonalAdjustment === 'seasonally_adjusted' || seasonalAdjustment === 'not_applicable');
   }
 
-  checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
-    return noData || (data && !data.some(s => s.display));
+  shouldDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean, analyzerView: boolean) => {
+    const { seasonalAdjustment, frequencyShort } = series;
+    /* series at the annual frequency or where seasonality is not applicable should be displayed
+    series should also be displayed if no seasonality is applicable to the entire category or
+    if the user is in the analyzer */
+    if (!seasonalAdjustment || seasonalAdjustment === 'not_applicable' || analyzerView || frequencyShort === 'A' || !hasSeasonal) {
+      return true;
+    }
+    if (showSeasonal && seasonalAdjustment === 'seasonally_adjusted') {
+      return true;
+    }
+    if (!showSeasonal && seasonalAdjustment === 'not_seasonally_adjusted') {
+      return true;
+    }
+    return false;
+  }
+
+  checkIfSeriesAvailable = (noData: boolean, data: Object) => {
+    const allSeries = Object.keys(data).reduce((dataArr, measurement) => {
+      return dataArr.concat(data[measurement]);
+    }, []);
+    return noData || (allSeries && !allSeries.some(s => s.display));
   }
 
   findSelectedDataList = (dataList, dataListId, dataListName) => {

@@ -4,6 +4,7 @@ import { CategoryTableRenderComponent } from '../category-table-render/category-
 import { AnalyzerService } from '../analyzer.service';
 import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
+import { RowClassRules } from 'ag-grid-community';
 
 @Component({
   selector: 'lib-category-table-view',
@@ -11,7 +12,8 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./category-table-view.component.scss']
 })
 export class CategoryTableViewComponent implements OnChanges, OnDestroy {
-  @Input() data;
+  @Input() displayedMeasurements;
+  @Input() measurementOrder: Array<string>
   @Input() selectedCategory;
   @Input() selectedDataList;
   @Input() tableId;
@@ -25,7 +27,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() tableEnd;
   @Input() portalSettings;
   @Input() showSeasonal: boolean;
-  @Input() hasNonSeasonal: boolean;
   @Input() hasSeasonal;
   private gridApi;
   columnDefs;
@@ -38,6 +39,12 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   geoSub: Subscription;
   selectedGeo: Geography;
   selectedFreq: Frequency;
+
+  public rowClassRules: RowClassRules = {
+    'seasonal-alert': (params) => {
+      return params.data.seriesInfo.displaySeasonalMessage;
+    }
+  }
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -62,34 +69,35 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
         noRowsToShow: 'Current selections do not return any data, please try a different combination'
       }
     };
-    if (this.data) {
-      this.columnDefs = this.setTableColumns(this.dates, this.tableStart, this.tableEnd);
-      this.data.forEach((series) => {
-        if (series !== 'No data available' && this.dates) {
-          series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasSeasonal);
-          series.analyze = this.analyzerService.checkAnalyzer(series);
-          const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
-          const { level, yoy, ytd, c5ma } = transformations;
-          const seriesData = this.selectedDataList ?
-            this.formatLvlData(series, level, this.selectedDataList.id) :
-            this.formatLvlData(series, level, null);
-          if (series.display) { this.rows.push(seriesData); }
-          if (this.yoyActive) {
-            const yoyData = this.formatTransformationData(series, yoy, 'pc1');
-            if (series.display) { this.rows.push(yoyData); }
+    if (this.displayedMeasurements) {
+      this.columnDefs = this.setTableColumns(this.dates, this.tableStart, this.tableEnd, this.showSeasonal);
+      this.measurementOrder.forEach((measurement) => {
+        this.helperService.toggleSeriesDisplay(this.hasSeasonal, this.showSeasonal, this.displayedMeasurements[measurement], false);
+        this.displayedMeasurements[measurement].forEach((series) => {
+          if (series.display || series.displaySeasonalMessage) {
+            series.analyze = this.analyzerService.checkAnalyzer(series);
+            const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
+            const { level, yoy, ytd, c5ma } = transformations;
+            const dataListId = this.selectedDataList?.id || null
+            const seriesData = this.formatLvlData(series, level, dataListId);
+            this.rows.push(seriesData);
+            if (this.yoyActive) {
+              const yoyData = this.formatTransformationData(series, yoy, 'pc1');
+              if (series.display) { this.rows.push(yoyData); }
+            }
+            if (this.ytdActive && this.selectedFreq.freq !== 'A') {
+              const ytdData = this.formatTransformationData(series, ytd, 'ytd');
+              if (series.display) { this.rows.push(ytdData); }
+            }
+            if (this.c5maActive) {
+              const c5maData = this.formatTransformationData(series, c5ma, 'c5ma');
+              if (series.display) { this.rows.push(c5maData); }
+            }
           }
-          if (this.ytdActive && this.selectedFreq.freq !== 'A') {
-            const ytdData = this.formatTransformationData(series, ytd, 'ytd');
-            if (series.display) { this.rows.push(ytdData); }
-          }
-          if (this.c5maActive) {
-            const c5maData = this.formatTransformationData(series, c5ma, 'c5ma');
-            if (series.display) { this.rows.push(c5maData); }
-          }
-        }
+        });
       });
     }
-    this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
+    this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.displayedMeasurements);
   }
 
   ngOnDestroy() {
@@ -97,7 +105,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     this.geoSub.unsubscribe();
   }
 
-  setTableColumns = (dates, tableStart, tableEnd) => {
+  setTableColumns = (dates, tableStart, tableEnd, showSeasonal) => {
     const columns: Array<any> = [];
     columns.push({
       field: 'series',
@@ -107,7 +115,10 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       width: 275,
       cellRenderer: 'categoryTableRender',
       tooltipValueGetter(params) {
-        return params.value;
+        const { displaySeasonalMessage } = params.data.seriesInfo;
+        return displaySeasonalMessage ?
+          `${params.value} Data only available as ${showSeasonal ? 'non-seasonally adjusted' : 'seasonally adjusted'}` :
+          params.value;
       }
     });
     // Reverse dates for right-to-left scrolling on tables
@@ -120,18 +131,30 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
 
   formatLvlData = (series, level, parentId) => {
     const { dates, values } = level;
-    const { unitsLabelShort, unitsLabel, tablePrefix, displayName, tablePostfix, saParam, decimals } = series;
+    const {
+      displaySeasonalMessage,
+      unitsLabelShort,
+      unitsLabel,
+      tablePrefix,
+      displayName,
+      tablePostfix,
+      saParam,
+      decimals
+    } = series;
     const units = unitsLabelShort || unitsLabel;
     const seriesData = {
       series: `${tablePrefix || ''} ${displayName} ${tablePostfix || ''} (${units})`,
       saParam: saParam,
       seriesInfo: series,
       lvlData: true,
+      ...(displaySeasonalMessage && { displaySeasonalMessage }),
       categoryId: parentId
     };
-    dates.forEach((d, index) => {
-      seriesData[d] = this.helperService.formatNum(+values[index], decimals);
-    });
+    if (!displaySeasonalMessage) {
+      dates.forEach((d: string, index: number) => {
+        seriesData[d] = this.helperService.formatNum(+values[index], decimals);
+      });
+    }
     return seriesData;
   }
 

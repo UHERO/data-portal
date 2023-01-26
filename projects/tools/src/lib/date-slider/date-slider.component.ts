@@ -133,7 +133,6 @@ export class DateSliderComponent implements OnChanges {
 
   onCalendarInput(e: any, calendar: string, freq: string) {
     const isValidInput = this.checkValidCalendarInput(e.target.value.toUpperCase(), freq);
-    console.log(isValidInput)
     if (isValidInput) {
       this.updateCalendarDate(e.target.value.toUpperCase(), calendar, freq);
     }
