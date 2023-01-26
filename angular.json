@@ -536,7 +536,7 @@
       "prefix": "lib",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss" 
+          "style": "scss"
         }
       },
       "architect": {
@@ -558,7 +558,15 @@
             "main": "projects/tools/src/test.ts",
             "tsConfig": "projects/tools/tsconfig.spec.json",
             "karmaConfig": "projects/tools/karma.conf.js",
-            "scripts": [
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/tools/**/*.ts",
+              "projects/tools/**/*.html"
             ]
           }
         }
@@ -588,7 +596,6 @@
               "projects/ccom/src/assets",
               "projects/ccom/src/outage.html",
               "projects/ccom/src/manifest.webmanifest"
-
             ],
             "allowedCommonJsDependencies": [
               "highcharts"
@@ -910,5 +917,10 @@
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }
