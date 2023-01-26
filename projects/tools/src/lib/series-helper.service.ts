@@ -3,8 +3,7 @@ import { Injectable } from '@angular/core';
 import { AnalyzerService } from './analyzer.service';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
-import { Frequency } from './tools.models';
-import { Geography } from './tools.models';
+import { Frequency, Geography, Series } from './tools.models';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +24,7 @@ export class SeriesHelperService {
     let currentForecast;
     let decimals;
     this.seriesData = {
-      seriesDetail: {},
+      seriesDetail: {} as Series,
       saPairAvail: null,
       regions: [],
       currentGeo: {} as Geography,

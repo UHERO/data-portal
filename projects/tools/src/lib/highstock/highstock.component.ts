@@ -1,12 +1,17 @@
 // Highstock chart component used for single-series view
 import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
-import { HighchartChartData, Series, HighstockObject, Geography, Frequency } from '../tools.models';
+import { HighchartChartData, Series, Geography, Frequency } from '../tools.models';
 import { HighstockHelperService } from '../highstock-helper.service';
 import { AnalyzerService } from '../analyzer.service';
 import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
 import offlineExport from 'highcharts/modules/offline-exporting';
+import Accessibility from 'highcharts/modules/accessibility';
+
+interface CustomChart extends Highcharts.Chart {
+  analyzerBtn: any
+}
 
 @Component({
   selector: 'lib-highstock',
@@ -16,28 +21,28 @@ import offlineExport from 'highcharts/modules/offline-exporting';
 })
 export class HighstockComponent implements OnChanges {
   @Input() portalSettings;
-  @Input() chartData;
-  @Input() seriesDetail;
-  @Input() start;
-  @Input() end;
-  @Input() showTitle;
+  @Input() chartData: HighchartChartData;
+  @Input() seriesDetail: Series;
+  @Input() start: string;
+  @Input() end: string;
+  @Input() showTitle: boolean;
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() tableExtremes = new EventEmitter(true);
-  Highcharts = Highcharts;
-  chartConstructor = 'stockChart';
   updateChart = false;
-  chartObject;
+  chartObject: Highcharts.Chart;
   showChart = false;
 
-  chartOptions = {
+  Highcharts: typeof Highcharts = Highcharts;
+  chartConstructor: string = 'stockChart';
+  chartOptions: Highcharts.Options = {
+    accessibility: {
+      description: ''
+    },
     chart: {
       alignTicks: false,
       zoomType: 'x',
       className: 'single-series-chart',
       styledMode: true,
-    },
-    lang: {
-      exportKey: 'Download Chart'
     },
     navigator: {
       enabled: false
@@ -54,7 +59,7 @@ export class HighstockComponent implements OnChanges {
         turboThreshold: 0
       }
     }
-  } as HighstockObject;
+  };
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -66,15 +71,12 @@ export class HighstockComponent implements OnChanges {
     exporting(this.Highcharts);
     exportData(this.Highcharts);
     offlineExport(this.Highcharts);
+    Accessibility(this.Highcharts);
+
     Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
       // Add metadata to top of CSV export
       const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
-      let seriesMetaData = '';
-      this.userOptions.labels.items.forEach((label) => {
-        if (!result.includes(label.html)) {
-          seriesMetaData += label.html ? `${label.html} \n` : '';
-        }
-      });
+      const seriesMetaData = this.userOptions.accessibility.description;
       return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
     });
   }
@@ -86,8 +88,8 @@ export class HighstockComponent implements OnChanges {
       this.updateChart = true;
     }
     if (this.chartOptions.xAxis) {
-      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
-      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+      (<Highcharts.AxisOptions>(this.chartOptions.xAxis)).min = this.start ? Date.parse(this.start) : undefined;
+      (<Highcharts.AxisOptions>(this.chartOptions.xAxis)).max = this.end ? Date.parse(this.end) : undefined;
       this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
       this.updateChart = true;
     }
@@ -97,122 +99,6 @@ export class HighstockComponent implements OnChanges {
     this.chartObject = chart;
   }
 
-  // Gets buttons used in Highstock Chart
-  formatChartButtons = (freq: string, buttons: Array<any>) => {
-    const chartButtons = buttons.reduce((allButtons, button) => {
-      if (freq === 'A') {
-        // Do not display 1Year button for series with an annual frequency
-        if (button !== 1 && button !== 'all') {
-          allButtons.push({ type: 'year', count: button, text: `${button}Y` });
-        }
-      }
-      if (freq !== 'A') {
-        if (button !== 'all') {
-          allButtons.push({ type: 'year', count: button, text: `${button}Y` });
-        }
-      }
-      if (button === 'all') {
-        allButtons.push({ type: 'all', text: 'All' });
-      }
-      return allButtons;
-    }, []);
-    return chartButtons;
-  }
-
-  // Labels used for metadata in CSV download
-  formatChartLabels = (seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) => {
-    const { title, sourceDescription, sourceLink, sourceDetails, id } = seriesDetail;
-    const { portal, portalLink, seriesLink } = portalSettings.highstock.labels;
-    const labelItems = [
-      {
-        html: `Series: ${title} (${geo.name}, ${freq.label})`
-      }, {
-        html: sourceDescription
-      }, {
-        html: sourceLink
-      }, {
-        html: sourceDetails
-      }, {
-        html: `${title}: ${seriesLink}${id}`
-      }, {
-        html: portal
-      }, {
-        html: portalLink
-      }
-    ];
-    return { items: labelItems, style: { display: 'none' } };
-  }
-
-  formatChartSeries = (chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) => {
-    const series0 = chartData[portalSettings.highstock.series0Name];
-    const series1 = chartData[portalSettings.highstock.series1Name];
-    const series2 = chartData[portalSettings.highstock.series2Name];
-    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
-    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    const c5maLabel = seriesDetail.percent ? 'Annual Change' : 'Annual % Change';
-    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
-    const seriesStart = seriesDetail.seriesObservations ? seriesDetail.seriesObservations.observationStart : null;
-    const series = [{
-      name: 'Level',
-      type: 'line',
-      yAxis: 1,
-      data: series0,
-      pointInterval: this.highstockHelper.freqInterval(freq.freq),
-      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
-      pointStart: Date.parse(seriesStart),
-      states: {
-        hover: {
-          lineWidth: 2
-        }
-      },
-      showInNavigator: true,
-      dataGrouping: {
-        enabled: false
-      },
-      zoneAxis: 'x',
-      zones: chartData.pseudoZones,
-      zIndex: 1
-    }, {
-      name: seriesLabels[portalSettings.highstock.series1Name],
-      type: portalSettings.highstock.series1Type,
-      data: series1,
-      color: '#9E9E9E',
-      pointInterval: this.highstockHelper.freqInterval(freq.freq),
-      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
-      pointStart: Date.parse(seriesStart),
-      showInNavigator: false,
-      dataGrouping: {
-        enabled: false
-      }
-    }, {
-      name: seriesLabels[portalSettings.highstock.series2Name],
-      data: series2,
-      pointInterval: this.highstockHelper.freqInterval(freq.freq),
-      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
-      pointStart: Date.parse(seriesStart),
-      color: 'none',
-      includeInDataExport: freq.freq === 'A' ? false : true,
-      dataGrouping: {
-        enabled: false
-      }
-    }];
-    return series;
-  }
-
-  setEndDate = (end: string, chartRange, chartData: HighchartChartData) => {
-    // Check if end is only a year. This should occur when switching between geos/freqs for a particular series.
-    // (Ex: If the max date selected in an annual series is 2015,
-    // switching to the quarterly frequency should select up to 2015 Q4 rather than 2015 Q1)
-    if (end && end.length === 4) {
-      const dateExists = chartData.dates.slice().reverse().find(date => date.date.includes(end));
-      return dateExists ? dateExists.date : null;
-    }
-    if (end && end.length !== 4) {
-      return end;
-    }
-    return chartRange ? chartRange.end : null;
-  }
-
   drawChart = (chartData: HighchartChartData, seriesDetail: Series, portalSettings) => {
     let chartObject = this.chartObject
     const decimals = seriesDetail.decimals || 1;
@@ -220,32 +106,46 @@ export class HighstockComponent implements OnChanges {
     const freq: Frequency = { freq: seriesDetail.frequencyShort, label: seriesDetail.frequency };
     const buttons = portalSettings.highstock.buttons;
     const chartButtons = this.formatChartButtons(freq.freq, buttons);
-    const labelItems = this.formatChartLabels(seriesDetail, portalSettings, geo, freq);
+    const accessibilityDescription = this.formatAccessibilityDescription(seriesDetail, portalSettings, geo, freq);
     const pseudoZones = chartData.pseudoZones;
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel || seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange, freq.freq) : null;
-    const startDate = this.start ? this.start /* : chartRange ? chartRange.start*/ : null;
+    const startDate = this.start ? this.start : null;
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
-    const formatTooltip = (points, x, pseudoZ, dec, frequency) => this.formatTooltip(points, x, pseudoZ, dec, frequency);
-    const xAxisFormatter = (chart, frequency) => this.highstockHelper.xAxisLabelFormatter(chart, frequency);
+    const formatTooltip = (
+        points: Array<Highcharts.TooltipFormatterContextObject>,
+        x: Highcharts.PointLabelObject['x'],
+        pseudoZ: Array<any>,
+        dec: number,
+        frequency: Frequency
+      ) => {
+        return this.formatTooltip(points, x, pseudoZ, dec, frequency);
+      };
+    const xAxisFormatter = (
+        chartAxis: Highcharts.AxisLabelsFormatterContextObject,
+        frequency: string
+      ) => {
+        return this.highstockHelper.xAxisLabelFormatter(chartAxis, frequency);
+      };
     const logo = this.logo;
     const addToAnalyzer = (seriesId: number) => this.analyzerService.addToAnalyzer(seriesId);
     const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId);
-    this.chartOptions.chart.description = freq.freq;
+    this.chartOptions.accessibility.description = accessibilityDescription;
     this.chartOptions.chart.events = {
       render() {
-        if (!this.chartObject || this.chartObject.series.length < 4) {
+        if (!chartObject || chartObject.series.length < 4) {
           chartObject = Object.assign({}, this);
         }
-        if (this.analyzerBtn) {
-          this.analyzerBtn.destroy();
+        const chart = this as CustomChart;
+        if (chart.analyzerBtn) {
+          chart.analyzerBtn.destroy();
         }
         const btnIcon = `<i class="analyzer-toggle bi ${!seriesDetail.analyze ? 'bi-star' : 'bi-star-fill'}"></i>`;
-        this.analyzerBtn = this.renderer.text(btnIcon, 10, this.renderer.height - 10, true)
+        chart.analyzerBtn = this.renderer.text(btnIcon, 10, this.chartHeight - 10, true)
           .on('click', function() {
           const btn = document.querySelector('.analyzer-toggle');
           seriesDetail.analyze ? rmvFromAnalyzer(+seriesDetail.id) : addToAnalyzer(+seriesDetail.id);
@@ -261,7 +161,6 @@ export class HighstockComponent implements OnChanges {
         Highcharts.fireEvent(this.xAxis[0], 'afterSetExtremes');
       }
     }
-    this.chartOptions.labels = labelItems;
     this.chartOptions.rangeSelector = {
       selected: null,
       buttons: chartButtons,
@@ -279,7 +178,6 @@ export class HighstockComponent implements OnChanges {
         exportButton: {
           menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
           text: 'Download',
-          _titleKey: 'exportKey',
         }
       },
       csv: {
@@ -287,7 +185,6 @@ export class HighstockComponent implements OnChanges {
       },
       filename: `${name}_${geo.name}_${freq.label}`,
       chartOptions: {
-        events: null,
         chart: {
           events: {
             load() {
@@ -344,15 +241,18 @@ export class HighstockComponent implements OnChanges {
       ordinal: false,
       labels: {
         formatter() {
-          return xAxisFormatter(this, this.chart.options.chart.description);
+          return xAxisFormatter(this, freq.label);
         }
       }
     };
     this.chartOptions.yAxis = [{
+      accessibility: {
+        description: change
+      },
       className: 'series2',
       labels: {
         formatter() {
-          return Highcharts.numberFormat(this.value, decimals, '.', ',');
+          return Highcharts.numberFormat(+this.value, decimals, '.', ',');
         }
       },
       title: {
@@ -364,13 +264,16 @@ export class HighstockComponent implements OnChanges {
       maxPadding: 0,
       minTickInterval: 0.01
     }, {
+      accessibility: {
+        description: units
+      },
       className: 'series1',
       title: {
         text: units
       },
       labels: {
         formatter() {
-          return Highcharts.numberFormat(this.value, decimals, '.', ',');
+          return Highcharts.numberFormat(+this.value, decimals, '.', ',');
         }
       },
       gridLineWidth: 0,
@@ -380,14 +283,142 @@ export class HighstockComponent implements OnChanges {
       minTickInterval: 0.01,
       showLastLabel: true
     }];
-    this.chartOptions.series = series;
+    this.chartOptions.series = series as Highcharts.SeriesOptionsType[];
     this.chartOptions.title = {
       text: this.showTitle ? `${name} (${geo.name}, ${freq.label})` : '',
       align: 'center'
     }
   }
 
-  formatTooltip = (points, x, pseudoZones, decimals, freq) => {
+  // Gets buttons used in Highstock Chart
+  formatChartButtons = (freq: string, buttons: Array<any>) => {
+    const chartButtons = buttons.reduce((allButtons, button) => {
+      if (freq === 'A') {
+        // Do not display 1 Year button for series with an annual frequency
+        if (button !== 1 && button !== 'all') {
+          allButtons.push({ type: 'year', count: button, text: `${button}Y` });
+        }
+      }
+      if (freq !== 'A') {
+        if (button !== 'all') {
+          allButtons.push({ type: 'year', count: button, text: `${button}Y` });
+        }
+      }
+      if (button === 'all') {
+        allButtons.push({ type: 'all', text: 'All' });
+      }
+      return allButtons;
+    }, []);
+    return chartButtons;
+  }
+
+  formatAccessibilityDescription = (seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) => {
+    const { title, sourceDescription, sourceLink, sourceDetails, id } = seriesDetail;
+    return `Series: ${title} (${geo.name} - ${freq.label})
+      ${sourceDescription ? sourceDescription : ''}
+      ${sourceLink ? sourceLink : ''}
+      ${sourceDetails ? sourceDetails : ''}
+      ${title}: ${portalSettings.highstock.labels.seriesLink}${id}
+      ${portalSettings.highstock.labels.portal}
+      ${portalSettings.highstock.labels.portalLink}`;
+  }
+
+  getSelectedChartRange = (userStart, userEnd, dates, defaults, freq) => {
+    const defaultSettings = defaults.find(ranges => ranges.freq === freq);
+    const defaultEnd = (defaultSettings && defaultSettings.end) || dates[dates.length - 1].date.substr(0, 4);
+    let counter = dates.length ? dates.length - 1 : null;
+    while (dates[counter].date.substr(0, 4) > defaultEnd) {
+      counter--;
+    }
+    const end = userEnd || dates[counter].date.substr(0, 10);
+    const firstObsYear = +dates[0].date.substr(0, 4);
+    const defaultStartYear = +dates[counter].date.substr(0, 4) - defaultSettings.range;
+    const defaultStart = defaultStartYear < firstObsYear ? dates[0].date :
+      `${defaultStartYear}${dates[counter].date.substr(4, 6)}`;
+    let start = userStart || defaultStart;
+    if (start > end) {
+      start = defaultStart;
+    }
+    return { start, end };
+  }
+
+  setEndDate = (end: string, chartRange, chartData: HighchartChartData) => {
+    // Check if end is only a year. This should occur when switching between geos/freqs for a particular series.
+    // (Ex: If the max date selected in an annual series is 2015,
+    // switching to the quarterly frequency should select up to 2015 Q4 rather than 2015 Q1)
+    if (end && end.length === 4) {
+      const dateExists = chartData.dates.slice().reverse().find(date => date.date.includes(end));
+      return dateExists ? dateExists.date : null;
+    }
+    if (end && end.length !== 4) {
+      return end;
+    }
+    return chartRange ? chartRange.end : null;
+  }
+
+  formatChartSeries = (chartData: HighchartChartData, portalSettings, seriesDetail: Series, freq: Frequency) => {
+    const series0 = chartData[portalSettings.highstock.series0Name];
+    const series1 = chartData[portalSettings.highstock.series1Name];
+    const series2 = chartData[portalSettings.highstock.series2Name];
+    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
+    const c5maLabel = seriesDetail.percent ? 'Annual Change' : 'Annual % Change';
+    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+    const seriesStart = seriesDetail.seriesObservations ? seriesDetail.seriesObservations.observationStart : null;
+    const series = [{
+      name: 'Level',
+      type: 'line',
+      yAxis: 1,
+      data: series0,
+      pointInterval: this.highstockHelper.freqInterval(freq.freq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
+      pointStart: Date.parse(seriesStart),
+      states: {
+        hover: {
+          lineWidth: 2
+        }
+      },
+      showInNavigator: true,
+      dataGrouping: {
+        enabled: false
+      },
+      zoneAxis: 'x',
+      zones: chartData.pseudoZones,
+      zIndex: 1
+    }, {
+      name: seriesLabels[portalSettings.highstock.series1Name],
+      type: portalSettings.highstock.series1Type,
+      data: series1,
+      color: '#9E9E9E',
+      pointInterval: this.highstockHelper.freqInterval(freq.freq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
+      pointStart: Date.parse(seriesStart),
+      showInNavigator: false,
+      dataGrouping: {
+        enabled: false
+      }
+    }, {
+      name: seriesLabels[portalSettings.highstock.series2Name],
+      data: series2,
+      pointInterval: this.highstockHelper.freqInterval(freq.freq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
+      pointStart: Date.parse(seriesStart),
+      color: 'none',
+      includeInDataExport: freq.freq === 'A' ? false : true,
+      dataGrouping: {
+        enabled: false
+      }
+    }];
+    return series;
+  }
+
+  formatTooltip = (
+    points: Array<Highcharts.TooltipFormatterContextObject>,
+    x: Highcharts.PointLabelObject['x'],
+    pseudoZones: Array<any>,
+    decimals: number,
+    freq: Frequency
+    ) => {
     const getFreqLabel = (frequency, date) => HighstockHelperService.getTooltipFreqLabel(frequency, date);
     const pseudo = 'Pseudo History ';
     let s = `<b>${getFreqLabel(freq.freq, x)}</b>`;
@@ -414,24 +445,5 @@ export class HighstockComponent implements OnChanges {
       }
     });
     return s;
-  }
-
-  getSelectedChartRange = (userStart, userEnd, dates, defaults, freq) => {
-    const defaultSettings = defaults.find(ranges => ranges.freq === freq);
-    const defaultEnd = (defaultSettings && defaultSettings.end) || dates[dates.length - 1].date.substr(0, 4);
-    let counter = dates.length ? dates.length - 1 : null;
-    while (dates[counter].date.substr(0, 4) > defaultEnd) {
-      counter--;
-    }
-    const end = userEnd || dates[counter].date.substr(0, 10);
-    const firstObsYear = +dates[0].date.substr(0, 4);
-    const defaultStartYear = +dates[counter].date.substr(0, 4) - defaultSettings.range;
-    const defaultStart = defaultStartYear < firstObsYear ? dates[0].date :
-      `${defaultStartYear}${dates[counter].date.substr(4, 6)}`;
-    let start = userStart || defaultStart;
-    if (start > end) {
-      start = defaultStart;
-    }
-    return { start, end };
   }
 }

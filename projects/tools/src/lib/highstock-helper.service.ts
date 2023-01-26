@@ -93,12 +93,12 @@ export class HighstockHelperService {
     return unit[freq] || 'month';
   }
 
-  xAxisLabelFormatter = (chart, freq) => {
+  xAxisLabelFormatter = (chartAxis, freq: string) => {
     let s = '';
-    const year = Highcharts.dateFormat('%Y', chart.value);
-    const first: any = Highcharts.dateFormat('%Y', chart.axis.userMin);
-    const last: any = Highcharts.dateFormat('%Y', chart.axis.userMax);
-    s = ((last - first) <= 5) && freq === 'Q' ? `${year} ${Highcharts.dateFormat('%Q', chart.value)}` : year;
-    return freq === 'Q' ? s : chart.axis.defaultLabelFormatter.call(chart);
+    const year = Highcharts.dateFormat('%Y', chartAxis.value);
+    const first: any = Highcharts.dateFormat('%Y', chartAxis.axis.userMin);
+    const last: any = Highcharts.dateFormat('%Y', chartAxis.axis.userMax);
+    s = ((last - first) <= 5) && freq === 'Q' ? `${year} ${Highcharts.dateFormat('%Q', chartAxis.value)}` : year;
+    return freq === 'Q' ? s : chartAxis.axis.defaultLabelFormatter.call(chartAxis);
   }
 }
