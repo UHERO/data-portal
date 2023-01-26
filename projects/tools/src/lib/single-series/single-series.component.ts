@@ -3,8 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
-import { Frequency } from '../tools.models';
-import { Geography } from '../tools.models';
+import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
 import { HelperService } from '../helper.service';
 
@@ -24,7 +23,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   chartStart;
   chartEnd;
   portalSettings;
-  seriesId;
+  seriesId: number;
   seriesShareLink: string;
   freqSub: Subscription;
   geoSub: Subscription;

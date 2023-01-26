@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
 import { HighchartChartData, Series, Geography, Frequency } from '../tools.models';
 import { HighstockHelperService } from '../highstock-helper.service';
 import { AnalyzerService } from '../analyzer.service';
@@ -21,11 +21,11 @@ interface CustomChart extends Highcharts.Chart {
 })
 export class HighstockComponent implements OnChanges {
   @Input() portalSettings;
-  @Input() chartData;
-  @Input() seriesDetail;
-  @Input() start;
-  @Input() end;
-  @Input() showTitle;
+  @Input() chartData: HighchartChartData;
+  @Input() seriesDetail: Series;
+  @Input() start: string;
+  @Input() end: string;
+  @Input() showTitle: boolean;
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() tableExtremes = new EventEmitter(true);
   updateChart = false;
@@ -116,8 +116,21 @@ export class HighstockComponent implements OnChanges {
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
-    const formatTooltip = (points, x, pseudoZ, dec, frequency) => this.formatTooltip(points, x, pseudoZ, dec, frequency);
-    const xAxisFormatter = (chart, frequency) => this.highstockHelper.xAxisLabelFormatter(chart, frequency);
+    const formatTooltip = (
+        points: Array<Highcharts.TooltipFormatterContextObject>,
+        x: Highcharts.PointLabelObject['x'],
+        pseudoZ: Array<any>,
+        dec: number,
+        frequency: Frequency
+      ) => {
+        return this.formatTooltip(points, x, pseudoZ, dec, frequency);
+      };
+    const xAxisFormatter = (
+        chartAxis: Highcharts.AxisLabelsFormatterContextObject,
+        frequency: string
+      ) => {
+        return this.highstockHelper.xAxisLabelFormatter(chartAxis, frequency);
+      };
     const logo = this.logo;
     const addToAnalyzer = (seriesId: number) => this.analyzerService.addToAnalyzer(seriesId);
     const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId);
@@ -165,7 +178,6 @@ export class HighstockComponent implements OnChanges {
         exportButton: {
           menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
           text: 'Download',
-          //_titleKey: 'exportKey',
         }
       },
       csv: {
@@ -173,7 +185,6 @@ export class HighstockComponent implements OnChanges {
       },
       filename: `${name}_${geo.name}_${freq.label}`,
       chartOptions: {
-        // events: null,
         chart: {
           events: {
             load() {
@@ -235,6 +246,9 @@ export class HighstockComponent implements OnChanges {
       }
     };
     this.chartOptions.yAxis = [{
+      accessibility: {
+        description: change
+      },
       className: 'series2',
       labels: {
         formatter() {
@@ -250,6 +264,9 @@ export class HighstockComponent implements OnChanges {
       maxPadding: 0,
       minTickInterval: 0.01
     }, {
+      accessibility: {
+        description: units
+      },
       className: 'series1',
       title: {
         text: units
@@ -277,7 +294,7 @@ export class HighstockComponent implements OnChanges {
   formatChartButtons = (freq: string, buttons: Array<any>) => {
     const chartButtons = buttons.reduce((allButtons, button) => {
       if (freq === 'A') {
-        // Do not display 1Year button for series with an annual frequency
+        // Do not display 1 Year button for series with an annual frequency
         if (button !== 1 && button !== 'all') {
           allButtons.push({ type: 'year', count: button, text: `${button}Y` });
         }
@@ -296,11 +313,12 @@ export class HighstockComponent implements OnChanges {
   }
 
   formatAccessibilityDescription = (seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) => {
-    return `Series: ${seriesDetail.title} (${geo.name} - ${freq.label})
-      ${seriesDetail.sourceDescription}
-      ${seriesDetail.sourceLink}
-      ${seriesDetail.sourceDetails ? seriesDetail.sourceDetails : ''}
-      ${seriesDetail.title}: ${portalSettings.highstock.labels.seriesLink}${seriesDetail.id}
+    const { title, sourceDescription, sourceLink, sourceDetails, id } = seriesDetail;
+    return `Series: ${title} (${geo.name} - ${freq.label})
+      ${sourceDescription ? sourceDescription : ''}
+      ${sourceLink ? sourceLink : ''}
+      ${sourceDetails ? sourceDetails : ''}
+      ${title}: ${portalSettings.highstock.labels.seriesLink}${id}
       ${portalSettings.highstock.labels.portal}
       ${portalSettings.highstock.labels.portalLink}`;
   }
@@ -338,7 +356,7 @@ export class HighstockComponent implements OnChanges {
     return chartRange ? chartRange.end : null;
   }
 
-  formatChartSeries = (chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) => {
+  formatChartSeries = (chartData: HighchartChartData, portalSettings, seriesDetail: Series, freq: Frequency) => {
     const series0 = chartData[portalSettings.highstock.series0Name];
     const series1 = chartData[portalSettings.highstock.series1Name];
     const series2 = chartData[portalSettings.highstock.series2Name];
@@ -394,7 +412,13 @@ export class HighstockComponent implements OnChanges {
     return series;
   }
 
-  formatTooltip = (points, x, pseudoZones, decimals, freq) => {
+  formatTooltip = (
+    points: Array<Highcharts.TooltipFormatterContextObject>,
+    x: Highcharts.PointLabelObject['x'],
+    pseudoZones: Array<any>,
+    decimals: number,
+    freq: Frequency
+    ) => {
     const getFreqLabel = (frequency, date) => HighstockHelperService.getTooltipFreqLabel(frequency, date);
     const pseudo = 'Pseudo History ';
     let s = `<b>${getFreqLabel(freq.freq, x)}</b>`;

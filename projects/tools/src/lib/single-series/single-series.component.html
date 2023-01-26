@@ -55,9 +55,9 @@
       [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"
       (tableExtremes)="changeRange($event, data, data.seriesTableData, data.chartData)">
     </lib-highstock>
-    <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
-      {{data.seriesDetail.source_description}}<br><a href="{{data.seriesDetail.source_link}}"
-        target="_blank">{{data.seriesDetail.source_link}}</a>
+    <div class="source" *ngIf="data.seriesDetail.sourceDescription || data.seriesDetail.sourceLink">
+      {{data.seriesDetail.sourceDescription}}<br><a href="{{data.seriesDetail.sourceLink}}"
+        target="_blank">{{data.seriesDetail.sourceLink}}</a>
       <p innerHTML='{{data.seriesDetail.sourceDetails}}' class="source_detail"></p>
     </div>
     <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">

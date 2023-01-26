@@ -96,6 +96,7 @@ export interface HighchartChartData {
   dates: Array<any>;
   level: Array<any>;
   pseudoZones: Array<any>;
+  // growth rates
   yoy: Array<any>;
   ytd: Array<any>;
   c5ma: Array<any>;
@@ -257,34 +258,36 @@ export interface HighstockObject {
   }
 }
 
+// Series data accepted by highstock component
 export interface Series {
-  analyze: boolean;
-  id: string;
-  title?: string;
-  name: string;
-  measurementId: number;
-  observationStart?: string;
-  observationEnd?: string;
-  frequency: string;
-  frequencyShort: string;
-  freqGeos: Array<any>;
-  freqs?: Array<any>;
-  unitsLabel: string;
-  unitsLabelShort: string;
-  geography: Geography;
-  geoFreqs: Array<any>;
-  geos?: Array<any>;
-  seriesObservations?: {
+  analyze: boolean,
+  decimals: number,
+  freqs: Array<any>,
+  frequency: string,
+  frequencyShort: string,
+  geography: Geography,
+  geos: Array<any>,
+  id: number,
+  measurementId: number,
+  measurementName: string,
+  name: string,
+  percent: boolean,
+  real: boolean,
+  saParam: boolean,
+  seasonalAdjustment: string,
+  seriesObservations: {
+    observationEnd: string,
     observationStart: string,
-    observationEnd: string
-  };
-  seasonalAdjustment: string;
-  source?: string;
-  sourceDescription?: string;
-  sourceDetails?: string;
-  sourceLink?: string;
-  percent: boolean;
-  decimals?: number;
-  real: boolean;
+    orderBy: string,
+    sortOrder: string,
+    transformationResults: Array<any>
+  },
+  sourceDescription: string,
+  sourceLink: string,
+  sourceDetails: string,
+  title: string,
+  unitsLabel: string,
+  unitsLabelShort: string,
+  universe: string
 }
 
