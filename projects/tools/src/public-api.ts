@@ -10,7 +10,6 @@ export * from './lib/tools.models';
 export * from './lib/landing-page/landing-page.component';
 export * from './lib/single-series/single-series.component';
 export * from './lib/analyzer/analyzer.component';
-export * from './lib/measurement-landing-page/measurement-landing-page.component';
 export * from './lib/embed-graph/embed-graph.component';
 export * from './lib/primeng-menu-nav/primeng-menu-nav.component';
 export * from './lib/category-charts/category-charts.component';

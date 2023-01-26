@@ -7,42 +7,53 @@
 			[dismissableMask]="true">
 			<p-tabView>
 				<p-tabPanel header="Category View">
-					<p>This is the category view of the Data Portal. Use the menu on the left hand side of the screen to display data
+					<p>This is the category view of the Data Portal. Use the menu on the left hand side of the screen to display
+						data
 						related to each category.</p>
 					<img src="assets/category_selectors.png" alt="Category selectors">
-					<p>At the top of the page are selectors to change the region and frequency (if applicable) for the series that are
+					<p>At the top of the page are selectors to change the region and frequency (if applicable) for the series that
+						are
 						displayed. Next to
 						the selector(s) is a toggle to switch between "Table View" and "Chart View." <em>Note that changing the
 							frequency or region may result in a different subset of series being
-							displayed in the chart/table view, as not all data are available at all frequencies and for all regions.</em>
-						This is followed by a date slider where the date range for the displayed data can be modified to your desired
+							displayed in the chart/table view, as not all data are available at all frequencies and for all
+							regions.</em>
+						This is followed by a date slider where the date range for the displayed data can be modified to your
+						desired
 						starting or ending period. This can be done by either clicking and dragging the handles of the slider or
-						manually selecting a date using the input boxes.</p>		
+						manually selecting a date using the input boxes.</p>
 				</p-tabPanel>
 				<p-tabPanel header="Chart View">
 					<img src="assets/category_chartview.png" alt="Category chart view">
-					<p>By default, the Data Portal loads into the Chart View. In the upper left corner of each chart you will find the
-						name of the indicator displayed, the date of the last value in the chart (with units in parentheses), and the
-						year-over-year percent change (or absolute change where appropriate). Hovering your mouse cursor over a series
+					<p>By default, the Data Portal loads into the Chart View. In the upper left corner of each chart you will find
+						the
+						name of the indicator displayed, the date of the last value in the chart (with units in parentheses), and
+						the
+						year-over-year percent change (or absolute change where appropriate). Hovering your mouse cursor over a
+						series
 						will display values at different points in time. Click on a chart to view more detailed data.</p>
-						<p>At the bottom left corner of each chart is a star. When selected, the star outline is
-							filled solid and the indicator is added to the Analyzer used for grouping and comparing multiple indicators.</p>
+					<p>At the bottom left corner of each chart is a star. When selected, the star outline is
+						filled solid and the indicator is added to the Analyzer used for grouping and comparing multiple indicators.
+					</p>
 				</p-tabPanel>
 				<p-tabPanel header="Table View">
 					<img src="assets/category_tableview.png" alt="Category table view">
-					<p>In the Table View, in addition to the selectors described above, there are toggles for switching back to chart view,
-						to display year-over-year percent change (absolute change where appropriate), and year-to-date growth rate for
+					<p>In the Table View, in addition to the selectors described above, there are toggles for switching back to
+						chart view,
+						to display year-over-year percent change (absolute change where appropriate), and year-to-date growth rate
+						for
 						indicators at the monthly or quarterly frequency. You can change your sample size using the same controls
 						available in Chart View. If the sample selected is too large to fit on the screen, you can scroll the table
 						horizontally to display the remaining observations. (Note that in some browsers the horizontal scroll bar is
 						hidden until you actually begin scrolling.)</p>
-						<p>The Download CSV link saves a Comma Separated Values formatted file
-							of the table to your downloads folder. A CSV file easily loads in Excel or other software programs. Selecting
-							the information icon next to the star pops up a box with more information
-							about the selected indidator including a description and source links. Click on the name of the indicator to
-							view the chart and table of the data.</p>
-						<p>Any indicator in the table can be added to the Analyzer by selecting the Analyzer
-							star, located to the right of the name of each indicator.</p>
+					<p>The Download CSV link saves a Comma Separated Values formatted file
+						of the table to your downloads folder. A CSV file easily loads in Excel or other software programs.
+						Selecting
+						the information icon next to the star pops up a box with more information
+						about the selected indidator including a description and source links. Click on the name of the indicator to
+						view the chart and table of the data.</p>
+					<p>Any indicator in the table can be added to the Analyzer by selecting the Analyzer
+						star, located to the right of the name of each indicator.</p>
 				</p-tabPanel>
 			</p-tabView>
 		</p-dialog>
@@ -69,45 +80,58 @@
 					{{data.selectedDataList.dataListName}}</h3>
 			</ng-template>
 			<div class="filters">
-				<lib-geo-selector [regions]="data.regions"
+				<lib-geo-selector *ngIf="portal.universe !== 'nta'" [regions]="data.regions"
 					(selectedGeoChange)="redrawSeriesGeo($event, selectedFreq, selectedFc)" class="selector">
 				</lib-geo-selector>
-				<lib-freq-selector [freqs]="data.frequencies"
+				<lib-freq-selector *ngIf="portal.universe !== 'nta'" [freqs]="data.frequencies"
 					(selectedFreqChange)="redrawSeriesFreq($event, selectedGeo, selectedFc)" class="selector">
 				</lib-freq-selector>
 				<lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecasts"
 					(selectedFcChange)="redrawSeriesFc($event, selectedGeo, selectedFreq)" class="selector">
 				</lib-forecast-selector>
+				<lib-measurement-selector *ngIf="data.measurements" [measurements]="data.measurements"
+					[selectedMeasurement]="data.currentMeasurement" (selectedMeasurementChange)="redrawSeriesMeasurements($event)"
+					class="selector">
+				</lib-measurement-selector>
 				<a (click)="switchView()" class="btn btn-sm switch-view">{{routeView === 'table' ? 'Chart View' : 'Table View'}}
 					<i class="bi" [class.bi-graph-up]="routeView === 'table'"
 						[class.bi-table]="routeView === 'chart' || !routeView"></i>
 				</a>
-				<label *ngIf="routeView === 'table'" class="me-2 form-check-inline">
+				<label *ngIf="portal.universe === 'nta' && routeView === 'table'" class="form-check-inline">
+					<input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event)">Annual
+					Change
+				</label>
+				<label *ngIf="portal.universe !== 'nta' && routeView === 'table'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year/Year
 				</label>
-				<label *ngIf="routeView === 'table' && selectedFreq?.freq !== 'A'" class="me-2 form-check-inline">
+				<label *ngIf="portal.universe !== 'nta' && routeView === 'table' && selectedFreq?.freq !== 'A'"
+					class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">Year-to-Date
 				</label>
 				<label *ngIf="data.hasSeasonal" class="form-check-inline">
 					<input type="checkbox" name="seasonal_toggle" [checked]="queryParams.sa === 'true'"
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
-				<lib-date-slider *ngIf="data.displaySeries" class="sliders" [portalSettings]="portalSettings"
-					[dates]="data.categoryDates" [dateFrom]="routeStart || null" [dateTo]="routeEnd || null"
-					[freq]="selectedFreq?.freq" (updateRange)="changeRange($event)"></lib-date-slider>
+				<lib-date-slider *ngIf="data.displayedMeasurements" class="sliders" [portalSettings]="portalSettings"
+					[dates]="data.categoryDates" [dateFrom]="routeStart || null"
+					[dateTo]="routeEnd ? routeEnd : data.seriesEnd || null" [freq]="selectedFreq?.freq || data.currentFreq.freq"
+					(updateRange)="changeRange($event, data)"></lib-date-slider>
 			</div>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && seriesRange && !search">
 			<lib-category-table-view *ngIf="routeView === 'table'" [portalSettings]="portalSettings"
+				[measurementOrder]="data.measurementOrder" [displayedMeasurements]="data.displayedMeasurements"
 				[dates]="data.categoryDates" [tableStart]="routeStart" [tableEnd]="routeEnd"
 				[selectedCategory]="data.selectedCategory" [selectedDataList]="data.selectedDataList"
-				[data]="data.displaySeries" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'"
-				[noSeries]="data.noData" [params]="queryParams" [showSeasonal]="queryParams.sa === 'true'"
+				[yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="data.noData"
+				[params]="queryParams" [c5maActive]="queryParams.c5ma === 'true'" [showSeasonal]="queryParams.sa === 'true'"
 				[hasSeasonal]="data.hasSeasonal">
 			</lib-category-table-view>
-			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [routeStart]="routeStart"
-				[routeEnd]="routeEnd" [data]="data.displaySeries" [dates]="data.categoryDates" [freq]="selectedFreq?.freq"
-				[noSeries]="data.noData" [showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal"
+			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings"
+				[chartStart]="data.seriesStart" [chartEnd]="data.seriesEnd" [displayedMeasurements]="data.displayedMeasurements"
+				[measurementOrder]="data.measurementOrder" [dates]="data.categoryDates"
+				[freq]="selectedFreq?.freq || data.currentFreq.freq" [noSeries]="data.noData"
+				[showSeasonal]="queryParams.sa === 'true'" [findMinMax]="data.findMinMax" [hasSeasonal]="data.hasSeasonal"
 				[analyzerView]="false" (updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>

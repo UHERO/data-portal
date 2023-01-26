@@ -1,3 +1,4 @@
+import { KeyValue } from '@angular/common';
 import { Component, Input, OnChanges, Inject, Output, EventEmitter } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
@@ -9,29 +10,23 @@ import { HelperService } from '../helper.service';
 })
 export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
-  @Input() data;
-  @Input() findMinMax;
-  @Input() freq;
-  @Input() noSeries;
-  @Input() showSeasonal;
-  @Input() hasNonSeasonal;
-  @Input() hasSeasonal;
-  @Input() nsaActive;
-  @Input() routeStart;
-  @Input() routeEnd;
-  @Input() search;
-  @Input() dates;
-  //@Input() dateWrapper;
+  @Input() displayedMeasurements: any;
+  @Input() measurementOrder: Array<string>;
+  @Input() findMinMax: boolean;
+  @Input() freq: string;
+  @Input() noSeries: boolean;
+  @Input() showSeasonal: boolean;
+  @Input() hasSeasonal: boolean;
+  @Input() chartStart: string;
+  @Input() chartEnd: string;
+  @Input() dates: Array<{date: string, tableDate: string}>;
   @Input() analyzerView: boolean;
-  @Input() indexChecked;
-  @Input() indexBaseYear;
+  @Input() indexChecked: boolean;
+  @Input() indexBaseYear: string;
   @Output() updateURLFragment = new EventEmitter();
-  minValue;
-  maxValue;
-  noSeriesToDisplay;
-  routeSubscription;
-  chartStart;
-  chartEnd;
+  minValue: number;
+  maxValue: number;
+  noSeriesToDisplay: boolean;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -40,35 +35,49 @@ export class CategoryChartsComponent implements OnChanges {
   ) { }
 
   ngOnChanges() {
-    if (this.data) {
-      this.data.forEach((chartSeries) => {
-        if (chartSeries && this.dates) {
-          chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
-          chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
-          const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
-          this.chartStart = this.dates[seriesStart].date;
-          this.chartEnd = this.dates[seriesEnd].date;
-        }
+    if (this.displayedMeasurements) {
+      Object.keys(this.displayedMeasurements).forEach((measurement) => {
+        this.helperService.toggleSeriesDisplay(this.hasSeasonal, this.showSeasonal, this.displayedMeasurements[measurement], this.analyzerView);
+        this.isSeriesInAnalyzer(this.displayedMeasurements[measurement]);
       });
     }
-    this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
+    this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.displayedMeasurements);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
-    if (this.portalSettings.highcharts.setYAxes && !this.search) {
+    if (this.portalSettings.highcharts.setYAxes) {
       const defaultStartEnd = this.defaultRange.find(ranges => ranges.freq === this.freq);
       const start = this.chartStart || Date.parse(defaultStartEnd.start);
       const end = this.chartEnd || Date.parse(defaultStartEnd.end);
       if (this.findMinMax) {
         // Find minimum and maximum values out of all series within a sublist; Use values to set min/max of yAxis
-        this.minValue = this.findMin(this.data, start, end);
-        this.maxValue = this.findMax(this.data, start, end);
+        this.minValue = this.findMin(this.displayedMeasurements, start, end);
+        this.maxValue = this.findMax(this.displayedMeasurements, start, end);
       }
     }
   }
 
+  measurementOrderFunc = (a: KeyValue<string, Array<any>>, b: KeyValue<string, Array<any>>): number => {
+    return !this.measurementOrder ?
+      null :
+      this.measurementOrder.indexOf(a.key) - this.measurementOrder.indexOf(b.key);
+  }
+
+  isSeriesInAnalyzer = (measurementSeries: Array<any>) => {
+    measurementSeries.forEach((series) => {
+      series.analyze = this.analyzerService.checkAnalyzer(series);
+    });
+  }
+
+  getAllSeriesFromAllMeasurements = (measurements) => {
+    return Object.keys(measurements).reduce((dataArr, measurement) => {
+      return dataArr.concat(measurements[measurement]);
+    }, []);
+  }
+
   findMin = (displaySeries, start, end) => {
     let minValue = null;
-    displaySeries.forEach((serie) => {
+    const allSeries = this.getAllSeriesFromAllMeasurements(displaySeries);
+    allSeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
       const min = Math.min(...values);
       if (minValue === null || min < minValue) {
@@ -80,7 +89,8 @@ export class CategoryChartsComponent implements OnChanges {
 
   findMax = (displaySeries, start, end) => {
     let maxValue = null;
-    displaySeries.forEach((serie) => {
+    const allSeries = this.getAllSeriesFromAllMeasurements(displaySeries);
+    allSeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
       const max = Math.max(...values);
       if (maxValue === null || max > maxValue) {
@@ -91,8 +101,8 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   getSeriesValues = (series, start, end) => {
-    const dateStart = this.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
-    const dateEnd = this.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
+    const dateStart = this.dates.findIndex(date => date.date === new Date(start).toISOString().substring(0, 10));
+    const dateEnd = this.dates.findIndex(date => date.date === new Date(end).toISOString().substring(0, 10));
     return series.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
   }
 
@@ -108,15 +118,11 @@ export class CategoryChartsComponent implements OnChanges {
 
   addCompare(series) {
     series.visible = true;
-    this.analyzerService.makeCompareSeriesVisible(series)
+    this.analyzerService.makeCompareSeriesVisible(series);
   }
 
   removeCompare(series) {
     series.visible = false;
     this.analyzerService.removeFromComparisonChart(series.id);
-  }
-
-  trackBySeries(index, item) {
-    return item.id;
   }
 }
