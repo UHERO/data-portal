@@ -40,7 +40,9 @@ export class HighstockComponent implements OnChanges {
     },
     chart: {
       alignTicks: false,
-      zoomType: 'x',
+      zooming: {
+        type: 'x'
+      },
       className: 'single-series-chart',
       styledMode: true,
     },
