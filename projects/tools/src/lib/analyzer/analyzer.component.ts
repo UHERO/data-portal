@@ -13,20 +13,18 @@ import { ApiService } from '../api.service';
 })
 export class AnalyzerComponent implements OnInit, OnDestroy {
   portalSettings;
-  tableYoy;
-  tableYtd;
-  tableC5ma;
-  tableMom;
-  startDate;
-  endDate;
+  tableYoy: boolean;
+  tableYtd: boolean;
+  tableC5ma: boolean;
+  tableMom: boolean;
   private noCache: boolean;
   analyzerData;
-  yRightSeries;
-  yLeftSeries;
-  leftMin;
-  leftMax;
-  rightMin;
-  rightMax;
+  yRightSeries: string;
+  yLeftSeries: string;
+  leftMin: string;
+  leftMax: string;
+  rightMin: string;
+  rightMax: string;
   analyzerShareLink: string;
   indexSeries: boolean;
   analyzerSeriesSub: Subscription;
@@ -63,12 +61,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         if (params[`chartSeries`]) {
           this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
         }
-        console.log(params)
         this.analyzerService.analyzerData.minDate = params['start'] || '';
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
         this.indexSeries = params['index'] || null;
         this.leftMin = params['leftMin'] || null;
-        console.log('this.leftMin', this.leftMin)
         this.leftMax = params['leftMax'] || null;
         this.rightMin = params['rightMin'] || null;
         this.rightMax = params['rightMax'] || null;
