@@ -19,6 +19,10 @@ export class ShareLinkComponent implements OnChanges {
   @Input() index: boolean;
   @Input() yRightSeries: Array<any>;
   @Input() yLeftSeries: Array<any>;
+  @Input() leftMin: number;
+  @Input() leftMax: number;
+  @Input() rightMin: number;
+  @Input() rightMax: number;
   @Input() displayCompare: boolean;
   @Input() seasonallyAdjusted: boolean;
   @Input() seriesId: number;
@@ -86,12 +90,15 @@ export class ShareLinkComponent implements OnChanges {
     seriesUrl += this.c5ma ? `&c5ma=${this.c5ma}` : '';
     seriesUrl += this.yRightSeries && this.yRightSeries.length ? `&yright=${this.yRightSeries.join('-')}` : '';
     seriesUrl += this.yLeftSeries && this.yLeftSeries.length ? `&yleft=${this.yLeftSeries.join('-')}` : '';
+    seriesUrl += this.leftMin ? `&leftMin=${this.leftMin}` : '';
+    seriesUrl += this.leftMax ? `&leftMax=${this.leftMax}` : '';
+    seriesUrl += this.rightMin ? `&rightMin=${this.rightMin}` : '';
+    seriesUrl += this.rightMax ? `&rightMax=${this.rightMax}` : '';
     seriesUrl += this.displayCompare && this.view === 'analyzer' ? `&compare=${this.displayCompare}` : '';
     return seriesUrl;
   }
 
   copyLink(inputValue, shareText) {
-    // $('.share-link').attr('title', 'Copied');
     document.querySelector<HTMLElement>('.share-link').setAttribute('title', 'Copied');
     inputValue.select();
     if (!navigator.clipboard) {
@@ -106,7 +113,6 @@ export class ShareLinkComponent implements OnChanges {
     setTimeout(() => {
       // Reset share link title
       document.querySelector<HTMLElement>('.share-link').setAttribute('title', 'Copy');
-      //$('.share-link').attr('title', 'Copy');
     }, 3000);
   }
 }

@@ -23,6 +23,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   analyzerData;
   yRightSeries;
   yLeftSeries;
+  leftMin;
+  leftMax;
+  rightMin;
+  rightMax;
   analyzerShareLink: string;
   indexSeries: boolean;
   analyzerSeriesSub: Subscription;
@@ -59,9 +63,15 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         if (params[`chartSeries`]) {
           this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
         }
+        console.log(params)
         this.analyzerService.analyzerData.minDate = params['start'] || '';
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
         this.indexSeries = params['index'] || null;
+        this.leftMin = params['leftMin'] || null;
+        console.log('this.leftMin', this.leftMin)
+        this.leftMax = params['leftMax'] || null;
+        this.rightMin = params['rightMin'] || null;
+        this.rightMax = params['rightMax'] || null;
         this.displayCompare = this.evalParamAsTrue(params['compare']);
         this.tableYoy = this.evalParamAsTrue(params['yoy']);
         this.tableYtd = this.evalParamAsTrue(params['ytd']);
@@ -73,10 +83,18 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         if (this.tableMom) { this.queryParams.mom = this.tableMom } else { delete this.queryParams.mom };
         if (this.displayCompare) { this.queryParams.compare = this.displayCompare } else { delete this.queryParams.compare };
         if (this.indexSeries) { this.queryParams.index = this.indexSeries } else { delete this.queryParams.index };
+        if (this.leftMin) { this.queryParams.leftMin = this.leftMin } else { delete this.queryParams.leftMin };
+        if (this.leftMax) { this.queryParams.leftMax = this.leftMax } else { delete this.queryParams.leftMax };
+        if (this.rightMin) { this.queryParams.rightMin = this.rightMin } else { delete this.queryParams.rightMin };
+        if (this.rightMax) { this.queryParams.rightMax = this.rightMax } else { delete this.queryParams.rightMax };
         this.yRightSeries = params['yright'];
         this.yLeftSeries = params['yleft'];
-        this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || []
-        this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || []
+        this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || [];
+        this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || [];
+        this.analyzerService.analyzerData.leftMin = this.leftMin ? this.leftMin : null;
+        this.analyzerService.analyzerData.leftMax = this.leftMax ? this.leftMax : null;
+        this.analyzerService.analyzerData.rightMin = this.rightMin ? this.rightMin : null;
+        this.analyzerService.analyzerData.rightMax = this.rightMax ? this.rightMax : null;
         this.noCache = this.evalParamAsTrue(params['nocache']);
       });
     }
@@ -187,7 +205,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       minDate,
       maxDate,
       yLeftSeries,
-      yRightSeries
+      yRightSeries,
+      leftMin,
+      leftMax,
+      rightMin,
+      rightMax
     } = analyzerData;
     this.queryParams.start = minDate;
     this.queryParams.end = maxDate;
@@ -195,6 +217,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.queryParams.chartSeries = analyzerSeries.filter(s => s.visible).map(s => s.id).join('-') || null;
     this.queryParams.yright = yRightSeries.length ? yRightSeries.join('-') : null;
     this.queryParams.yleft = yLeftSeries.length ? yLeftSeries.join('-') : null;
+    this.queryParams.leftMin = leftMin ? leftMin : null;
+    this.queryParams.leftMax = leftMax ? leftMax : null;
+    this.queryParams.rightMin = rightMin ? rightMin : null;
+    this.queryParams.rightMax = rightMax ? rightMax : null;
     const url = this.router.createUrlTree([], {
       relativeTo: this.route, queryParams: this.queryParams
     }).toString();

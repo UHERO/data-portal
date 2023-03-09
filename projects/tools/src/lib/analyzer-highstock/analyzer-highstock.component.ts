@@ -363,8 +363,19 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const rightAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'right');
     this.chartOptions.yAxis = this.chartOptions.series.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
-        const currentMin = this.chartOptions.yAxis.find(a => a.id === s.yAxis)?.min;
-        const currentMax = this.chartOptions.yAxis.find(a => a.id === s.yAxis)?.max;
+        console.log('left min',this.analyzerService.analyzerData.leftMin);
+        let currentMin: number;
+        let currentMax: number;
+        if (s.yAxis === 'left') {
+          currentMin = +this.analyzerService.analyzerData.leftMin || 0;
+          currentMax = +this.analyzerService.analyzerData.leftMax || null;
+        }
+        if (s.yAxis === 'right') {
+          currentMin = +this.analyzerService.analyzerData.rightMin || 0;
+          currentMax = +this.analyzerService.analyzerData.rightMax || null;
+        }
+        //const currentMin = this.chartOptions.yAxis.find(a => a.id === s.yAxis)?.min;
+        //const currentMax = this.chartOptions.yAxis.find(a => a.id === s.yAxis)?.max;
         axes.push({
           labels: {
             formatter() {
@@ -547,13 +558,18 @@ export class AnalyzerHighstockComponent implements OnChanges {
   }
 
   changeYAxisMin(e, axis) {
+    console.log('min change axis', axis)
     this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value ?? null;
+    this.analyzerService.analyzerData[`${axis.userOptions.id}Min`] = +e.target.value ?? null;
     this.updateChart = true;
+    this.updateUrl.emit();
   }
 
   changeYAxisMax(e, axis) {
     this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value ?? null;
+    this.analyzerService.analyzerData[`${axis.userOptions.id}Max`] = +e.target.value ?? null;
     this.updateChart = true;
+    this.updateUrl.emit();
   }
 
   calculateMinRange = (freq: string) => {

@@ -3,7 +3,31 @@ import { Inject, Injectable, EventEmitter, Output } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { DataPortalSettingsService } from './data-portal-settings.service';
-import { DateWrapper } from './tools.models';
+import { DateWrapper, AnalyzerDataInterface } from './tools.models';
+
+class AnalyzerData implements AnalyzerDataInterface {
+  analyzerTableDates = [];
+  analyzerMeasurements = {};
+  sliderDates = [];
+  analyzerDateWrapper = { firstDate: '', endDate: '' };
+  analyzerSeries = [];
+  displayFreqSelector = false;
+  siblingFreqs = [];
+  analyzerFrequency = null;
+  y0Series = null;
+  yRightSeries = [];
+  yLeftSeries = [];
+  leftMin = null;
+  leftMax = null;
+  rightMin = null;
+  rightMax = null;
+  urlChartSeries = [];
+  minDate = null;
+  maxDate = null;
+  requestComplete = false;
+  indexed = false;
+  baseYear = null;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -15,25 +39,7 @@ export class AnalyzerService {
   analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesTrackerSource.value.length);
   analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
 
-  public analyzerData = {
-    analyzerTableDates: [],
-    analyzerMeasurements: {},
-    sliderDates: [],
-    analyzerDateWrapper: { firstDate: '', endDate: '' },
-    analyzerSeries: [],
-    displayFreqSelector: false,
-    siblingFreqs: [],
-    analyzerFrequency: null,
-    y0Series: null,
-    yRightSeries: [],
-    yLeftSeries: [],
-    urlChartSeries: [],
-    minDate: null,
-    maxDate: null,
-    requestComplete: false,
-    indexed: false,
-    baseYear: null
-  };
+  public analyzerData = new AnalyzerData();
   public embedData = {
     analyzerTableDates: [],
     analyzerSeries: [],
@@ -359,25 +365,7 @@ export class AnalyzerService {
   }
 
   resetAnalyzerData = () => {
-    return {
-      analyzerTableDates: [],
-      analyzerMeasurements: {},
-      sliderDates: [],
-      analyzerDateWrapper: { firstDate: '', endDate: '' },
-      analyzerSeries: [],
-      displayFreqSelector: false,
-      siblingFreqs: [],
-      analyzerFrequency: null,
-      y0Series: null,
-      yRightSeries: [],
-      yLeftSeries: [],
-      urlChartSeries: [],
-      requestComplete: false,
-      indexed: false,
-      baseYear: null,
-      minDate: null,
-      maxDate: null
-    };
+    return new AnalyzerData();
   }
 
   formatSeriesForAnalyzer = (series) => {
