@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'lib-tools',
@@ -10,11 +10,8 @@ import { Component, OnInit } from '@angular/core';
   styles: [
   ]
 })
-export class ToolsComponent implements OnInit {
+export class ToolsComponent {
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

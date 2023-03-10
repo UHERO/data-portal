@@ -261,7 +261,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
               }
             });
           });
-          const chartOptionSeries = this.chartOptions.series.find(s => s.className === `${seriesId}`);
+          const chartOptionSeries = this.chartOptions.series.find(s => +s.className === seriesId);
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
@@ -303,7 +303,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     exporting(this.Highcharts);
     exportData(this.Highcharts);
     offlineExport(this.Highcharts);
-    Accessibility(this.Highcharts);
+    //Accessibility(this.Highcharts);
 
     Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
       // Add metadata to top of CSV export
