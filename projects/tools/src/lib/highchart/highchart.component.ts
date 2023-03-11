@@ -110,7 +110,7 @@ export class HighchartComponent implements OnChanges {
     }];
   }
 
-  setChartSeries = (portalSettings, series0, pseudoZones, series1, endDate) => {
+  setChartSeries = (portalSettings, series0, pseudoZones, series1, endDate, startDate) => {
     const chartSeries = [];
     chartSeries.push({
       name: portalSettings.highcharts.series0Name,
@@ -118,7 +118,7 @@ export class HighchartComponent implements OnChanges {
       yAxis: 1,
       data: series0.values,
       _indexed: this.indexChecked,
-      pointStart: Date.parse(series0.start),
+      pointStart: Date.parse(startDate),
       endDate: endDate,
       states: {
         hover: {
@@ -137,7 +137,7 @@ export class HighchartComponent implements OnChanges {
         name: portalSettings.highcharts.series1Name,
         type: portalSettings.highcharts.series1Type,
         data: series1.values,
-        pointStart: Date.parse(series1.start),
+        pointStart: Date.parse(startDate),
         endDate: endDate,
         dataGrouping: {
           enabled: false
@@ -166,7 +166,7 @@ export class HighchartComponent implements OnChanges {
     const endDate = Date.parse(chartEnd) || Date.parse(end);
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));
-    const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate);
+    const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate, startDate);
     const formatLabel = (seriesName, perc, freq) => this.formatTransformLabel(seriesName, perc, freq);
     const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const indexed = this.indexChecked;
@@ -327,7 +327,7 @@ export class HighchartComponent implements OnChanges {
     };
     this.chartOptions.series = chartSeries;
     if (this.chartObject) {
-      this.chartObject.redraw();
+      //this.chartObject.redraw();
     }
   }
 
