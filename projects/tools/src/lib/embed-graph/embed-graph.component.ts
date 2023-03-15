@@ -9,7 +9,7 @@ import { AnalyzerService } from '../analyzer.service';
   templateUrl: './embed-graph.component.html',
   styleUrls: ['./embed-graph.component.scss']
 })
-export class EmbedGraphComponent implements OnInit {
+export class EmbedGraphComponent implements OnInit, OnDestroy {
   private seriesId: number;
   private analyzerIds: Array<any>;
   startDate: string;
@@ -19,6 +19,10 @@ export class EmbedGraphComponent implements OnInit {
   portalSettings: any;
   yLeftSeries: string;
   yRightSeries: string;
+  leftMin: string;
+  leftMax: string;
+  rightMin: string;
+  rightMax: string;
   indexSeries: boolean;
   
   constructor(
@@ -49,11 +53,27 @@ export class EmbedGraphComponent implements OnInit {
       }
       if (params[`yleft`]) {
         this.yLeftSeries = params['yleft'];
-        this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || []
+        this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || [];
       }
       if (params[`yright`]) {
         this.yRightSeries = params['yright'];
-        this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || []
+        this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || [];
+      }
+      if (params[`leftMin`]) {
+        this.leftMin = params['leftMin'];
+        this.analyzerService.analyzerData.leftMin = +params['leftMin'];
+      }
+      if (params[`leftMax`]) {
+        this.leftMax = params['leftMax'];
+        this.analyzerService.analyzerData.leftMax = +params['leftMax'];
+      }
+      if (params[`rightMin`]) {
+        this.rightMin = params['rightMin'];
+        this.analyzerService.analyzerData.rightMin = +params['rightMin'];
+      }
+      if (params[`rightMax`]) {
+        this.rightMax = params['rightMax'];
+        this.analyzerService.analyzerData.rightMax = +params['rightMax'];
       }
       if (params[`index`]) {
         this.indexSeries = params[`index`];

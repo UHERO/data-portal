@@ -1,4 +1,4 @@
-import { Inject, Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -12,7 +12,7 @@ import { HelperService } from '../helper.service';
   templateUrl: './single-series.component.html',
   styleUrls: ['./single-series.component.scss']
 })
-export class SingleSeriesComponent implements OnInit, AfterViewInit {
+export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
   noSelection: string;
   newTableData;
   tableHeaders;

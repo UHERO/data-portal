@@ -28,67 +28,67 @@ export class DateWrapper {
 
 export interface HighchartsObject {
   chart: {
-    spacingTop: number,
-    className: string,
+    spacingTop: number;
+    className: string;
     events: {
-      render: () => void,
-      redraw?: () => void,
-      load?: () => void
-    },
-    styledMode: true,
-    margin?: any
+      render?: () => void;
+      redraw?: () => void;
+      load?: () => void;
+    };
+    styledMode: true;
+    margin?: any;
   };
   exporting: {
-    enabled: boolean,
+    enabled: boolean;
   };
   time?: {
-    timezone: string
+    timezone: string;
   };
   title: {
-    text: string,
-    useHTML: boolean,
-    align: string,
-    widthAdjust: number,
-    x: number,
-    y: number,
+    text: string;
+    useHTML: boolean;
+    align: string;
+    widthAdjust: number;
+    x: number;
+    y: number;
     style: {
-      margin: number
-    }
+      margin: number;
+    };
   };
   tooltip: {
-    positioner: () => {},
-    shadow: boolean,
-    borderWidth: number,
-    shared: boolean,
-    formatter: () => string,
-    useHTML: boolean,
+    positioner: () => {};
+    shadow: boolean;
+    borderWidth: number;
+    shared: boolean;
+    formatter: () => string;
+    useHTML: boolean;
   };
   legend: {
-    enabled: boolean,
+    enabled: boolean;
   };
   credits: {
-    enabled: boolean,
+    enabled: boolean;
   };
   xAxis: {
-    type: string,
+    type: string;
     labels: {
-      enabled: boolean
-    },
-    lineWidth: number,
-    tickLength: number
+      enabled: boolean;
+    };
+    lineWidth: number;
+    tickLength: number;
   };
   yAxis: Array<any>;
   plotOptions: {
     line: {
       marker: {
-        enabled: boolean,
-        radius: number
-      }
-    }
+        enabled: boolean;
+        radius: number;
+      };
+    };
   };
   series: Array<any>;
   lang: {
-    noData: string
+    noData: string;
   };
 }
 
@@ -102,192 +102,58 @@ export interface HighchartChartData {
   c5ma: Array<any>;
 }
 
-export interface HighstockObject {
-  accessibility: {
-    description: string
-  },
-  chart: {
-    alignTicks: boolean,
-    animation?: boolean,
-    events?: {
-      render?: () => void,
-      redraw?: () => void,
-      load?: () => void
-    },
-    className?: string,
-    zoomType: string,
-    styledMode: boolean,
-    description: string, // used in xAxis label formatter
-  };
-  labels: {
-    items: Array<any>,
-    style: {
-      display: string
-    }
-  };
-  rangeSelector: {
-    selected: number,
-    buttons: Array<any>,
-    buttonPosition?: {
-      x: number,
-      y: number
-    },
-    labelStyle: {
-      visibility: string
-    },
-    inputEnabled: boolean,
-    inputDateFormat?: string,
-    inputEditDateFormat?: string,
-    inputDateParser?: (args: any) => any,
-    inputPosition?: {
-      x: number,
-      y: number
-    }
-  };
-  lang: {
-    exportKey: string
-  };
-  legend?: {
-    enabled: boolean,
-    useHTML?: boolean,
-    labelFormatter: () => string
-  };
-  navigator: {
-    enabled?: boolean,
-    series?: {
-      includeInDataExport: boolean
-    }
-  };
-  scrollbar?: {
-    enabled: boolean
-  };
-  exporting: {
-    allowHTML: boolean,
-    buttons?: {
-      contextButton: {
-        enabled: boolean
-      },
-      exportButton: {
-        text: string,
-        _titleKey: string,
-        menuItems: Array<any>
-      },
-      lvlButton?: {
-        text: string,
-        onclick: () => void
-      },
-      yoyButton?: {
-        text: string,
-        onclick: () => void
-      }
-    },
-    csv: {
-      dateFormat: string
-    },
-    filename: string,
-    chartOptions: {
-      legend?: {
-        labelFormatter: () => string
-      },
-      events: any,
-      chart: any,
-      navigator: {
-        enabled: boolean
-      },
-      scrollbar: {
-        enabled: boolean
-      },
-      rangeSelector: {
-        enabled: boolean
-      },
-      credits: {
-        enabled: boolean,
-        text: string,
-        position: {
-          align: string,
-          x: number,
-          y: number
-        }
-      },
-      title: {
-        text: string,
-        align: string,
-      },
-      subtitle?: {
-        text: ''
-      },
-      series?: Array<any>
-    }
-  };
-  tooltip: {
-    borderWidth: number,
-    shadow: false,
-    followPointer: boolean,
-    shared?: boolean,
-    split?: boolean,
-    formatter?: (args: any) => any,
-    pointFormatter?: () => any,
-  };
-  credits: {
-    enabled: boolean
-  };
-  xAxis: {
-    events: {
-      afterSetExtremes?: () => void,
-      setExtremes?: (e) => void
-    },
-    minRange?: number,
-    min: number,
-    max: number,
-    ordinal: boolean,
-    labels?: {
-      formatter: () => string
-    }
-  };
-  yAxis: Array<any>;
-  plotOptions: {
-    series: {
-      cropThreshold: number,
-      turboThreshold?: number,
-    }
-  };
-  series: Array<any>;
-  title?: {
-    text: string,
-    align: string
-  }
-}
-
 // Series data accepted by highstock component
 export interface Series {
-  analyze: boolean,
-  decimals: number,
-  freqs: Array<any>,
-  frequency: string,
-  frequencyShort: string,
-  geography: Geography,
-  geos: Array<any>,
-  id: number,
-  measurementId: number,
-  measurementName: string,
-  name: string,
-  percent: boolean,
-  real: boolean,
-  saParam: boolean,
-  seasonalAdjustment: string,
+  analyze: boolean;
+  decimals: number;
+  freqs: Array<any>;
+  frequency: string;
+  frequencyShort: string;
+  geography: Geography;
+  geos: Array<any>;
+  id: number;
+  measurementId: number;
+  measurementName: string;
+  name: string;
+  percent: boolean;
+  real: boolean;
+  saParam: boolean;
+  seasonalAdjustment: string;
   seriesObservations: {
-    observationEnd: string,
-    observationStart: string,
-    orderBy: string,
-    sortOrder: string,
-    transformationResults: Array<any>
-  },
-  sourceDescription: string,
-  sourceLink: string,
-  sourceDetails: string,
-  title: string,
-  unitsLabel: string,
-  unitsLabelShort: string,
-  universe: string
+    observationEnd: string;
+    observationStart: string;
+    orderBy: string;
+    sortOrder: string;
+    transformationResults: Array<any>;
+  };
+  sourceDescription: string;
+  sourceLink: string;
+  sourceDetails: string;
+  title: string;
+  unitsLabel: string;
+  unitsLabelShort: string;
+  universe: string;
 }
 
+export interface AnalyzerDataInterface {
+  analyzerTableDates: Array<any>;
+  analyzerMeasurements: {};
+  sliderDates: Array<any>;
+  analyzerDateWrapper: DateWrapper;
+  analyzerSeries: Array<any>;
+  displayFreqSelector: boolean;
+  siblingFreqs: Array<any>;
+  analyzerFrequency: null;
+  yRightSeries: Array<any>;
+  yLeftSeries: Array<any>;
+  leftMin: number;
+  leftMax: number;
+  rightMin: number;
+  rightMax: number;
+  urlChartSeries: Array<any>;
+  minDate: string;
+  maxDate: string;
+  requestComplete: boolean;
+  indexed: boolean;
+  baseYear: string;
+}

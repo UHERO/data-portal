@@ -23,6 +23,8 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() analyzerView: boolean;
   @Input() indexChecked: boolean;
   @Input() indexBaseYear: string;
+  @Input() routeStart;
+  @Input() routeEnd;
   @Output() updateURLFragment = new EventEmitter();
   minValue: number;
   maxValue: number;
@@ -40,6 +42,9 @@ export class CategoryChartsComponent implements OnChanges {
         this.helperService.toggleSeriesDisplay(this.hasSeasonal, this.showSeasonal, this.displayedMeasurements[measurement], this.analyzerView);
         this.isSeriesInAnalyzer(this.displayedMeasurements[measurement]);
       });
+      const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
+      this.chartStart = this.dates[seriesStart].date;
+      this.chartEnd = this.dates[seriesEnd].date;
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.displayedMeasurements);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range

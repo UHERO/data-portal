@@ -23,7 +23,7 @@
   </div>
   <div id="navbar-side" class="navbar-side" [class.reveal]="reveal">
     <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
-    <lib-search-bar (onSearch)="onSearch($event)"></lib-search-bar>
+    <lib-search-bar (search)="onSearch($event)"></lib-search-bar>
     <p-panelMenu [model]="navMenuItems"></p-panelMenu>
     <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer">&nbsp; Analyzer ({{analyzerSeries}})</a>
     <hr *ngIf="portalSettings.otherDashboardLinks && portalSettings.otherDashboardLinks.length" />

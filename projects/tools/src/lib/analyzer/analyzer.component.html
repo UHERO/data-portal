@@ -59,6 +59,7 @@
         <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
           [index]="indexSeries" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="data.minDate"
           [endDate]="data.maxDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries"
+          [leftMin]="data.leftMin" [leftMax]="data.leftMax" [rightMin]="data.rightMin" [rightMax]="data.rightMax"
           [displayCompare]="displayCompare">
         </lib-share-link>
       </div>
@@ -82,9 +83,10 @@
       <div class="w-100">
         <ng-template ngIf [ngIf]="data.requestComplete">
           <lib-category-charts *ngIf="!displayCompare && data.minDate" [portalSettings]="portalSettings"
-            [displayedMeasurements]="data.analyzerMeasurements" [dates]="data.sliderDates" [freq]="data.analyzerFrequency.freq"
-            [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true" [chartStart]="data.minDate"
-            [chartEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
+            [displayedMeasurements]="data.analyzerMeasurements" [dates]="data.sliderDates"
+            [freq]="data.analyzerFrequency.freq" [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal"
+            [analyzerView]="true" [chartStart]="data.minDate" [chartEnd]="data.maxDate" [routeStart]="data.minDate"
+            [routeEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
           </lib-category-charts>
           <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
             [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate" [indexChecked]="indexSeries"

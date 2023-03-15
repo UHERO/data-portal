@@ -4,6 +4,8 @@ import { AnalyzerService } from '../analyzer.service';
 import * as Highcharts from 'highcharts';
 import { HighchartsObject } from '../tools.models';
 
+type CustomSeriesOptions = Highcharts.SeriesOptionsType & {endDate: string, _indexed: boolean};
+
 @Component({
   selector: 'lib-highchart',
   templateUrl: './highchart.component.html',
@@ -21,7 +23,7 @@ export class HighchartComponent implements OnChanges {
   chartCallback;
   chartObject;
   Highcharts: typeof Highcharts = Highcharts;
-  chartOptions = {} as HighchartsObject;
+  chartOptions: Highcharts.Options = {} //as HighchartsObject;
   updateChart = false;
 
   static findLastValue(valueArray, endDate, start) {
@@ -59,23 +61,24 @@ export class HighchartComponent implements OnChanges {
     }
   }
 
-  setChartTitle = (title: string) => {
-    return {
-      text: title,
-      useHTML: true,
-      align: 'left',
-      widthAdjust: 0,
-      x: 0,
-      y: -5,
-      style: {
-        margin: 75
-      }
-    };
+  noDataChart = (seriesData) => {
+    const title = seriesData.displayName;
+    this.chartOptions.title = this.setChartTitle(`<b>${title}</b><br />No Data Available`);
+    this.chartOptions.exporting = { enabled: false };
+    this.chartOptions.legend = { enabled: false };
+    this.chartOptions.credits = { enabled: false };
+    this.chartOptions.yAxis = this.setYAxis(null, null);
+    this.chartOptions.xAxis = this.setXAxis(null, null);
+    this.chartOptions.series = [{
+      data: [],
+      type: 'line'
+    }];
+    this.chartOptions.lang = { noData: 'No Data Available' };
   }
-
+  
   setXAxis = (startDate, endDate) => {
     return {
-      type: 'datetime',
+      type: 'datetime' as Highcharts.AxisTypeValue,
       min: startDate,
       max: endDate,
       ordinal: false,
@@ -84,6 +87,20 @@ export class HighchartComponent implements OnChanges {
       },
       lineWidth: 0,
       tickLength: 0
+    };
+  }
+
+  setChartTitle = (title: string) => {
+    return {
+      text: title,
+      useHTML: true,
+      align: 'left' as Highcharts.AlignValue,
+      widthAdjust: 0,
+      x: 0,
+      y: -5,
+      style: {
+        margin: 75
+      }
     };
   }
 
@@ -111,6 +128,7 @@ export class HighchartComponent implements OnChanges {
   }
 
   setChartSeries = (portalSettings, series0, pseudoZones, series1, endDate) => {
+    const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const chartSeries = [];
     chartSeries.push({
       name: portalSettings.highcharts.series0Name,
@@ -166,10 +184,10 @@ export class HighchartComponent implements OnChanges {
     const endDate = Date.parse(chartEnd) || Date.parse(end);
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));
-    const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate);
     const formatLabel = (seriesName, perc, freq) => this.formatTransformLabel(seriesName, perc, freq);
     const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const indexed = this.indexChecked;
+    const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate);
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
       const dateLabel = formatDate(point0.x, freq);
       let subtitleText = '';
@@ -213,9 +231,9 @@ export class HighchartComponent implements OnChanges {
           const s0 = this.series[0];
           const s1 = this.series[1];
           // Get position of last non-null value
-            let lastValue0 = (s0?.points?.length) ? HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
-            let lastValue1 = (s1?.points?.length) ? HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
-          if (s0.userOptions._indexed && !s0.points.some(p => p.y !== null)) {
+            let lastValue0 = (s0?.points?.length) ? HighchartComponent.findLastValue(s0.points, (<CustomSeriesOptions>s0.userOptions).endDate, s0.xAxis.min) : -1;
+            let lastValue1 = (s1?.points?.length) ? HighchartComponent.findLastValue(s1.points, (<CustomSeriesOptions>s1.userOptions).endDate, s1.xAxis.min) : -1;
+          if ((<CustomSeriesOptions>s0.userOptions)._indexed && !s0.points.some(p => p.y !== null)) {
             lastValue0 = -1;
             lastValue1 = -1
           }
@@ -223,7 +241,7 @@ export class HighchartComponent implements OnChanges {
           // Reset toolip value and marker to most recent observation
           this.tooltip.hide = () => {
             if (lastValue0 > -1) {
-              const tooltipData = lastValue1 > -1 ?
+              const tooltipData = lastValue1 > -1 && s1.points[lastValue1].y !== null ?
                 [s0.points[lastValue0], s1.points[lastValue1]] :
                 // no YTD values
                 [s0.points[lastValue0]];
@@ -246,9 +264,9 @@ export class HighchartComponent implements OnChanges {
             this.setClassName(undefined);
             const categoryDisplayStart = formatDate(Date.parse(start), currentFreq);
             const categoryDisplayEnd = formatDate(Date.parse(end), currentFreq);
-            this.setTitle({ text: s0.userOptions._indexed ? `<b>${indexDisplayName}</b>` : `<b>${title}</b>` });
+            this.setTitle({ text: (<CustomSeriesOptions>s0.userOptions)._indexed ? `<b>${indexDisplayName}</b>` : `<b>${title}</b>` });
             this.setSubtitle({
-              text: s0.userOptions._indexed ? `Not available for current base year` : `Data Available From: ${categoryDisplayStart} - ${categoryDisplayEnd}`,
+              text: (<CustomSeriesOptions>s0.userOptions)._indexed ? `Not available for current base year` : `Data Available From: ${categoryDisplayStart} - ${categoryDisplayEnd}`,
               verticalAlign: 'middle',
               y: -20
             });
@@ -259,7 +277,7 @@ export class HighchartComponent implements OnChanges {
      margin: [50, 15, 10, 10]
     };
     this.chartOptions.exporting = { enabled: false };
-    this.chartOptions.title = this.setChartTitle('<br>');
+    this.chartOptions.title = this.setChartTitle('');
     this.chartOptions.tooltip = {
       positioner() {
         return { x: 0, y: -5 };
@@ -326,9 +344,6 @@ export class HighchartComponent implements OnChanges {
       }
     };
     this.chartOptions.series = chartSeries;
-    if (this.chartObject) {
-      this.chartObject.redraw();
-    }
   }
 
   formatTransformLabel = (transformationName: string, percent: boolean, currentFreq: string) => {
@@ -368,19 +383,5 @@ export class HighchartComponent implements OnChanges {
       return `${Highcharts.dateFormat('%b', date)} ${Highcharts.dateFormat('%Y', date)}`;
     }
     return Highcharts.dateFormat('%b %d %Y', date);
-  }
-
-  noDataChart = (seriesData) => {
-    const title = seriesData.displayName;
-    this.chartOptions.title = this.setChartTitle(`<b>${title}</b><br />No Data Available`);
-    this.chartOptions.exporting = { enabled: false };
-    this.chartOptions.legend = { enabled: false };
-    this.chartOptions.credits = { enabled: false };
-    this.chartOptions.yAxis = this.setYAxis(null, null);
-    this.chartOptions.xAxis = this.setXAxis(null, null);
-    this.chartOptions.series = [{
-      data: []
-    }];
-    this.chartOptions.lang = { noData: 'No Data Available' };
   }
 }
