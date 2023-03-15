@@ -31,7 +31,7 @@ export interface HighchartsObject {
     spacingTop: number;
     className: string;
     events: {
-      render: () => void;
+      render?: () => void;
       redraw?: () => void;
       load?: () => void;
     };
