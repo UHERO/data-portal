@@ -4,10 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
-import { Frequency, Geography } from '../tools.models';
+import { Frequency, Geography, DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
-import { DialogModule } from 'primeng/dialog';
-import { TabViewModule } from 'primeng/tabview';
 
 @Component({
   selector: 'lib-landing-page',
@@ -35,9 +33,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   freqSub: Subscription;
   fcSub: Subscription;
   geoSub: Subscription;
+  dateRangeSub: Subscription;
   selectedGeo: Geography;
   selectedFreq: Frequency;
   selectedFc: string;
+  selectedDateRange: DateRange;
 
   constructor(
     @Inject('portal') public portal,
@@ -48,6 +48,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     private router: Router,
   ) {
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
+      console.log('selectedFreq', freq)
       this.selectedFreq = freq;
     });
     this.geoSub = helperService.currentGeo.subscribe((geo) => {
@@ -55,7 +56,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     });
     this.fcSub = helperService.currentFc.subscribe((fc) => {
       this.selectedFc = fc;
-    })
+    });
+    this.dateRangeSub = helperService.currentDateRange.subscribe((dateRange) => {
+      console.log('current date range', dateRange)
+      this.selectedDateRange = dateRange;
+    });
   }
 
   ngOnInit(): void {
@@ -107,6 +112,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
+    this.dateRangeSub.unsubscribe();
   }
 
   // Redraw series when a new measurement is selected
@@ -166,7 +172,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     category.seriesEnd = e.seriesEnd;
     console.log('e', e)
     this.routeStart = e.seriesStart;
-    this.routeEnd = /* e.endOfSample ? null : */ e.seriesEnd;
+    this.routeEnd = e.endOfSample ? null : e.seriesEnd;
     this.seriesRange = e;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;

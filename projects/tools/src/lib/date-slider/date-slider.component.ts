@@ -1,5 +1,7 @@
-import { Component, Input, Inject, OnChanges, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, Inject, OnChanges, OnDestroy, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { HelperService } from '../helper.service';
+import { DateRange } from '../tools.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'lib-date-slider',
@@ -7,7 +9,7 @@ import { HelperService } from '../helper.service';
   styleUrls: ['./date-slider.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DateSliderComponent implements OnChanges {
+export class DateSliderComponent implements OnChanges, OnDestroy {
   @ViewChild('calendarStart') calendarStart;
   @ViewChild('calendarEnd') calendarEnd;
   @Input() portalSettings;
@@ -33,11 +35,17 @@ export class DateSliderComponent implements OnChanges {
   invalidEndDates: Array<any>
   displayMonthNavigator: boolean;
   placeholderStr: string;
+  dateSubscription: Subscription;
+  selectedDateRange: DateRange;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
-  ) { }
+  ) {
+    this.dateSubscription = helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+    });
+  }
 
   ngOnChanges() {
     if (this.dates && this.dates.length) {
@@ -62,6 +70,10 @@ export class DateSliderComponent implements OnChanges {
       this.placeholderStr = this.setPlaceholderText(this.freq);
       this.setMinMaxDates();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.dateSubscription.unsubscribe();
   }
 
   setPlaceholderText = (freq: string) => {
@@ -263,6 +275,7 @@ export class DateSliderComponent implements OnChanges {
     const seriesStart = from;
     const seriesEnd = to;
     const endOfSample = this.dates[this.dates.length - 1].date === seriesEnd;
+    this.helperService.updateCurrentDateRange({ startDate: seriesStart, endDate: seriesEnd, endOfSample });
     this.updateRange.emit({ seriesStart, seriesEnd, endOfSample });
   }
 }

@@ -3,6 +3,12 @@ export interface Frequency {
   label: string;
 }
 
+export interface DateRange {
+  startDate: string,
+  endDate: string,
+  endOfSample: boolean;
+}
+
 export interface Geography {
   fips: number;
   name: string;

@@ -3,7 +3,7 @@ import { of as observableOf, Observable, forkJoin, of } from 'rxjs';
 import { Injectable, Inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
-import { CategoryData, DateWrapper, Geography, Frequency } from './tools.models';
+import { CategoryData, DateWrapper, Geography, Frequency, DateRange } from './tools.models';
 import { switchMap, tap } from 'rxjs/operators';
 import { DataPortalSettingsService } from './data-portal-settings.service';
 
@@ -27,6 +27,7 @@ export class CategoryHelperService {
   // Called on page load
   // Gets data sublists available for a selected category
   initContent = (catId: any, noCache: boolean, routeParams: any): Observable<any> => {
+    console.log('catId', catId)
     const cacheId = this.helperService.setCacheId(catId, routeParams);
     if (this.categoryData.hasOwnProperty(cacheId)) {
       this.updateSelectors(this.categoryData[cacheId], this.portal.universe);
@@ -37,6 +38,7 @@ export class CategoryHelperService {
         this.getCategoryData(this.categoryData[cacheId], noCache, catId, routeParams) :
         this.initSearch(this.categoryData[cacheId], noCache, catId);
     }
+    console.log(this.categoryData)
     return observableOf([this.categoryData[cacheId]]);
   }
 
@@ -91,7 +93,12 @@ export class CategoryHelperService {
   }
 
   updateSelectors(cachedCategoryData: any, portal: string) {
-    const { updateCurrentFrequency, updateCurrentForecast, updateCurrentGeography } = this.helperService;
+    const {
+      updateCurrentFrequency,
+      updateCurrentForecast,
+      updateCurrentGeography,
+      updateCurrentDateRange
+    } = this.helperService;
     if (portal !== 'nta') {
       updateCurrentGeography(cachedCategoryData.currentGeo);
     }
@@ -99,6 +106,9 @@ export class CategoryHelperService {
       updateCurrentForecast(cachedCategoryData.currentForecast);
     }
     updateCurrentFrequency(cachedCategoryData.currentFreq);
+    updateCurrentDateRange({
+      startDate: '', endDate: '', endOfSample: false
+    });
   }
 
   setNoCategoryCata(cachedCategoryData: any) {

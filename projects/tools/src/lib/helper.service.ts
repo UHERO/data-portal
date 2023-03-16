@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { Frequency, Geography, DateWrapper } from './tools.models';
+import { BehaviorSubject } from 'rxjs';
+import { Frequency, Geography, DateWrapper, DateRange } from './tools.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
-  private categoryData = new Subject();
+  // private categoryData = new Subject();
   currentFreqChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentFreq = this.currentFreqChange.asObservable();
   currentGeoChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentGeo = this.currentGeoChange.asObservable();
   currentFcChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentFc = this.currentFcChange.asObservable();
+  currentDateRangeChange: BehaviorSubject<any> = new BehaviorSubject(null);
+  currentDateRange = this.currentDateRangeChange.asObservable();
 
 
   constructor() { }
@@ -38,6 +40,12 @@ export class HelperService {
   updateCurrentGeography = (newGeo: Geography) => {
     this.currentGeoChange.next(newGeo);
     return newGeo;
+  }
+
+  updateCurrentDateRange = (newDateRange: DateRange) => {
+    console.log('newDateRange', newDateRange)
+    this.currentDateRangeChange.next(newDateRange);
+    return newDateRange;
   }
 
   getIdParam = (id: any) => {
