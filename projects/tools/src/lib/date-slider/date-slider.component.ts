@@ -1,4 +1,4 @@
-import { Component, Input, Inject, OnChanges, OnDestroy, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, Inject, OnChanges, OnDestroy, OnInit, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./date-slider.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DateSliderComponent implements OnChanges, OnDestroy {
+export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('calendarStart') calendarStart;
   @ViewChild('calendarEnd') calendarEnd;
   @Input() portalSettings;
@@ -43,21 +43,44 @@ export class DateSliderComponent implements OnChanges, OnDestroy {
     private helperService: HelperService,
   ) {
     this.dateSubscription = helperService.currentDateRange.subscribe((dateRange) => {
+      console.log('date slider selected date range', dateRange)
       this.selectedDateRange = dateRange;
     });
   }
 
+  ngOnInit() {
+    console.log('ON INIT')
+  }
+
   ngOnChanges() {
     if (this.dates && this.dates.length) {
-      const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.dateFrom, this.dateTo, this.freq, this.defaultRange);
-      // Start and end used for 'from' and 'to' inputs in slider
-      // If start/end exist in values array, position handles at start/end; otherwise, use default range
-      this.start = defaultRanges.seriesStart;
-      this.end = defaultRanges.seriesEnd;
+      console.log("ON CHANGES")
+      console.log('dateFrom', this.dateFrom);
+      console.log('dateTo', this.dateTo)
       this.sliderDates = this.dates.map(d => d.date);
+      if (!this.dateFrom && !this.dateTo) {
+        const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.dateFrom, this.dateTo, this.freq, this.defaultRange);
+        this.start = defaultRanges.seriesStart;
+        this.end = defaultRanges.seriesEnd;
+        this.helperService.updateCurrentDateRange({
+          startDate: this.dates[this.start].date,
+          endDate: this.dates[this.end].date,
+          useDefaultRange: true,
+          endOfSample: false
+        });
+      } else {
+        const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.dateFrom, this.dateTo, this.freq, this.defaultRange);
+        this.start = defaultRanges.seriesStart;
+        this.end = defaultRanges.seriesEnd;
+        this.helperService.updateCurrentDateRange({
+          startDate: this.dates[this.start].date,
+          endDate: this.dates[this.end].date,
+          useDefaultRange: false,
+          endOfSample: this.end === this.dates.length - 1
+        });
+      }
       this.sliderSelectedRange = [this.start, this.end];
-      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
-      /* Date picker inputs */
+      // Date picker inputs
       this.displayMonthNavigator = this.freq === 'W' || this.freq === 'D';
       this.calendarView = this.setCalendarView(this.freq);
       this.calendarYearRange = this.setCalendarYearRange(this.sliderDates);
@@ -69,7 +92,17 @@ export class DateSliderComponent implements OnChanges, OnDestroy {
       this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
       this.placeholderStr = this.setPlaceholderText(this.freq);
       this.setMinMaxDates();
-    }
+      /* 
+      // Start and end used for 'from' and 'to' inputs in slider
+      // If start/end exist in values array, position handles at start/end; otherwise, use default range
+      this.start = defaultRanges.seriesStart;
+      this.end = defaultRanges.seriesEnd;
+      
+      console.log('this.start', this.start);
+      console.log('this.end', this.end);
+      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
+       */
+    } 
   }
 
   ngOnDestroy(): void {
@@ -250,6 +283,7 @@ export class DateSliderComponent implements OnChanges, OnDestroy {
   }
 
   slideChange(e) {
+    console.log('slideChange e', e)
     this.start = e.values[0];
     this.end = e.values[1];
     // workaround for onSlideEnd not firing when not using the slide handles
@@ -266,16 +300,24 @@ export class DateSliderComponent implements OnChanges, OnDestroy {
   }
 
   onChange(e) {
+    console.log('onChange e', e)
     if (e.event.type === 'click') {
       this.slideChange(e)
     }
   }
 
   updateChartsAndTables(from, to) {
-    const seriesStart = from;
+    const endOfSample = this.dates[this.dates.length - 1].date === to;
+    this.helperService.updateCurrentDateRange({
+      startDate: this.dates[this.start].date,
+      endDate: this.dates[this.end].date,
+      useDefaultRange: false,
+      endOfSample
+    });
+    this.updateRange.emit({ startDate: from, endDate: to, useDefaultRange: false, endOfSample });
+    /* const seriesStart = from;
     const seriesEnd = to;
-    const endOfSample = this.dates[this.dates.length - 1].date === seriesEnd;
     this.helperService.updateCurrentDateRange({ startDate: seriesStart, endDate: seriesEnd, endOfSample });
-    this.updateRange.emit({ seriesStart, seriesEnd, endOfSample });
+    this.updateRange.emit({ seriesStart, seriesEnd, endOfSample }); */
   }
 }

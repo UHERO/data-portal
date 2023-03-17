@@ -97,7 +97,6 @@ export class CategoryHelperService {
       updateCurrentFrequency,
       updateCurrentForecast,
       updateCurrentGeography,
-      updateCurrentDateRange
     } = this.helperService;
     if (portal !== 'nta') {
       updateCurrentGeography(cachedCategoryData.currentGeo);
@@ -106,9 +105,6 @@ export class CategoryHelperService {
       updateCurrentForecast(cachedCategoryData.currentForecast);
     }
     updateCurrentFrequency(cachedCategoryData.currentFreq);
-    updateCurrentDateRange({
-      startDate: '', endDate: '', endOfSample: false
-    });
   }
 
   setNoCategoryCata(cachedCategoryData: any) {

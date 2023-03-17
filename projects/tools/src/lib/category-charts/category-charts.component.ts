@@ -1,5 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { Component, Input, OnChanges, Inject, Output, EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
 
@@ -25,16 +26,28 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() indexBaseYear: string;
   @Input() routeStart;
   @Input() routeEnd;
+  @Input() dateRange;
   @Output() updateURLFragment = new EventEmitter();
   minValue: number;
   maxValue: number;
   noSeriesToDisplay: boolean;
+  dateRangeSubscription: Subscription;
+  selectedDateRange;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
     private analyzerService: AnalyzerService,
-  ) { }
+  ) {
+    console.log('TEST')
+    this.dateRangeSubscription = helperService.currentDateRange.subscribe((dateRange) => {
+      console.log('category charts date range', dateRange)
+
+      this.selectedDateRange = dateRange;
+      this.chartStart = dateRange.startDate;
+      this.chartEnd = dateRange.endDate;
+    })
+  }
 
   ngOnChanges() {
     if (this.displayedMeasurements) {
@@ -43,8 +56,8 @@ export class CategoryChartsComponent implements OnChanges {
         this.isSeriesInAnalyzer(this.displayedMeasurements[measurement]);
       });
       const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
-      this.chartStart = this.dates[seriesStart].date;
-      this.chartEnd = this.dates[seriesEnd].date;
+      //this.chartStart = this.dates[seriesStart].date;
+      //this.chartEnd = this.dates[seriesEnd].date;
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.displayedMeasurements);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range

@@ -6,7 +6,8 @@ export interface Frequency {
 export interface DateRange {
   startDate: string,
   endDate: string,
-  endOfSample: boolean;
+  useDefaultRange: boolean,
+  endOfSample: boolean
 }
 
 export interface Geography {

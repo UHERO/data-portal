@@ -60,6 +60,9 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.dateRangeSub = helperService.currentDateRange.subscribe((dateRange) => {
       console.log('current date range', dateRange)
       this.selectedDateRange = dateRange;
+      if (dateRange) {
+        //this.changeRange(this.selectedDateRange);
+      }
     });
   }
 
@@ -167,13 +170,13 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.displayHelp = true;
   }
 
-  changeRange(e, category) {
-    category.seriesStart = e.seriesStart;
-    category.seriesEnd = e.seriesEnd;
+  changeRange(e/*,  category */) {
+    // category.seriesStart = e.seriesStart;
+    // category.seriesEnd = e.seriesEnd;
     console.log('e', e)
-    this.routeStart = e.seriesStart;
-    this.routeEnd = e.endOfSample ? null : e.seriesEnd;
-    this.seriesRange = e;
+    this.routeStart = e.useDefaultRange ? null : e.startDate;
+    this.routeEnd = e.endOfSample ? null : e.endDate;
+    //this.seriesRange = e;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;
     this.updateRoute();
