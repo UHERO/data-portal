@@ -36,8 +36,10 @@
       <lib-forecast-selector *ngIf="displayFcSelector" [forecasts]="data.forecastList"
         (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)"
         class="selector"></lib-forecast-selector>
-      <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="startDate"
-        [endDate]="endDate" [seriesId]="data.seriesDetail.id"></lib-share-link>
+
+     <!-- <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="startDate"
+        [endDate]="endDate" [seriesId]="data.seriesDetail.id"></lib-share-link> -->
+
       <div class="form-check" *ngIf="data.saPairAvail">
         <label class="form-check-inline">
           <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
@@ -45,22 +47,26 @@
           Adjusted
         </label>
       </div>
-      <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+      <!-- <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
         [dates]="data.sliderDates" [dateFrom]="startDate" [dateTo]="endDate" [freq]="data.seriesDetail.frequencyShort"
-        (updateRange)="changeRange($event, data, data.seriesTableData, data.chartData)"></lib-date-slider>
+        (updateRange)="changeRange($event, data, data.seriesTableData, data.chartData)"></lib-date-slider> -->
+      <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+        [dates]="data.sliderDates" [freq]="data.seriesDetail.frequencyShort"
+        (updateRange)="changeRange($event, data, data.seriesTableData)"></lib-date-slider>
+
     </div>
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
-    <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate"
-      [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"
-      (tableExtremes)="changeRange($event, data, data.seriesTableData, data.chartData)">
+    <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="selectedDateRange.startDate"
+      [end]="selectedDateRange.endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"
+      (tableExtremes)="changeRange($event, data, data.seriesTableData)">
     </lib-highstock>
     <div class="source" *ngIf="data.seriesDetail.sourceDescription || data.seriesDetail.sourceLink">
       {{data.seriesDetail.sourceDescription}}<br><a href="{{data.seriesDetail.sourceLink}}"
         target="_blank">{{data.seriesDetail.sourceLink}}</a>
       <p innerHTML='{{data.seriesDetail.sourceDetails}}' class="source_detail"></p>
     </div>
-    <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
+   <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
       <div class="stat">
         <p>Min {{summaryStats.minValueDate}}:<br><b>{{summaryStats.minValue}}</b>
           ({{data.seriesDetail.unitsLabelShort}})</p>
@@ -77,8 +83,10 @@
       </div>
     </div>
     <div class="series-table">
-      <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
-        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'">
+      <!-- <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
+        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'"> -->
+        <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="drawTable(selectedDateRange, data, data.seriesTableData, data.chartData).tableHeaders"
+        [value]="drawTable(selectedDateRange, data, data.seriesTableData, data.chartData).newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'"> 
         <ng-template pTemplate="header" let-columns>
           <tr>
             <th *ngFor="let col of columns" [pSortableColumn]="col.field"

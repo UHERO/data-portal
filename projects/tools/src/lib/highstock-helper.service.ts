@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HelperService } from './helper.service';
 import * as Highcharts from 'highcharts/highstock';
 
 Highcharts.dateFormats['Q'] = (timestamp) => {
@@ -38,28 +39,13 @@ export class HighstockHelperService {
       return `${month} ${day}, ${year}`;
     }
   }
-
-  static rangeSelectorSetExtremesEvent(eventMin, eventMax, frequency: string, tableExtremes: any) {
-    const userMin = new Date(eventMin).toISOString().split('T')[0];
-    const userMax = new Date(eventMax).toISOString().split('T')[0];
-    const selectedMin = this.setDateToFirstOfMonth(frequency, userMin);
-    const selectedMax = this.setDateToFirstOfMonth(frequency, userMax);
-    tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
-  }
-
-  static setDateToFirstOfMonth(freq: any, date: string) {
-    const month = +date.substring(5, 7);
-    const year = +date.substring(0, 4);
-    const firstOfMonth = {
-      'A': `${year}-01-01`,
-      'Q': `${year}-${this.getQuarterMonths(month)}-01`,
-      'M': `${date.substring(0, 7)}-01`,
-      'S': `${date.substring(0, 7)}-01`
-    }
-    return firstOfMonth[freq] || date;
-  }
   
-  static getQuarterMonths(month: number) {
+  constructor(
+    private helperService: HelperService,
+  ) {
+  }
+
+  getQuarterMonths(month: number) {
     if (month >= 1 && month <= 3) {
       return '01';
     }
@@ -73,7 +59,32 @@ export class HighstockHelperService {
       return '10';
     }
   }
-  constructor() { }
+
+  setDateToFirstOfMonth(freq: any, date: string) {
+    const month = +date.substring(5, 7);
+    const year = +date.substring(0, 4);
+    const firstOfMonth = {
+      'A': `${year}-01-01`,
+      'Q': `${year}-${this.getQuarterMonths(month)}-01`,
+      'M': `${date.substring(0, 7)}-01`,
+      'S': `${date.substring(0, 7)}-01`
+    }
+    return firstOfMonth[freq] || date;
+  }
+
+  rangeSelectorSetExtremesEvent(eventMin, eventMax, frequency: string, tableExtremes: any) {
+    const userMin = new Date(eventMin).toISOString().split('T')[0];
+    const userMax = new Date(eventMax).toISOString().split('T')[0];
+    const selectedMin = this.setDateToFirstOfMonth(frequency, userMin);
+    const selectedMax = this.setDateToFirstOfMonth(frequency, userMax);
+    this.helperService.updateCurrentDateRange({
+      startDate: selectedMin,
+      endDate: selectedMax,
+      endOfSample: false,
+      useDefaultRange: false
+    });
+    tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
+  }
 
   freqInterval = (freq: string) => {
     const interval = {

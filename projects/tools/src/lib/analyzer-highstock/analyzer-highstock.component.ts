@@ -347,6 +347,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const logo = this.logo;
     const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
     const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
+    const rangeSelectorSetExtremes = (eventMin, eventMax, freq, tableExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, tableExtremes);
     this.chartOptions.accessibility.description = `${portal}\n${portalLink}`;
     this.chartOptions.series = series.map((s, index) => {
       return {
@@ -488,7 +489,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       events: {
         setExtremes: function(e) {
           if (e.trigger === 'rangeSelectorButton') {
-            HighstockHelperService.rangeSelectorSetExtremesEvent(e.min, e.max, highestFreq, tableExtremes);
+            rangeSelectorSetExtremes(e.min, e.max, highestFreq, tableExtremes);
           }
         },
       },

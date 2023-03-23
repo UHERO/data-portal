@@ -1,25 +1,26 @@
-import { Inject, Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, OnDestroy, AfterViewInit, AfterContentChecked, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
-import { Frequency, Geography } from '../tools.models';
+import { Frequency, Geography, DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
 import { HelperService } from '../helper.service';
+import { tap, map, shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'lib-single-series',
   templateUrl: './single-series.component.html',
   styleUrls: ['./single-series.component.scss']
 })
-export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestroy, AfterContentChecked {
   noSelection: string;
   newTableData;
   tableHeaders;
   summaryStats;
   seasonallyAdjusted = false;
-  startDate;
-  endDate;
+  // startDate;
+  // endDate;
   chartStart;
   chartEnd;
   portalSettings;
@@ -28,6 +29,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
   freqSub: Subscription;
   geoSub: Subscription;
   fcSub: Subscription;
+  dateRangeSubscription: Subscription;
+  selectedDateRange: DateRange;
   selectedGeo: Geography;
   selectedForecast;
   selectedFreq: Frequency;
@@ -55,14 +58,18 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.fcSub = helperService.currentFc.subscribe((forecast) => {
       this.selectedForecast = forecast;
     });
+    
   }
 
   ngOnInit() {
     this.portalSettings = this.dataPortalSettings.dataPortalSettings[this.portal.universe];
     this.displayFcSelector = this.portalSettings.selectors.includes('forecast');
-  }
+    this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      console.log('SINGLE SERIES date range', dateRange)
+      this.summaryStats = { avg: '', cagr: '', levelChange: '', maxValue: '', minValue: '', missing: null, percChange: '', range: '', series: '', seriesInfo: null, total: ''}
+    });
 
-  ngAfterViewInit() {
     this.route.queryParams.subscribe(params => {
       this.seriesId = Number(params[`id`]);
       let categoryId;
@@ -74,17 +81,47 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
         categoryId = Number(params[`data_list_id`]);
       }
       if (params[`start`]) {
-        this.startDate = params[`start`];
+        //this.startDate = params[`start`];
       }
       if (params[`end`]) {
-        this.endDate = params[`end`];
+        //this.endDate = params[`end`];
+      }
+      if (params[`nocache`]) {
+        noCache = params[`nocache`] === 'true';
+      }
+      this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId)
+
+      // this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
+    });
+  }
+
+  /* ngAfterViewInit() {
+    this.route.queryParams.subscribe(params => {
+      this.seriesId = Number(params[`id`]);
+      let categoryId;
+      let noCache: boolean;
+      if (params[`sa`] !== undefined) {
+        this.seasonallyAdjusted = (params[`sa`] === 'true');
+      }
+      if (params[`data_list_id`]) {
+        categoryId = Number(params[`data_list_id`]);
+      }
+      if (params[`start`]) {
+        //this.startDate = params[`start`];
+      }
+      if (params[`end`]) {
+        //this.endDate = params[`end`];
       }
       if (params[`nocache`]) {
         noCache = params[`nocache`] === 'true';
       }
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId);
-      this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
+      // this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
     });
+    this.cdRef.detectChanges();
+  } */
+
+  ngAfterContentChecked() {
     this.cdRef.detectChanges();
   }
 
@@ -92,6 +129,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
     this.fcSub.unsubscribe();
+    this.dateRangeSubscription.unsubscribe();
   }
 
   updateSelectedForecast(siblings: Array<any>, geo: string, sa: boolean, forecasts: Array<any>, newFc: string) {
@@ -117,8 +155,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
         geo,
         freq
       };
-      this.startDate = this.chartStart;
-      this.endDate = this.chartEnd;
+      // this.startDate = this.chartStart;
+      // this.endDate = this.chartEnd;
       this.router.navigate(['/series/'], { queryParams, queryParamsHandling: 'merge' });
     } else {
       this.noSelection = 'Selection Not Available';
@@ -140,7 +178,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Update table when selecting new ranges in the chart
-  redrawTable = (startDate, endDate, seriesData, tableData, chartData) => {
+  /* drawTable = (startDate, endDate, seriesData, tableData, chartData) => {
     let minDate;
     let maxDate;
     let tableStart;
@@ -159,6 +197,32 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.tableHeaders = this.createTableColumns(this.portalSettings, seriesData.seriesDetail);
     seriesData.observations = seriesData.seriesObservations;
     this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesData.seriesDetail, chartData, minDate, maxDate, false, null);
+  } */
+  drawTable = (selectedDateRange, seriesData, tableData, chartData) => {
+    let minDate;
+    let maxDate;
+    let tableStart;
+    let tableEnd;
+    //minDate = startDate;
+    //maxDate = endDate;
+    minDate = selectedDateRange.startDate;
+    maxDate = selectedDateRange.endDate;
+    if (minDate && maxDate) {
+      for (let i = 0; i < tableData.length; i++) {
+        if (tableData[i].date === maxDate) {
+          tableStart = i;
+        }
+        if (tableData[i].date === minDate) {
+          tableEnd = i;
+        }
+      }
+      const newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
+      const tableHeaders = this.createTableColumns(this.portalSettings, seriesData.seriesDetail);
+      seriesData.observations = seriesData.seriesObservations;
+      //this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesData.seriesDetail, chartData, minDate, maxDate, false, null);
+      return {newTableData, tableHeaders};  
+    }
+    return {}
   }
 
   createTableColumns = (portalSettings, seriesDetail) => {
@@ -205,10 +269,14 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit, OnDestroy {
     return seriesUrl;
   }
 
-  changeRange(event, data, tableData, chartData) {
+  changeRange(event, data, tableData) {
+    console.log('changeRange')
     const { seriesStart, seriesEnd } = event;
-    this.startDate = seriesStart;
-    this.endDate = seriesEnd;
-    this.redrawTable(this.startDate, this.endDate, data, tableData, chartData);
+    // this.startDate = seriesStart;
+    // this.endDate = seriesEnd;
+    const { seriesDetail, chartData } = data;
+    const { startDate, endDate } = this.selectedDateRange;
+    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, startDate, endDate, false, null);
+    this.drawTable(this.selectedDateRange, data, tableData, chartData);
   }
 }

@@ -13,7 +13,7 @@ export class HelperService {
   currentGeo = this.currentGeoChange.asObservable();
   currentFcChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentFc = this.currentFcChange.asObservable();
-  currentDateRangeChange: BehaviorSubject<any> = new BehaviorSubject(null);
+  currentDateRangeChange: BehaviorSubject<any> = new BehaviorSubject(<DateRange>{});
   currentDateRange = this.currentDateRangeChange.asObservable();
 
 
@@ -22,7 +22,9 @@ export class HelperService {
   setCacheId(category: any, routeParams: any) {
     let id = `category${category}`;
     Object.keys(routeParams).forEach((param) => {
-      id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
+      if (param !== 'routeStart' && param !== 'routeEnd') {
+        id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
+      }
     });
     return id;
   }
@@ -43,7 +45,6 @@ export class HelperService {
   }
 
   updateCurrentDateRange = (newDateRange: DateRange) => {
-    console.log('newDateRange', newDateRange)
     this.currentDateRangeChange.next(newDateRange);
     return newDateRange;
   }

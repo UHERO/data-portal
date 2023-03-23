@@ -2,6 +2,7 @@ import { Component, Input, Inject, OnChanges, OnDestroy, OnInit, EventEmitter, O
 import { HelperService } from '../helper.service';
 import { DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'lib-date-slider',
@@ -25,6 +26,8 @@ export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   minDateValue;
   maxDateValue;
   value;
+  routeStart: string;
+  routeEnd: string;
   calendarStartDateFormat: string;
   calendarEndDateFormat: string;
   calendarView: string;
@@ -37,76 +40,89 @@ export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   placeholderStr: string;
   dateSubscription: Subscription;
   selectedDateRange: DateRange;
+  routeSubscription: Subscription
 
   constructor(
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
+    private activatedRoute: ActivatedRoute
   ) {
     this.dateSubscription = helperService.currentDateRange.subscribe((dateRange) => {
-      console.log('date slider selected date range', dateRange)
       this.selectedDateRange = dateRange;
     });
   }
 
   ngOnInit() {
-    console.log('ON INIT')
+    this.routeSubscription = this.activatedRoute.queryParams.subscribe((routeParams) => {
+      this.routeStart = routeParams[`start`] || null;
+      this.routeEnd = routeParams[`end`] || null;
+      this.updateDateRange(routeParams['start'], routeParams['end']);
+    });
   }
 
   ngOnChanges() {
+    console.log('ON CHANGES')
     if (this.dates && this.dates.length) {
-      console.log("ON CHANGES")
-      console.log('dateFrom', this.dateFrom);
-      console.log('dateTo', this.dateTo)
       this.sliderDates = this.dates.map(d => d.date);
-      if (!this.dateFrom && !this.dateTo) {
-        const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.dateFrom, this.dateTo, this.freq, this.defaultRange);
-        this.start = defaultRanges.seriesStart;
-        this.end = defaultRanges.seriesEnd;
-        this.helperService.updateCurrentDateRange({
-          startDate: this.dates[this.start].date,
-          endDate: this.dates[this.end].date,
-          useDefaultRange: true,
-          endOfSample: false
-        });
-      } else {
-        const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.dateFrom, this.dateTo, this.freq, this.defaultRange);
-        this.start = defaultRanges.seriesStart;
-        this.end = defaultRanges.seriesEnd;
-        this.helperService.updateCurrentDateRange({
-          startDate: this.dates[this.start].date,
-          endDate: this.dates[this.end].date,
-          useDefaultRange: false,
-          endOfSample: this.end === this.dates.length - 1
-        });
-      }
-      this.sliderSelectedRange = [this.start, this.end];
-      // Date picker inputs
-      this.displayMonthNavigator = this.freq === 'W' || this.freq === 'D';
-      this.calendarView = this.setCalendarView(this.freq);
-      this.calendarYearRange = this.setCalendarYearRange(this.sliderDates);
-      this.calendarStartDate = new Date(this.dates[this.start].date.replace(/-/g, '/'));
-      this.calendarEndDate = new Date(this.dates[this.end].date.replace(/-/g, '/'));
-      this.calendarStartDateFormat = this.setCalendarDateFormat(this.freq, this.calendarStartDate);
-      this.calendarEndDateFormat = this.setCalendarDateFormat(this.freq, this.calendarEndDate);
-      this.invalidStartDates = this.setInvalidDates(this.calendarStartDate.getFullYear(), this.freq, this.calendarStartDate.getMonth() + 1);
-      this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
-      this.placeholderStr = this.setPlaceholderText(this.freq);
-      this.setMinMaxDates();
-      /* 
-      // Start and end used for 'from' and 'to' inputs in slider
-      // If start/end exist in values array, position handles at start/end; otherwise, use default range
-      this.start = defaultRanges.seriesStart;
-      this.end = defaultRanges.seriesEnd;
-      
-      console.log('this.start', this.start);
-      console.log('this.end', this.end);
-      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
-       */
+      const { startDate, endDate } = this.selectedDateRange;
+      this.updateDateRange(startDate, endDate);
     } 
   }
 
   ngOnDestroy(): void {
+    console.log('DATE SLIDER ON DESTROY')
     this.dateSubscription.unsubscribe();
+    this.routeSubscription.unsubscribe();
+  }
+
+  updateDateRange(start: string, end: string) {
+    console.log('start', start)
+    console.log('end', end)
+    const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, start, end, this.freq, this.defaultRange);
+    this.start = defaultRanges.seriesStart;
+    this.end = defaultRanges.seriesEnd;
+    if (start) {
+      this.helperService.updateCurrentDateRange({
+        ...this.selectedDateRange,
+        startDate: this.dates[this.start].date,
+        useDefaultRange: false,
+        endOfSample: this.end === this.dates.length - 1
+      });
+    }
+    if (end) {
+      this.helperService.updateCurrentDateRange({
+        ...this.selectedDateRange,
+        endDate: this.dates[this.end].date,
+        useDefaultRange: false,
+        endOfSample: this.end === this.dates.length - 1
+      });
+    }
+    if (!start && !end) {
+      this.helperService.updateCurrentDateRange({
+        ...this.selectedDateRange,
+        startDate: this.dates[this.start].date,
+        endDate: this.dates[this.end].date,
+        useDefaultRange: false,
+        endOfSample: this.end === this.dates.length - 1
+      });
+    }
+    this.sliderSelectedRange = [this.start, this.end];
+    this.setDatePickerInputs();
+  }
+
+  setDatePickerInputs() {
+    // Date picker inputs
+    this.displayMonthNavigator = this.freq === 'W' || this.freq === 'D';
+    this.calendarView = this.setCalendarView(this.freq);
+    this.calendarYearRange = this.setCalendarYearRange(this.sliderDates);
+    this.calendarStartDate = new Date(this.dates[this.start].date.replace(/-/g, '/'));
+    this.calendarEndDate = new Date(this.dates[this.end].date.replace(/-/g, '/'));
+    this.calendarStartDateFormat = this.setCalendarDateFormat(this.freq, this.calendarStartDate);
+    this.calendarEndDateFormat = this.setCalendarDateFormat(this.freq, this.calendarEndDate);
+    this.invalidStartDates = this.setInvalidDates(this.calendarStartDate.getFullYear(), this.freq, this.calendarStartDate.getMonth() + 1);
+    this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
+    this.placeholderStr = this.setPlaceholderText(this.freq);
+    this.setMinMaxDates();
   }
 
   setPlaceholderText = (freq: string) => {
@@ -283,7 +299,6 @@ export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   slideChange(e) {
-    console.log('slideChange e', e)
     this.start = e.values[0];
     this.end = e.values[1];
     // workaround for onSlideEnd not firing when not using the slide handles
@@ -300,7 +315,6 @@ export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onChange(e) {
-    console.log('onChange e', e)
     if (e.event.type === 'click') {
       this.slideChange(e)
     }

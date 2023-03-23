@@ -50,11 +50,6 @@ export class HighchartComponent implements OnChanges {
     this.chartCallback = chart => {
       this.chartObject = chart;
     };
-    this.dateRangeSubscription = helperService.currentDateRange.subscribe((dateRange) => {
-      this.selectedDateRange = dateRange;
-      this.xAxisStart = Date.parse(dateRange.startDate);
-      this.xAxisEnd = Date.parse(dateRange.endDate);
-    })
   }
 
   ngOnChanges() {
@@ -190,6 +185,7 @@ export class HighchartComponent implements OnChanges {
     let { series0, series1, pseudoZones } = gridDisplay.chartData;
     series0 = this.indexChecked ? this.helperService.getIndexedTransformation(observations[0], this._analyzerService.analyzerData.baseYear) : series0;
     console.log('HIGHCHARTS chartStart', chartStart)
+    console.log('HIGHCHARTS start', start)
     const startDate = Date.parse(chartStart) || Date.parse(start);
     const endDate = Date.parse(chartEnd) || Date.parse(end);
     // Check how many non-null points exist in level series
@@ -343,7 +339,7 @@ export class HighchartComponent implements OnChanges {
     };
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
-    this.chartOptions.xAxis = this.setXAxis(this.xAxisStart, this.xAxisEnd)//this.setXAxis(startDate, endDate);
+    this.chartOptions.xAxis = this.setXAxis(startDate, endDate); //this.setXAxis(this.xAxisStart, this.xAxisEnd)//
     this.chartOptions.yAxis = this.setYAxis(min, max);
     this.chartOptions.plotOptions = {
       line: {

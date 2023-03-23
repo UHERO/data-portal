@@ -118,6 +118,7 @@ export class HighstockComponent implements OnChanges {
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
+    const rangeSelectorSetExtremes = (eventMin, eventMax, freq, tableExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, tableExtremes)
     const formatTooltip = (
         points: Array<Highcharts.TooltipFormatterContextObject>,
         x: Highcharts.PointLabelObject['x'],
@@ -234,7 +235,8 @@ export class HighstockComponent implements OnChanges {
       events: {
         setExtremes(e) {
           if (e.trigger === 'rangeSelectorButton') {
-            HighstockHelperService.rangeSelectorSetExtremesEvent(e.min, e.max, freq.freq, tableExtremes);
+            console.log('e', e)
+            rangeSelectorSetExtremes(e.min, e.max, freq.freq, tableExtremes);
           }
         }
       },

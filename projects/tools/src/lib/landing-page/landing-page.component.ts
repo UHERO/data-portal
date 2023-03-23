@@ -48,7 +48,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     private router: Router,
   ) {
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
-      console.log('selectedFreq', freq)
       this.selectedFreq = freq;
     });
     this.geoSub = helperService.currentGeo.subscribe((geo) => {
@@ -58,7 +57,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.selectedFc = fc;
     });
     this.dateRangeSub = helperService.currentDateRange.subscribe((dateRange) => {
-      console.log('current date range', dateRange)
       this.selectedDateRange = dateRange;
       if (dateRange) {
         //this.changeRange(this.selectedDateRange);
@@ -173,7 +171,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   changeRange(e/*,  category */) {
     // category.seriesStart = e.seriesStart;
     // category.seriesEnd = e.seriesEnd;
-    console.log('e', e)
     this.routeStart = e.useDefaultRange ? null : e.startDate;
     this.routeEnd = e.endOfSample ? null : e.endDate;
     //this.seriesRange = e;

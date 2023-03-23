@@ -2,7 +2,7 @@ import { Component, Inject, OnChanges, Input, OnDestroy } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { CategoryTableRenderComponent } from '../category-table-render/category-table-render.component';
 import { AnalyzerService } from '../analyzer.service';
-import { Frequency, Geography } from '../tools.models';
+import { Frequency, Geography, DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
 import { RowClassRules } from 'ag-grid-community';
 
@@ -23,8 +23,8 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() ytdActive;
   @Input() c5maActive;
   @Input() params;
-  @Input() tableStart;
-  @Input() tableEnd;
+  //@Input() tableStart;
+  //@Input() tableEnd;
   @Input() portalSettings;
   @Input() showSeasonal: boolean;
   @Input() hasSeasonal;
@@ -37,8 +37,10 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   gridOptions;
   freqSub: Subscription;
   geoSub: Subscription;
+  dateRangeSub: Subscription;
   selectedGeo: Geography;
   selectedFreq: Frequency;
+  selectedDateRange: DateRange;
 
   public rowClassRules: RowClassRules = {
     'seasonal-alert': (params) => {
@@ -60,6 +62,13 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     this.geoSub = helperService.currentGeo.subscribe((geo) => {
       this.selectedGeo = geo;
     });
+    this.dateRangeSub = helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      if (this.dates?.length) {
+        const { startDate, endDate } = this.selectedDateRange;
+        this.columnDefs = this.setTableColumns(this.dates, startDate, endDate, this.showSeasonal);
+      }
+    });
   }
 
   ngOnChanges() {
@@ -70,7 +79,8 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       }
     };
     if (this.displayedMeasurements) {
-      this.columnDefs = this.setTableColumns(this.dates, this.tableStart, this.tableEnd, this.showSeasonal);
+      const { startDate, endDate } = this.selectedDateRange;
+      this.columnDefs = this.setTableColumns(this.dates, startDate, endDate, this.showSeasonal);
       this.measurementOrder.forEach((measurement) => {
         this.helperService.toggleSeriesDisplay(this.hasSeasonal, this.showSeasonal, this.displayedMeasurements[measurement], false);
         this.displayedMeasurements[measurement].forEach((series) => {
@@ -103,6 +113,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   ngOnDestroy() {
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
+    this.dateRangeSub.unsubscribe();
   }
 
   setTableColumns = (dates, tableStart, tableEnd, showSeasonal) => {
