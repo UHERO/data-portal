@@ -66,27 +66,10 @@
         target="_blank">{{data.seriesDetail.sourceLink}}</a>
       <p innerHTML='{{data.seriesDetail.sourceDetails}}' class="source_detail"></p>
     </div>
-   <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
-      <div class="stat">
-        <p>Min {{summaryStats.minValueDate}}:<br><b>{{summaryStats.minValue}}</b>
-          ({{data.seriesDetail.unitsLabelShort}})</p>
-      </div>
-      <div class="stat">
-        <p>Max {{summaryStats.maxValueDate}}:<br><b>{{summaryStats.maxValue}}</b>
-          ({{data.seriesDetail.unitsLabelShort}})</p>
-      </div>
-      <div class="stat" *ngIf="!data.seriesDetail.percent">
-        <p>% Change over Selected Range:<br><b>{{summaryStats.percChange}}</b></p>
-      </div>
-      <div class="stat">
-        <p>Change over Selected Range:<br><b>{{summaryStats.levelChange}}</b></p>
-      </div>
-    </div>
-    <div class="series-table">
-      <!-- <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
-        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'"> -->
-        <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="drawTable(selectedDateRange, data, data.seriesTableData, data.chartData).tableHeaders"
-        [value]="drawTable(selectedDateRange, data, data.seriesTableData, data.chartData).newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'"> 
+    <lib-summary-statistics *ngIf="data.requestComplete" [seriesData]="data"></lib-summary-statistics>
+    <!-- <div class="series-table">
+      <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
+        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'">
         <ng-template pTemplate="header" let-columns>
           <tr>
             <th *ngFor="let col of columns" [pSortableColumn]="col.field"
@@ -106,6 +89,7 @@
           </tr>
         </ng-template>
       </p-table>
-    </div>
+    </div> -->
+    <lib-single-series-table *ngIf="!noSelection && !data.noData" [seriesData]="data"></lib-single-series-table>
   </div>
 </div>

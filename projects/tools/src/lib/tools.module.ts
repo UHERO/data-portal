@@ -37,6 +37,8 @@ import { SearchResultsComponent } from './search-results/search-results.componen
 import { DialogModule } from 'primeng/dialog';
 import { RequestCache } from './request-cache';
 import { CacheInterceptor } from './cache.interceptor';
+import { SummaryStatisticsComponent } from './summary-statistics/summary-statistics.component';
+import { SingleSeriesTableComponent } from './single-series-table/single-series-table.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +66,8 @@ import { CacheInterceptor } from './cache.interceptor';
     MeasurementSelectorComponent,
     EmbedGraphComponent,
     SearchResultsComponent,
+    SummaryStatisticsComponent,
+    SingleSeriesTableComponent,
   ],
   imports: [
     CommonModule,
@@ -105,6 +109,8 @@ import { CacheInterceptor } from './cache.interceptor';
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
     MeasurementSelectorComponent,
+    SummaryStatisticsComponent,
+    SingleSeriesTableComponent
   ],
   providers: [
     RequestCache,

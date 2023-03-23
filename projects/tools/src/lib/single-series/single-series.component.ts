@@ -276,7 +276,7 @@ export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestr
     // this.endDate = seriesEnd;
     const { seriesDetail, chartData } = data;
     const { startDate, endDate } = this.selectedDateRange;
-    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, startDate, endDate, false, null);
-    this.drawTable(this.selectedDateRange, data, tableData, chartData);
+    //this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, startDate, endDate, false, null);
+    //this.drawTable(this.selectedDateRange, data, tableData, chartData);
   }
 }

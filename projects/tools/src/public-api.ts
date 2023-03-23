@@ -26,3 +26,5 @@ export * from './lib/analyzer-table-renderer/analyzer-table-renderer.component';
 export * from './lib/analyzer-stats-renderer/analyzer-stats-renderer.component';
 export * from './lib/analyzer-table/analyzer-table.component';
 export * from './lib/measurement-selector/measurement-selector.component';
+export * from './lib/summary-statistics/summary-statistics.component';
+export * from './lib/single-series-table/single-series-table.component';
