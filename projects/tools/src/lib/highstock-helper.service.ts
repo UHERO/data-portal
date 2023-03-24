@@ -72,18 +72,18 @@ export class HighstockHelperService {
     return firstOfMonth[freq] || date;
   }
 
-  rangeSelectorSetExtremesEvent(eventMin, eventMax, frequency: string, tableExtremes: any) {
+  rangeSelectorSetExtremesEvent(eventMin, eventMax, frequency: string, dates: Array<any>, xAxisExtremes: any) {
     const userMin = new Date(eventMin).toISOString().split('T')[0];
     const userMax = new Date(eventMax).toISOString().split('T')[0];
     const selectedMin = this.setDateToFirstOfMonth(frequency, userMin);
     const selectedMax = this.setDateToFirstOfMonth(frequency, userMax);
-    this.helperService.updateCurrentDateRange({
+    this.helperService.setCurrentDateRange(selectedMin, selectedMax, false, dates);
+    xAxisExtremes.emit({
       startDate: selectedMin,
       endDate: selectedMax,
-      endOfSample: false,
-      useDefaultRange: false
+      useDefaultRange: false,
+      endOfSample: selectedMax === dates[dates.length - 1].date
     });
-    tableExtremes.emit({ seriesStart: selectedMin, seriesEnd: selectedMax });
   }
 
   freqInterval = (freq: string) => {

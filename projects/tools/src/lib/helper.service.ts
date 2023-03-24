@@ -49,6 +49,15 @@ export class HelperService {
     return newDateRange;
   }
 
+  setCurrentDateRange = (start: string, end: string, useDefault: boolean, dates: Array<any>) => {
+    this.updateCurrentDateRange({
+      startDate: start,
+      endDate: end,
+      useDefaultRange: useDefault,
+      endOfSample: end === dates[dates.length - 1].date
+    });
+  }
+
   getIdParam = (id: any) => {
     if (id === undefined) {
       return null;

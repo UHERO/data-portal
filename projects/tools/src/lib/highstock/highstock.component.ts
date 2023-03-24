@@ -27,7 +27,7 @@ export class HighstockComponent implements OnChanges {
   @Input() end: string;
   @Input() showTitle: boolean;
   // Async EventEmitter, emit tableExtremes on load to render table
-  @Output() tableExtremes = new EventEmitter(true);
+  @Output() xAxisExtremes = new EventEmitter(true);
   updateChart = false;
   chartObject: Highcharts.Chart;
   showChart = false;
@@ -117,8 +117,9 @@ export class HighstockComponent implements OnChanges {
     const startDate = this.start ? this.start : null;
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
-    const tableExtremes = this.tableExtremes;
-    const rangeSelectorSetExtremes = (eventMin, eventMax, freq, tableExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, tableExtremes)
+    const { dates } = chartData;
+    const xAxisExtremes = this.xAxisExtremes;
+    const rangeSelectorSetExtremes = (eventMin, eventMax, freq, dates, xAxisExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, dates, xAxisExtremes)
     const formatTooltip = (
         points: Array<Highcharts.TooltipFormatterContextObject>,
         x: Highcharts.PointLabelObject['x'],
@@ -235,8 +236,7 @@ export class HighstockComponent implements OnChanges {
       events: {
         setExtremes(e) {
           if (e.trigger === 'rangeSelectorButton') {
-            console.log('e', e)
-            rangeSelectorSetExtremes(e.min, e.max, freq.freq, tableExtremes);
+            rangeSelectorSetExtremes(e.min, e.max, freq.freq, dates, xAxisExtremes);
           }
         }
       },

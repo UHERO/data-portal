@@ -32,7 +32,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   @Input() start;
   @Input() end;
   @Input() indexChecked;
-  @Output() tableExtremes = new EventEmitter(true);
+  @Output() xAxisExtremes = new EventEmitter(true);
   @Output() updateUrl = new EventEmitter<any>();
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
@@ -343,11 +343,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const startDate = this.start || null;
     const endDate = this.end || null;
     const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
-    const tableExtremes = this.tableExtremes;
+    const xAxisExtremes = this.xAxisExtremes;
     const logo = this.logo;
     const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
     const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-    const rangeSelectorSetExtremes = (eventMin, eventMax, freq, tableExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, tableExtremes);
+    const rangeSelectorSetExtremes = (eventMin, eventMax, freq, dates, xAxisExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, dates, xAxisExtremes);
     this.chartOptions.accessibility.description = `${portal}\n${portalLink}`;
     this.chartOptions.series = series.map((s, index) => {
       return {
@@ -489,7 +489,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       events: {
         setExtremes: function(e) {
           if (e.trigger === 'rangeSelectorButton') {
-            rangeSelectorSetExtremes(e.min, e.max, highestFreq, tableExtremes);
+            rangeSelectorSetExtremes(e.min, e.max, highestFreq, [], xAxisExtremes);
           }
         },
       },

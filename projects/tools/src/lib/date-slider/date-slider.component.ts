@@ -1,4 +1,4 @@
-import { Component, Input, Inject, OnChanges, OnDestroy, OnInit, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, Inject, OnChanges, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./date-slider.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
+export class DateSliderComponent implements OnChanges {
   @ViewChild('calendarStart') calendarStart;
   @ViewChild('calendarEnd') calendarEnd;
   @Input() portalSettings;
@@ -18,6 +18,8 @@ export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   @Input() freq;
   @Input() dateFrom;
   @Input() dateTo;
+  @Input() routeStart: string;
+  @Input() routeEnd: string;
   @Output() updateRange = new EventEmitter(true);
   start;
   end;
@@ -26,8 +28,8 @@ export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   minDateValue;
   maxDateValue;
   value;
-  routeStart: string;
-  routeEnd: string;
+  //routeStart: string;
+  // routeEnd: string;
   calendarStartDateFormat: string;
   calendarEndDateFormat: string;
   calendarView: string;
@@ -45,39 +47,39 @@ export class DateSliderComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
-    private activatedRoute: ActivatedRoute
-  ) {
-    this.dateSubscription = helperService.currentDateRange.subscribe((dateRange) => {
-      this.selectedDateRange = dateRange;
-    });
-  }
-
-  ngOnInit() {
-    this.routeSubscription = this.activatedRoute.queryParams.subscribe((routeParams) => {
-      this.routeStart = routeParams[`start`] || null;
-      this.routeEnd = routeParams[`end`] || null;
-      this.updateDateRange(routeParams['start'], routeParams['end']);
-    });
-  }
+  ) {}
 
   ngOnChanges() {
-    console.log('ON CHANGES')
-    if (this.dates && this.dates.length) {
-      this.sliderDates = this.dates.map(d => d.date);
-      const { startDate, endDate } = this.selectedDateRange;
-      this.updateDateRange(startDate, endDate);
-    } 
-  }
-
-  ngOnDestroy(): void {
-    console.log('DATE SLIDER ON DESTROY')
-    this.dateSubscription.unsubscribe();
-    this.routeSubscription.unsubscribe();
+    console.log('ROUTE START', this.routeStart)
+    console.log('ROUTE END', this.routeEnd);
+    this.sliderDates = this.dates.map(d => d.date);
+    if (this.routeStart && this.routeEnd) {
+      const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
+      const { seriesStart: start, seriesEnd: end } = defaultRanges;
+      this.start = start;
+      this.end = end;
+      this.helperService.setCurrentDateRange(this.dates[start].date, this.dates[end].date, false, this.dates);
+      this.sliderSelectedRange = [start, end];
+    } else if (this.routeStart && !this.routeEnd) {
+      const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, '', this.freq, this.defaultRange);
+      const { seriesStart: start, seriesEnd: end } = defaultRanges;
+      this.start = start;
+      this.end = end;
+      this.helperService.setCurrentDateRange(this.dates[start].date, this.dates[end].date, false, this.dates);
+      this.sliderSelectedRange = [start, end];
+    } else {
+      const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, '', '', this.freq, this.defaultRange);
+      const { seriesStart: start, seriesEnd: end } = defaultRanges;
+      this.start = start;
+      this.end = end;
+      this.helperService.setCurrentDateRange(this.dates[start].date, this.dates[end].date, true, this.dates);
+      this.sliderSelectedRange = [start, end];
+    }
+    
+    this.setDatePickerInputs();
   }
 
   updateDateRange(start: string, end: string) {
-    console.log('start', start)
-    console.log('end', end)
     const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, start, end, this.freq, this.defaultRange);
     this.start = defaultRanges.seriesStart;
     this.end = defaultRanges.seriesEnd;

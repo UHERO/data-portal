@@ -1,95 +1,78 @@
 <div *ngFor="let data of seriesData | async" class="single-series-view col-xs-12 col-sm-12 col-xl-11">
-  <p *ngIf="data.error">Series does not exist.</p>
-  <div *ngIf="!data.error">
-    <h3 class="series-title">{{data.seriesDetail.title}}</h3><i (click)="showHelp()"
-      class="bi bi-question-circle display-help-icon"></i>
-    <p-dialog header="Series View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
-      [dismissableMask]="true">
-      <p>The series view plots a single indicator using a line measured on the right axis and the year-over-year percent
-        change (or absolute change) displayed as bars measured on the left axis.</p>
-      <p>At the top of the chart, in addition to the familiar selector boxes, you can also toggle whether the chart
-        displays seasonally-adjusted indicators or the non-seasonally-adjusted indicator if both are available. The
-        share button next to the frequency selector opens a dialog box containing a static URL to this series which can
-        be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen, as well as, an embed
-        code. As in each of the other views, to add an indicator to the Analyzer, toggle the star, located at the bottom
-        left corner of the chart.
-      </p>
-      <p>To control the selected sample of data, use the slider located above the chart. The dates can be selected by
-        either clicking and dragging the handles of the slider or by clicking the input boxes and entering a date
-        manually. There is also a set of buttons at the top left-hand corner of the chart to set the range of data to 1
-        Year (for non-annual series), 5 Years, or 10 Years from the selected starting date. The 'All' button will
-        display all available data.
-      </p>
-      <p>Below the chart is the source of the data, a link to the source agency, and any relevant notes followed by a
-        row of summary statistics measured over the currently selected range and a table displaying the data with the
-        option of sorting by date either ascending or descending.</p>
-      <p>In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of
-        the selected data.</p>
-    </p-dialog>
-    <div class="filters">
-      <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
-        (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
-        class="geo-selector"></lib-geo-selector>
-      <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
-        (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
-        class="freq-selector"></lib-freq-selector>
-      <lib-forecast-selector *ngIf="displayFcSelector" [forecasts]="data.forecastList"
-        (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)"
-        class="selector"></lib-forecast-selector>
-
-     <!-- <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="startDate"
-        [endDate]="endDate" [seriesId]="data.seriesDetail.id"></lib-share-link> -->
-
-      <div class="form-check" *ngIf="data.saPairAvail">
-        <label class="form-check-inline">
-          <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
-            (ngModelChange)="goToSeries(data.siblings, selectedFreq.freq, selectedGeo.handle, $event)">Seasonally
-          Adjusted
-        </label>
+  <ng-template ngIf [ngIf]="!data.requestComplete">
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
-      <!-- <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-        [dates]="data.sliderDates" [dateFrom]="startDate" [dateTo]="endDate" [freq]="data.seriesDetail.frequencyShort"
-        (updateRange)="changeRange($event, data, data.seriesTableData, data.chartData)"></lib-date-slider> -->
-      <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-        [dates]="data.sliderDates" [freq]="data.seriesDetail.frequencyShort"
-        (updateRange)="changeRange($event, data, data.seriesTableData)"></lib-date-slider>
-
     </div>
-    <p *ngIf="noSelection">{{noSelection}}</p>
-    <p *ngIf="data.noData">{{data.noData}}</p>
-    <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="selectedDateRange.startDate"
-      [end]="selectedDateRange.endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"
-      (tableExtremes)="changeRange($event, data, data.seriesTableData)">
-    </lib-highstock>
-    <div class="source" *ngIf="data.seriesDetail.sourceDescription || data.seriesDetail.sourceLink">
-      {{data.seriesDetail.sourceDescription}}<br><a href="{{data.seriesDetail.sourceLink}}"
-        target="_blank">{{data.seriesDetail.sourceLink}}</a>
-      <p innerHTML='{{data.seriesDetail.sourceDetails}}' class="source_detail"></p>
+  </ng-template>
+  <ng-template ngIf [ngIf]="data.requestComplete">
+    <p *ngIf="data.error">Series does not exist.</p>
+    <div *ngIf="!data.error">
+      <h3 class="series-title">{{data.seriesDetail.title}}</h3><i (click)="showHelp()"
+        class="bi bi-question-circle display-help-icon"></i>
+      <p-dialog header="Series View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
+        [dismissableMask]="true">
+        <p>The series view plots a single indicator using a line measured on the right axis and the year-over-year percent
+          change (or absolute change) displayed as bars measured on the left axis.</p>
+        <p>At the top of the chart, in addition to the familiar selector boxes, you can also toggle whether the chart
+          displays seasonally-adjusted indicators or the non-seasonally-adjusted indicator if both are available. The
+          share button next to the frequency selector opens a dialog box containing a static URL to this series which can
+          be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen, as well as, an embed
+          code. As in each of the other views, to add an indicator to the Analyzer, toggle the star, located at the bottom
+          left corner of the chart.
+        </p>
+        <p>To control the selected sample of data, use the slider located above the chart. The dates can be selected by
+          either clicking and dragging the handles of the slider or by clicking the input boxes and entering a date
+          manually. There is also a set of buttons at the top left-hand corner of the chart to set the range of data to 1
+          Year (for non-annual series), 5 Years, or 10 Years from the selected starting date. The 'All' button will
+          display all available data.
+        </p>
+        <p>Below the chart is the source of the data, a link to the source agency, and any relevant notes followed by a
+          row of summary statistics measured over the currently selected range and a table displaying the data with the
+          option of sorting by date either ascending or descending.</p>
+        <p>In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of
+          the selected data.</p>
+      </p-dialog>
+      <div class="filters">
+        <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
+          (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
+          class="geo-selector"></lib-geo-selector>
+        <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
+          (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
+          class="freq-selector"></lib-freq-selector>
+        <lib-forecast-selector *ngIf="displayFcSelector" [forecasts]="data.forecastList"
+          (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)"
+          class="selector"></lib-forecast-selector>
+        <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted"
+          [startDate]="selectedDateRange.startDate" [endDate]="selectedDateRange.endDate"
+          [seriesId]="data.seriesDetail.id"></lib-share-link>
+        <div class="form-check" *ngIf="data.saPairAvail">
+          <label class="form-check-inline">
+            <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
+              (ngModelChange)="goToSeries(data.siblings, selectedFreq.freq, selectedGeo.handle, $event)">Seasonally
+            Adjusted
+          </label>
+        </div>
+        <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+          [dates]="data.sliderDates" [freq]="data.seriesDetail.frequencyShort" [routeStart]="routeStart"
+          [routeEnd]="routeEnd" (updateRange)="changeRange($event)"></lib-date-slider>
+      </div>
+      <p *ngIf="noSelection">{{noSelection}}</p>
+      <p *ngIf="data.noData">{{data.noData}}</p>
+      <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings"
+        [start]="selectedDateRange.startDate" [end]="selectedDateRange.endDate" [chartData]="data.chartData"
+        [seriesDetail]="data.seriesDetail" (xAxisExtremes)="changeRange($event)">
+      </lib-highstock>
+      <div class="source" *ngIf="data.seriesDetail.sourceDescription || data.seriesDetail.sourceLink">
+        {{data.seriesDetail.sourceDescription}}<br><a href="{{data.seriesDetail.sourceLink}}"
+          target="_blank">{{data.seriesDetail.sourceLink}}</a>
+        <p innerHTML='{{data.seriesDetail.sourceDetails}}' class="source_detail"></p>
+      </div>
+      <lib-summary-statistics *ngIf="data.requestComplete" [seriesData]="data"></lib-summary-statistics>
+      <lib-single-series-table *ngIf="!noSelection && !data.noData && data.requestComplete"
+        [seriesData]="data"></lib-single-series-table>
     </div>
-    <lib-summary-statistics *ngIf="data.requestComplete" [seriesData]="data"></lib-summary-statistics>
-    <!-- <div class="series-table">
-      <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
-        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'spinner-border'">
-        <ng-template pTemplate="header" let-columns>
-          <tr>
-            <th *ngFor="let col of columns" [pSortableColumn]="col.field"
-              [pSortableColumnDisabled]="col.field !== 'tableDate'">
-              {{col.header}}
-              <p-sortIcon *ngIf="col.field === 'tableDate'" [field]="col.field" ariaLabel="Activate to sort"
-                ariaLabelDesc="Activate to sort in descending order" ariaLabelAsc="Activate to sort in ascending order">
-              </p-sortIcon>
-            </th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-rowData let-columns="columns">
-          <tr>
-            <td *ngFor="let col of columns">
-              {{rowData[col.field]}}
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div> -->
-    <lib-single-series-table *ngIf="!noSelection && !data.noData" [seriesData]="data"></lib-single-series-table>
-  </div>
+  
+  </ng-template>
 </div>

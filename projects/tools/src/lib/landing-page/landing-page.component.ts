@@ -98,6 +98,20 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       const dataListId = this.dataListId;
       const selectedMeasure = params[`m`];
+      /* if (this.routeStart) {
+        this.helperService.updateCurrentDateRange({
+          startDate: this.routeStart,
+          useDefaultRange: false,
+          ...this.selectedDateRange
+        });
+      }
+      if (this.routeEnd) {
+        this.helperService.updateCurrentDateRange({
+          endDate: this.routeEnd,
+          useDefaultRange: false,
+          ...this.selectedDateRange
+        });
+      } */
       this.categoryData = this.portal.universe === 'nta' ?
         this.catHelper.initContent(this.id, this.noCache, { dataListId, selectedMeasure }) :
         this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq, fc })

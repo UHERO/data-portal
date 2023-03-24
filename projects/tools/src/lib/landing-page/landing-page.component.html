@@ -113,8 +113,8 @@
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
 				<lib-date-slider *ngIf="data.displayedMeasurements" class="sliders" [portalSettings]="portalSettings"
-					[dates]="data.categoryDates" [freq]="selectedFreq?.freq || data.currentFreq.freq"
-					(updateRange)="changeRange($event)"></lib-date-slider>
+					[dates]="data.categoryDates" [freq]="selectedFreq?.freq || data.currentFreq.freq" [routeStart]="routeStart"
+					[routeEnd]="routeEnd" (updateRange)="changeRange($event)"></lib-date-slider>
 			</div>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && !data.noData && !search">

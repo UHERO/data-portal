@@ -25,8 +25,6 @@ export class SummaryStatisticsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.dateRangeSub = this.helperService.currentDateRange.subscribe((dateRange) => {
       this.selectedDateRange = dateRange;
-      console.log('stats component seriesData', this.seriesData)
-      console.log('stats component dateRange', dateRange)
       const { seriesDetail, chartData } = this.seriesData;
       const { startDate, endDate } = dateRange;
       this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, startDate, endDate, false, null);

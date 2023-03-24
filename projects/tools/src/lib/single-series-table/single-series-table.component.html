@@ -1,6 +1,5 @@
 <div class="series-table">
-  <p-table styleClass="p-datatable-striped" [columns]="tableHeaders" [value]="tableData"
-    [loading]="!seriesData.requestComplete" [loadingIcon]="'spinner-border'">
+  <p-table styleClass="p-datatable-striped" [columns]="tableHeaders" [value]="tableData">
     <ng-template pTemplate="header" let-columns>
       <tr>
         <th *ngFor="let col of columns" [pSortableColumn]="col.field"

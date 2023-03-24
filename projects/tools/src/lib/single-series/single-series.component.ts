@@ -1,4 +1,4 @@
-import { Inject, Component, OnInit, OnDestroy, AfterViewInit, AfterContentChecked, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, OnDestroy, AfterContentChecked, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -6,14 +6,14 @@ import { SeriesHelperService } from '../series-helper.service';
 import { Frequency, Geography, DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
 import { HelperService } from '../helper.service';
-import { tap, map, shareReplay } from 'rxjs/operators';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'lib-single-series',
   templateUrl: './single-series.component.html',
   styleUrls: ['./single-series.component.scss']
 })
-export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestroy, AfterContentChecked {
+export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChecked {
   noSelection: string;
   newTableData;
   tableHeaders;
@@ -37,6 +37,9 @@ export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestr
   displayFcSelector: boolean;
   displayHelp: boolean = false;
   public seriesData;
+  queryParams: any = {};
+  routeStart: string;
+  routeEnd: string;
 
   constructor(
     @Inject('environment') private environment,
@@ -47,7 +50,8 @@ export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestr
     private analyzerService: AnalyzerService,
     private route: ActivatedRoute,
     private router: Router,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private location: Location
   ) {
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
       this.selectedFreq = freq;
@@ -66,11 +70,9 @@ export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestr
     this.displayFcSelector = this.portalSettings.selectors.includes('forecast');
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
       this.selectedDateRange = dateRange;
-      console.log('SINGLE SERIES date range', dateRange)
-      this.summaryStats = { avg: '', cagr: '', levelChange: '', maxValue: '', minValue: '', missing: null, percChange: '', range: '', series: '', seriesInfo: null, total: ''}
     });
-
     this.route.queryParams.subscribe(params => {
+      this.queryParams = {...params};
       this.seriesId = Number(params[`id`]);
       let categoryId;
       let noCache: boolean;
@@ -81,45 +83,19 @@ export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestr
         categoryId = Number(params[`data_list_id`]);
       }
       if (params[`start`]) {
-        //this.startDate = params[`start`];
+        this.routeStart = params[`start`];
       }
       if (params[`end`]) {
-        //this.endDate = params[`end`];
-      }
-      if (params[`nocache`]) {
-        noCache = params[`nocache`] === 'true';
-      }
-      this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId)
-
-      // this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
-    });
-  }
-
-  /* ngAfterViewInit() {
-    this.route.queryParams.subscribe(params => {
-      this.seriesId = Number(params[`id`]);
-      let categoryId;
-      let noCache: boolean;
-      if (params[`sa`] !== undefined) {
-        this.seasonallyAdjusted = (params[`sa`] === 'true');
-      }
-      if (params[`data_list_id`]) {
-        categoryId = Number(params[`data_list_id`]);
-      }
-      if (params[`start`]) {
-        //this.startDate = params[`start`];
-      }
-      if (params[`end`]) {
-        //this.endDate = params[`end`];
+        this.routeEnd = params[`end`];
       }
       if (params[`nocache`]) {
         noCache = params[`nocache`] === 'true';
       }
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId);
-      // this.seriesShareLink = this.formatSeriesShareLink(this.startDate, this.endDate);
     });
-    this.cdRef.detectChanges();
-  } */
+
+    
+  }
 
   ngAfterContentChecked() {
     this.cdRef.detectChanges();
@@ -153,7 +129,9 @@ export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestr
         sa: this.seasonallyAdjusted,
         ...(forecast?.forecast && { fc: forecast.forecast }),
         geo,
-        freq
+        freq,
+        start: this.routeStart ? this.routeStart : null,
+        end: this.routeEnd ? this.routeEnd : null
       };
       // this.startDate = this.chartStart;
       // this.endDate = this.chartEnd;
@@ -177,106 +155,20 @@ export class SingleSeriesComponent implements OnInit/*, AfterViewInit*/, OnDestr
     this.analyzerService.removeFromAnalyzer(series.id);
   }
 
-  // Update table when selecting new ranges in the chart
-  /* drawTable = (startDate, endDate, seriesData, tableData, chartData) => {
-    let minDate;
-    let maxDate;
-    let tableStart;
-    let tableEnd;
-    minDate = startDate;
-    maxDate = endDate;
-    for (let i = 0; i < tableData.length; i++) {
-      if (tableData[i].date === maxDate) {
-        tableStart = i;
-      }
-      if (tableData[i].date === minDate) {
-        tableEnd = i;
-      }
-    }
-    this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.tableHeaders = this.createTableColumns(this.portalSettings, seriesData.seriesDetail);
-    seriesData.observations = seriesData.seriesObservations;
-    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesData.seriesDetail, chartData, minDate, maxDate, false, null);
-  } */
-  drawTable = (selectedDateRange, seriesData, tableData, chartData) => {
-    let minDate;
-    let maxDate;
-    let tableStart;
-    let tableEnd;
-    //minDate = startDate;
-    //maxDate = endDate;
-    minDate = selectedDateRange.startDate;
-    maxDate = selectedDateRange.endDate;
-    if (minDate && maxDate) {
-      for (let i = 0; i < tableData.length; i++) {
-        if (tableData[i].date === maxDate) {
-          tableStart = i;
-        }
-        if (tableData[i].date === minDate) {
-          tableEnd = i;
-        }
-      }
-      const newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-      const tableHeaders = this.createTableColumns(this.portalSettings, seriesData.seriesDetail);
-      seriesData.observations = seriesData.seriesObservations;
-      //this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesData.seriesDetail, chartData, minDate, maxDate, false, null);
-      return {newTableData, tableHeaders};  
-    }
-    return {}
-  }
-
-  createTableColumns = (portalSettings, seriesDetail) => {
-    const { frequencyShort, percent } = seriesDetail;
+  changeRange(dateRange: DateRange) {
     const {
-      series1,
-      series2,
-      series2PercLabel,
-      series2Label,
-      columns,
-      series3,
-      series3PercLabel,
-      series3Label
-    } = portalSettings.seriesTable;
-    const cols = [];
-    cols.push({ field: 'tableDate', header: 'Date' });
-    cols.push({ field: series1, header: 'Level' });
-    cols.push({
-      field: series2, header: percent ? series2PercLabel : series2Label
-    });
-    if (frequencyShort !== 'A' && columns === 4) {
-      cols.push({
-        field: series3, header: percent ? series3PercLabel : series3Label
-      });
-    }
-    return cols;
-  }
-
-  formatSeriesShareLink = (start: string, end: string) => this.environment[`portalUrl`] + this.addQueryParams('/series', start, end);
-
-  addQueryParams(seriesUrl, start, end) {
-    if (this.seriesId) {
-      seriesUrl += `?id=${this.seriesId}`;
-    }
-    if (this.seasonallyAdjusted) {
-      seriesUrl += `&sa=${this.seasonallyAdjusted}`;
-    }
-    if (start) {
-      seriesUrl += `&start=${start}`;
-    }
-    if (end) {
-      seriesUrl += `&end=${end}`;
-    }
-    return seriesUrl;
-  }
-
-  changeRange(event, data, tableData) {
-    console.log('changeRange')
-    const { seriesStart, seriesEnd } = event;
-    // this.startDate = seriesStart;
-    // this.endDate = seriesEnd;
-    const { seriesDetail, chartData } = data;
-    const { startDate, endDate } = this.selectedDateRange;
-    //this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, startDate, endDate, false, null);
-    //this.drawTable(this.selectedDateRange, data, tableData, chartData);
+      startDate,
+      endDate,
+      useDefaultRange,
+      endOfSample
+    } = dateRange;
+    this.queryParams.start = useDefaultRange ? null : startDate;
+    this.queryParams.end = endOfSample ? null : endDate;
+    this.routeStart = this.queryParams.start;
+    this.routeEnd = this.queryParams.end;
+    const url = this.router.createUrlTree([], {
+      relativeTo: this.route, queryParams: this.queryParams
+    }).toString();
+    this.location.go(url);
   }
 }
