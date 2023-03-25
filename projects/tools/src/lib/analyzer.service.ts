@@ -464,7 +464,10 @@ export class AnalyzerService {
       });
     });
     allDates = allDates.sort(this.dateComparison);
-    if (start && end) { allDates = allDates.filter(date => date.date >= start && date.date <= end); }
+    if (start && end) {
+      allDates = allDates.filter(date => date.date >= start && date.date <= end);
+    }
+    console.log('allDates', allDates)
     return allDates;
   }
 

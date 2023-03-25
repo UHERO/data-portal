@@ -35,6 +35,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   urlParams;
   displayHelp: boolean = false;
   displaySelectionNA: boolean = false;
+  routeStart: string;
+  routeEnd: string;
 
   constructor(
     @Inject('environment') private environment,
@@ -61,8 +63,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         if (params[`chartSeries`]) {
           this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
         }
+        console.log('params', params)
         this.analyzerService.analyzerData.minDate = params['start'] || '';
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
+        this.routeStart = params[`start`] || null;
+        this.routeEnd = params[`end`] || null;
         this.indexSeries = params['index'] || null;
         this.leftMin = params['leftMin'] || null;
         this.leftMax = params['leftMax'] || null;
@@ -186,8 +191,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   changeRange(e) {
+    console.log("CHANGE RANGE", e)
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
+    this.routeStart = e.startDate;
+    this.routeEnd = e.endDate;
     if (this.analyzerService.analyzerData.indexed) {
       this.analyzerService.updateBaseYear();
     }
@@ -207,8 +215,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       rightMin,
       rightMax
     } = analyzerData;
-    this.queryParams.start = minDate;
-    this.queryParams.end = maxDate;
+    this.queryParams.start = this.routeStart;
+    this.queryParams.end = this.routeEnd;
     this.queryParams.analyzerSeries = analyzerSeries.map(s => s.id).join('-');
     this.queryParams.chartSeries = analyzerSeries.filter(s => s.visible).map(s => s.id).join('-') || null;
     this.queryParams.yright = yRightSeries.length ? yRightSeries.join('-') : null;
@@ -217,6 +225,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.queryParams.leftMax = leftMax ? leftMax : null;
     this.queryParams.rightMin = rightMin ? rightMin : null;
     this.queryParams.rightMax = rightMax ? rightMax : null;
+    console.log('QUERY PARAMS', this.queryParams)
     const url = this.router.createUrlTree([], {
       relativeTo: this.route, queryParams: this.queryParams
     }).toString();

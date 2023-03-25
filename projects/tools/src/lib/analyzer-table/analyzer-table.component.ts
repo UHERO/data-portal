@@ -2,6 +2,8 @@ import { Component, Inject, OnInit, OnChanges, Input, Output, EventEmitter, Chan
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
+import { DateRange } from '../tools.models';
+import { Subscription } from 'rxjs';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
 import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
@@ -17,6 +19,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
+  @Input() dates: Array<any>;
   @Output() tableTransform = new EventEmitter();
   @Input() yoyChecked;
   @Input() ytdChecked;
@@ -36,6 +39,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   summaryRows;
   public gridOptions: GridOptions;
   public statGridOptions: GridOptions;
+  dateRangeSub: Subscription;
+  selectedDateRange: DateRange;
 
   constructor(
     @Inject('portal') private portal,
@@ -62,12 +67,22 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+    this.dateRangeSub = this.helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      /* if (this.dates?.length) {
+        const { startDate, endDate } = this.selectedDateRange;
+        //this.columnDefs = this.setTableColumns(this.dates, startDate, endDate, this.showSeasonal);
+      } */
+      console.log('ANALYZER TABLE dateRange', dateRange)
+      const { startDate, endDate } = dateRange;
+      this.drawTable(startDate, endDate);
+    });
   }
 
   ngOnChanges() {
-    this.displayMomCheck = this.freq === 'M' || this.freq === 'W' || this.freq === 'D';
-    const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
-    this.columnDefs = this.setTableColumns(tableDateCols);
+    /* this.displayMomCheck = this.freq === 'M' || this.freq === 'W' || this.freq === 'D';
+    //const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
+    //this.columnDefs = this.setTableColumns(tableDateCols);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = [];
@@ -77,8 +92,43 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
       const { level, yoy, ytd, c5ma, mom } = transformations;
       const seriesData = this.formatLvlData(series, level, this.minDate);
-      const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
-      this.summaryRows.push(summaryStats)
+      
+      //const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
+      
+      //this.summaryRows.push(summaryStats)
+      
+      this.rows.push(seriesData);
+      this.addTransformationToTableRows(this.yoyChecked, yoy, series);
+      this.addTransformationToTableRows(this.ytdChecked, ytd, series);
+      this.addTransformationToTableRows(this.c5maChecked, c5ma, series);
+      this.addTransformationToTableRows(this.momChecked, mom, series);
+    });
+    // Check if the summary statistics for a series has NA values
+    this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows); */
+    console.log('ON CHANGES')
+  }
+
+  drawTable = (startDate: string, endDate: string) => {
+    this.displayMomCheck = this.freq === 'M' || this.freq === 'W' || this.freq === 'D';
+    const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, startDate, endDate);
+    console.log('tableDateCols', tableDateCols)
+    this.columnDefs = this.setTableColumns(tableDateCols);
+    this.gridApi?.setColumnDefs(this.columnDefs)
+    console.log('this.columnDefs', this.columnDefs)
+    this.rows = [];
+    this.summaryColumns = this.setSummaryStatColumns();
+    this.summaryRows = [];
+    // Display values in the range of dates selected
+
+    this.series.forEach((series) => {
+      const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
+      const { level, yoy, ytd, c5ma, mom } = transformations;
+      const seriesData = this.formatLvlData(series, level, startDate);
+      
+      //const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
+      
+      //this.summaryRows.push(summaryStats)
+      
       this.rows.push(seriesData);
       this.addTransformationToTableRows(this.yoyChecked, yoy, series);
       this.addTransformationToTableRows(this.ytdChecked, ytd, series);

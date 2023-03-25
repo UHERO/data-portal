@@ -73,8 +73,8 @@
             [disabled]="!data.displayFreqSelector">Index
         </label>
         <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-          [dates]="data.sliderDates" [dateFrom]="data.minDate" [dateTo]="data.maxDate"
-          [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
+          [dates]="data.sliderDates" [routeStart]="routeStart" [routeEnd]="routeEnd" [freq]="data.analyzerFrequency.freq"
+          (updateRange)="changeRange($event)"></lib-date-slider>
         <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
           (click)="removeAllAnalyzerSeries()">
           Remove All Series
@@ -88,7 +88,7 @@
             [analyzerView]="true" [chartStart]="data.minDate" [chartEnd]="data.maxDate" [routeStart]="data.minDate"
             [routeEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
           </lib-category-charts> -->
-          <lib-category-charts *ngIf="!displayCompare && data.minDate" [portalSettings]="portalSettings"
+          <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
             [displayedMeasurements]="data.analyzerMeasurements" [dates]="data.sliderDates"
             [freq]="data.analyzerFrequency.freq" [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal"
             [analyzerView]="true" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
@@ -97,10 +97,10 @@
             [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate" [indexChecked]="indexSeries"
             (tableExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation()">
           </lib-analyzer-highstock>
-          <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="data.minDate" [maxDate]="data.maxDate"
-            [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom"
-            [indexChecked]="indexSeries" [series]="data.analyzerSeries" [freq]="data.analyzerFrequency.freq"
-            [indexBaseYear]="data.baseYear" (tableTransform)="checkTransforms($event)">
+          <lib-analyzer-table *ngIf="data.analyzerSeries.length" [dates]="data.sliderDates" [yoyChecked]="tableYoy"
+            [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom" [indexChecked]="indexSeries"
+            [series]="data.analyzerSeries" [freq]="data.analyzerFrequency.freq" [indexBaseYear]="data.baseYear"
+            (tableTransform)="checkTransforms($event)">
           </lib-analyzer-table>
         </ng-template>
       </div>

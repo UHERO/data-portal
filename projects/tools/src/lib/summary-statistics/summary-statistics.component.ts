@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { SeriesHelperService } from '../series-helper.service';
-import { Frequency, Geography, DateRange } from '../tools.models';
+import { DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
 
 @Component({
