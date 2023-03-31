@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { Location } from '@angular/common';
 import { AnalyzerService } from '../analyzer.service';
 import { DateRange } from '../tools.models';
@@ -13,7 +13,7 @@ import { HelperService } from '../helper.service';
   templateUrl: './analyzer.component.html',
   styleUrls: ['./analyzer.component.scss']
 })
-export class AnalyzerComponent implements OnInit, OnDestroy {
+export class AnalyzerComponent implements OnInit, OnDestroy, AfterContentChecked {
   portalSettings;
   tableYoy: boolean;
   tableYtd: boolean;
@@ -50,6 +50,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private apiService: ApiService,
     private router: Router,
+    private cdRef: ChangeDetectorRef,
     private location: Location,
     private helperService: HelperService
   ) {
@@ -107,6 +108,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     }
     this.updateAnalyzer(this.analyzerSeries);
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+  }
+
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
   }
 
   evalParamAsTrue = (param: string) => param === 'true';
@@ -198,8 +203,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   changeRange(e) {
-    //this.analyzerService.analyzerData.minDate = e.seriesStart;
-    //this.analyzerService.analyzerData.maxDate = e.seriesEnd;
     this.routeStart = e.startDate;
     this.routeEnd = e.endDate;
     if (this.analyzerService.analyzerData.indexed) {

@@ -88,8 +88,7 @@
             [analyzerView]="true" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
           </lib-category-charts>
           <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-            [series]="data.analyzerSeries" [dates]="data.sliderDates" [start]="selectedDateRange.startDate"
-            [end]="selectedDateRange.endDate" [indexChecked]="indexSeries" (tableExtremes)="changeRange($event)"
+            [series]="data.analyzerSeries" [dates]="data.sliderDates" [indexChecked]="indexSeries" (tableExtremes)="changeRange($event)"
             (xAxisExtremes)="changeRange($event)">
           </lib-analyzer-highstock>
           <lib-analyzer-table *ngIf="data.analyzerSeries.length" [dates]="data.sliderDates" [yoyChecked]="tableYoy"

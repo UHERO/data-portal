@@ -13,25 +13,31 @@
         class="bi bi-question-circle display-help-icon"></i>
       <p-dialog header="Series View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
         [dismissableMask]="true">
-        <p>The series view plots a single indicator using a line measured on the right axis and the year-over-year percent
+        <p>The series view plots a single indicator using a line measured on the right axis and the year-over-year
+          percent
           change (or absolute change) displayed as bars measured on the left axis.</p>
         <p>At the top of the chart, in addition to the familiar selector boxes, you can also toggle whether the chart
           displays seasonally-adjusted indicators or the non-seasonally-adjusted indicator if both are available. The
-          share button next to the frequency selector opens a dialog box containing a static URL to this series which can
-          be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen, as well as, an embed
-          code. As in each of the other views, to add an indicator to the Analyzer, toggle the star, located at the bottom
+          share button next to the frequency selector opens a dialog box containing a static URL to this series which
+          can
+          be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen, as well as, an
+          embed
+          code. As in each of the other views, to add an indicator to the Analyzer, toggle the star, located at the
+          bottom
           left corner of the chart.
         </p>
         <p>To control the selected sample of data, use the slider located above the chart. The dates can be selected by
           either clicking and dragging the handles of the slider or by clicking the input boxes and entering a date
-          manually. There is also a set of buttons at the top left-hand corner of the chart to set the range of data to 1
+          manually. There is also a set of buttons at the top left-hand corner of the chart to set the range of data to
+          1
           Year (for non-annual series), 5 Years, or 10 Years from the selected starting date. The 'All' button will
           display all available data.
         </p>
         <p>Below the chart is the source of the data, a link to the source agency, and any relevant notes followed by a
           row of summary statistics measured over the currently selected range and a table displaying the data with the
           option of sorting by date either ascending or descending.</p>
-        <p>In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of
+        <p>In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports
+          of
           the selected data.</p>
       </p-dialog>
       <div class="filters">
@@ -60,8 +66,7 @@
       </div>
       <p *ngIf="noSelection">{{noSelection}}</p>
       <p *ngIf="data.noData">{{data.noData}}</p>
-      <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings"
-        [start]="selectedDateRange.startDate" [end]="selectedDateRange.endDate" [chartData]="data.chartData"
+      <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [chartData]="data.chartData"
         [seriesDetail]="data.seriesDetail" (xAxisExtremes)="changeRange($event)">
       </lib-highstock>
       <div class="source" *ngIf="data.seriesDetail.sourceDescription || data.seriesDetail.sourceLink">
@@ -73,6 +78,6 @@
       <lib-single-series-table *ngIf="!noSelection && !data.noData && data.requestComplete"
         [seriesData]="data"></lib-single-series-table>
     </div>
-  
+
   </ng-template>
 </div>

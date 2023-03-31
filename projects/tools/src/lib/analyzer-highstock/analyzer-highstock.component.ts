@@ -1,16 +1,22 @@
 import {
   Component,
   Inject,
+  OnInit,
+  OnDestroy,
   OnChanges,
   Input,
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
   ViewEncapsulation,
+  SimpleChanges
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
+import { DateRange } from '../tools.models';
 import { Dropdown } from 'bootstrap';
 import { HighstockHelperService } from '../highstock-helper.service';
+import { HelperService } from '../helper.service';
+import { Subscription } from 'rxjs';
 import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
@@ -26,11 +32,11 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {frequencyShort: strin
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class AnalyzerHighstockComponent implements OnChanges {
+export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;
   @Input() portalSettings;
-  @Input() start;
-  @Input() end;
+  //@Input() start;
+  //@Input() end;
   @Input() dates;
   @Input() indexChecked;
   @Output() xAxisExtremes = new EventEmitter(true);
@@ -42,6 +48,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
   indexed: boolean = false;
   analyzerData;
   oneToOneFlag = false;
+  dateRangeSubscription: Subscription;
+  selectedDateRange: DateRange;
 
   chartCallback = (chart) => {
     if (!this.chartObject) {
@@ -243,6 +251,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     @Inject('logo') private logo,
     private highstockHelper: HighstockHelperService,
     private analyzerService: AnalyzerService,
+    private helperService: HelperService
   ) {
     this.analyzerData = this.analyzerService.analyzerData;
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
@@ -285,17 +294,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
           addToComparisonChartItem.addEventListener('click', (e) => {
             e.stopPropagation();
             if (chartOptionSeries) {
-              analyzerService.makeCompareSeriesVisible(chartOptionSeries, this.start);
+              analyzerService.makeCompareSeriesVisible(chartOptionSeries, this.selectedDateRange.startDate);
               this.updateUrl.emit(chartOptionSeries);
             }
           });
           removeFromComparisonChartItem.addEventListener('click', () => {
-            analyzerService.removeFromComparisonChart(seriesId, this.start);
+            analyzerService.removeFromComparisonChart(seriesId, this.selectedDateRange.startDate);
             this.updateUrl.emit(chartOptionSeries);
           });
           removeFromAnalyzerItem.addEventListener('click', (e) => {
             e.stopPropagation();
-            analyzerService.removeFromAnalyzer(seriesId, this.start);
+            analyzerService.removeFromAnalyzer(seriesId, this.selectedDateRange.startDate);
           });
         }
       });
@@ -315,13 +324,40 @@ export class AnalyzerHighstockComponent implements OnChanges {
     });
   }
 
-  ngOnChanges() {
-    this.updateChartOptions(this.series);
+  ngOnInit(): void {
+    this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      const { startDate, endDate } = dateRange;
+      this.drawChart(startDate, endDate);
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const indexCheckChange = changes['indexChecked'];
+    const seriesChange = changes['series']; 
+    const datesChange = changes['dates'];
+    if (
+      (indexCheckChange && !indexCheckChange.firstChange) ||
+      (seriesChange && !seriesChange.firstChange) ||
+      (datesChange && !datesChange.firstChange)
+    ) {
+      const { startDate, endDate } = this.selectedDateRange;
+      this.drawChart(startDate, endDate)
+    }
+
+  }
+
+  ngOnDestroy(): void {
+    this.dateRangeSubscription.unsubscribe();
+  }
+
+  drawChart(startDate: string, endDate: string) {
+    this.updateChartOptions(this.series, startDate, endDate);
     this.updateChart = true;
     if (this.chartOptions.xAxis) {
-      (<Highcharts.AxisOptions>this.chartOptions.xAxis).min = this.start ? Date.parse(this.start) : undefined;
-      (<Highcharts.AxisOptions>this.chartOptions.xAxis).max = this.end ? Date.parse(this.end) : undefined;
-      this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
+      (<Highcharts.AxisOptions>this.chartOptions.xAxis).min = Date.parse(startDate);
+      (<Highcharts.AxisOptions>this.chartOptions.xAxis).max = Date.parse(endDate);
+      this.chartObject?.xAxis[0].setExtremes(Date.parse(startDate), Date.parse(endDate));
       this.setYMinMax();
     }
   }
@@ -339,10 +375,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return { items: labelItems, style: { display: 'none' } };
   }
 
-  updateChartOptions(series) {
+  updateChartOptions(series, startDate: string, endDate: string) {
     const { portal, portalLink } = this.portalSettings.highstock.labels;
-    const startDate = this.start || null;
-    const endDate = this.end || null;
+    //const startDate = this.start || null;
+    //const endDate = this.end || null;
     const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
     const xAxisExtremes = this.xAxisExtremes;
     const logo = this.logo;

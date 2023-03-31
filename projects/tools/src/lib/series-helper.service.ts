@@ -89,6 +89,7 @@ export class SeriesHelperService {
         this.seriesData.eror = true;
         this.seriesData.requestComplete = true;
       });
+      console.log('SERIES DATA', this.seriesData)
     return observableForkJoin([observableOf(this.seriesData)]);
   }
 

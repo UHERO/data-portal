@@ -51,30 +51,10 @@ export class DateSliderComponent implements OnChanges {
     this.sliderDates = this.dates.map(d => d.date);
     if (this.routeStart && this.routeEnd) {
       this.updateDateRange(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange, false);
-      /* const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
-      const { seriesStart: start, seriesEnd: end } = defaultRanges;
-      this.start = start;
-      this.end = end;
-      this.helperService.setCurrentDateRange(this.dates[start].date, this.dates[end].date, false, this.dates);
-      this.sliderSelectedRange = [start, end]; */
     } else if (this.routeStart && !this.routeEnd) {
       this.updateDateRange(this.dates, this.routeStart, '', this.freq, this.defaultRange, false);
-
-      /* const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, '', this.freq, this.defaultRange);
-      const { seriesStart: start, seriesEnd: end } = defaultRanges;
-      this.start = start;
-      this.end = end;
-      this.helperService.setCurrentDateRange(this.dates[start].date, this.dates[end].date, false, this.dates);
-      this.sliderSelectedRange = [start, end]; */
     } else {
       this.updateDateRange(this.dates, '', '', this.freq, this.defaultRange, true);
-
-      /* const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, '', '', this.freq, this.defaultRange);
-      const { seriesStart: start, seriesEnd: end } = defaultRanges;
-      this.start = start;
-      this.end = end;
-      this.helperService.setCurrentDateRange(this.dates[start].date, this.dates[end].date, true, this.dates);
-      this.sliderSelectedRange = [start, end]; */
     }
     this.setDatePickerInputs();
   }
@@ -87,39 +67,6 @@ export class DateSliderComponent implements OnChanges {
     this.helperService.setCurrentDateRange(dates[seriesStart].date, dates[seriesEnd].date, useDefaultRange, dates);
     this.sliderSelectedRange = [seriesStart, seriesEnd];
   }
-
-  /* updateDateRange(start: string, end: string) {
-    const defaultRanges = this.helperService.getSeriesStartAndEnd(this.dates, start, end, this.freq, this.defaultRange);
-    this.start = defaultRanges.seriesStart;
-    this.end = defaultRanges.seriesEnd;
-    if (start) {
-      this.helperService.updateCurrentDateRange({
-        ...this.selectedDateRange,
-        startDate: this.dates[this.start].date,
-        useDefaultRange: false,
-        endOfSample: this.end === this.dates.length - 1
-      });
-    }
-    if (end) {
-      this.helperService.updateCurrentDateRange({
-        ...this.selectedDateRange,
-        endDate: this.dates[this.end].date,
-        useDefaultRange: false,
-        endOfSample: this.end === this.dates.length - 1
-      });
-    }
-    if (!start && !end) {
-      this.helperService.updateCurrentDateRange({
-        ...this.selectedDateRange,
-        startDate: this.dates[this.start].date,
-        endDate: this.dates[this.end].date,
-        useDefaultRange: false,
-        endOfSample: this.end === this.dates.length - 1
-      });
-    }
-    this.sliderSelectedRange = [this.start, this.end];
-    this.setDatePickerInputs();
-  } */
 
   setDatePickerInputs() {
     // Date picker inputs
@@ -340,9 +287,5 @@ export class DateSliderComponent implements OnChanges {
       endOfSample
     });
     this.updateRange.emit({ startDate: from, endDate: to, useDefaultRange: false, endOfSample });
-    /* const seriesStart = from;
-    const seriesEnd = to;
-    this.helperService.updateCurrentDateRange({ startDate: seriesStart, endDate: seriesEnd, endOfSample });
-    this.updateRange.emit({ seriesStart, seriesEnd, endOfSample }); */
   }
 }

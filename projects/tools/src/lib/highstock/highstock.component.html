@@ -1,2 +1,2 @@
-<highcharts-chart id="single-stock-chart" *ngIf="showChart" [Highcharts]="Highcharts"
+<highcharts-chart id="single-stock-chart" [Highcharts]="Highcharts"
   [constructorType]="chartConstructor" [options]="chartOptions" [(update)]="updateChart" (chartInstance)="saveChartInstance($event)"></highcharts-chart>

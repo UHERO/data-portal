@@ -1,8 +1,10 @@
 // Highstock chart component used for single-series view
-import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
-import { HighchartChartData, Series, Geography, Frequency } from '../tools.models';
+import { Component, Inject, Input, Output, EventEmitter, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { HighchartChartData, Series, Geography, Frequency, DateRange } from '../tools.models';
 import { HighstockHelperService } from '../highstock-helper.service';
 import { AnalyzerService } from '../analyzer.service';
+import { HelperService } from '../helper.service';
+import { Subscription } from 'rxjs';
 import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
@@ -19,18 +21,17 @@ interface CustomChart extends Highcharts.Chart {
   styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class HighstockComponent implements OnChanges {
+export class HighstockComponent implements OnInit, OnDestroy {
   @Input() portalSettings;
   @Input() chartData: HighchartChartData;
   @Input() seriesDetail: Series;
-  @Input() start: string;
-  @Input() end: string;
   @Input() showTitle: boolean;
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() xAxisExtremes = new EventEmitter(true);
   updateChart = false;
   chartObject: Highcharts.Chart;
-  showChart = false;
+  dateRangeSubscription: Subscription;
+  selectedDateRange: DateRange;
 
   Highcharts: typeof Highcharts = Highcharts;
   chartConstructor: string = 'stockChart';
@@ -68,6 +69,7 @@ export class HighstockComponent implements OnChanges {
     @Inject('logo') private logo,
     private highstockHelper: HighstockHelperService,
     private analyzerService: AnalyzerService,
+    private helperService: HelperService
   ) {
     // workaround to include exporting module in production build
     exporting(this.Highcharts);
@@ -83,39 +85,44 @@ export class HighstockComponent implements OnChanges {
     });
   }
 
-  ngOnChanges() {
-    if (Object.keys(this.seriesDetail).length) {
-      this.showChart = true;
-      this.drawChart(this.chartData, this.seriesDetail, this.portalSettings);
+  ngOnInit() {
+    this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      const { startDate, endDate } = dateRange;
+      this.drawChart(this.chartData, this.seriesDetail, this.portalSettings, startDate, endDate);
       this.updateChart = true;
-    }
-    if (this.chartOptions.xAxis) {
-      (<Highcharts.AxisOptions>(this.chartOptions.xAxis)).min = this.start ? Date.parse(this.start) : undefined;
-      (<Highcharts.AxisOptions>(this.chartOptions.xAxis)).max = this.end ? Date.parse(this.end) : undefined;
-      this.chartObject?.xAxis[0].setExtremes(Date.parse(this.start), Date.parse(this.end));
-      this.updateChart = true;
-    }
+      if (this.chartOptions.xAxis) {
+        (<Highcharts.AxisOptions>(this.chartOptions.xAxis)).min = Date.parse(startDate);
+        (<Highcharts.AxisOptions>(this.chartOptions.xAxis)).max = Date.parse(endDate)
+        this.chartObject?.xAxis[0].setExtremes(Date.parse(startDate), Date.parse(endDate));
+        this.updateChart = true;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.dateRangeSubscription.unsubscribe();
   }
 
   saveChartInstance(chart: Highcharts.Chart) {
     this.chartObject = chart;
   }
 
-  drawChart = (chartData: HighchartChartData, seriesDetail: Series, portalSettings) => {
+  drawChart = (chartData: HighchartChartData, seriesDetail: Series, portalSettings, startDate: string, endDate: string) => {
     let chartObject = this.chartObject
     const decimals = seriesDetail.decimals || 1;
     const geo: Geography = seriesDetail.geography;
     const freq: Frequency = { freq: seriesDetail.frequencyShort, label: seriesDetail.frequency };
     const buttons = portalSettings.highstock.buttons;
     const chartButtons = this.formatChartButtons(freq.freq, buttons);
-    const accessibilityDescription = this.formatAccessibilityDescription(seriesDetail, portalSettings, geo, freq);
+    const accessibilityDescription = this.formatAccessibilityDescription(seriesDetail, portalSettings, freq);
     const pseudoZones = chartData.pseudoZones;
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel || seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
-    const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange, freq.freq) : null;
-    const startDate = this.start ? this.start : null;
-    const endDate = this.setEndDate(this.end, chartRange, chartData);
+    const chartRange = chartData.level ? this.getSelectedChartRange(startDate, endDate, chartData.dates, this.defaultRange, freq.freq) : null;
+    // TODO: may need to reimplement/find alternative to setEndDate
+    // const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const { dates } = chartData;
     const xAxisExtremes = this.xAxisExtremes;
@@ -316,9 +323,9 @@ export class HighstockComponent implements OnChanges {
     return chartButtons;
   }
 
-  formatAccessibilityDescription = (seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) => {
-    const { title, sourceDescription, sourceLink, sourceDetails, id } = seriesDetail;
-    return `Series: ${title} (${geo.name} - ${freq.label})
+  formatAccessibilityDescription = (seriesDetail: Series, portalSettings, freq: Frequency) => {
+    const { title, geography, sourceDescription, sourceLink, sourceDetails, id } = seriesDetail;
+    return `Series: ${title} (${geography.name} - ${freq.label})
       ${sourceDescription ? sourceDescription : ''}
       ${sourceLink ? sourceLink : ''}
       ${sourceDetails ? sourceDetails : ''}
