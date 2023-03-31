@@ -149,7 +149,7 @@ export class SeriesHelperService {
       total: 'N/A',
       avg: 'N/A',
       cagr: 'N/A',
-      missing: null,
+      missing: false,
       range: null,
     };
     const { formatNum, formatDate } = this.helperService;

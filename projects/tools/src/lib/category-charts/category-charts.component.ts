@@ -18,14 +18,10 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() noSeries: boolean;
   @Input() showSeasonal: boolean;
   @Input() hasSeasonal: boolean;
-  //@Input() chartStart: string;
-  //@Input() chartEnd: string;
   @Input() dates: Array<{date: string, tableDate: string}>;
   @Input() analyzerView: boolean;
   @Input() indexChecked: boolean;
   @Input() indexBaseYear: string;
-  //@Input() routeStart;
-  //@Input() routeEnd;
   @Input() dateRange;
   @Output() updateURLFragment = new EventEmitter();
   minValue: number;
@@ -124,16 +120,16 @@ export class CategoryChartsComponent implements OnChanges {
 
   removeFromAnalyzer(series) {
     series.analyze = false;
-    this.analyzerService.removeFromAnalyzer(series.id);
+    this.analyzerService.removeFromAnalyzer(series.id, this.selectedDateRange.startDate);
   }
 
   addCompare(series) {
     series.visible = true;
-    this.analyzerService.makeCompareSeriesVisible(series);
+    this.analyzerService.makeCompareSeriesVisible(series, this.selectedDateRange.startDate);
   }
 
   removeCompare(series) {
     series.visible = false;
-    this.analyzerService.removeFromComparisonChart(series.id);
+    this.analyzerService.removeFromComparisonChart(series.id, this.selectedDateRange.startDate);
   }
 }

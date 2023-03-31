@@ -31,6 +31,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   @Input() portalSettings;
   @Input() start;
   @Input() end;
+  @Input() dates;
   @Input() indexChecked;
   @Output() xAxisExtremes = new EventEmitter(true);
   @Output() updateUrl = new EventEmitter<any>();
@@ -284,17 +285,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
           addToComparisonChartItem.addEventListener('click', (e) => {
             e.stopPropagation();
             if (chartOptionSeries) {
-              analyzerService.makeCompareSeriesVisible(chartOptionSeries);
+              analyzerService.makeCompareSeriesVisible(chartOptionSeries, this.start);
               this.updateUrl.emit(chartOptionSeries);
             }
           });
           removeFromComparisonChartItem.addEventListener('click', () => {
-            analyzerService.removeFromComparisonChart(seriesId);
+            analyzerService.removeFromComparisonChart(seriesId, this.start);
             this.updateUrl.emit(chartOptionSeries);
           });
           removeFromAnalyzerItem.addEventListener('click', (e) => {
             e.stopPropagation();
-            analyzerService.removeFromAnalyzer(seriesId);
+            analyzerService.removeFromAnalyzer(seriesId, this.start);
           });
         }
       });
@@ -347,6 +348,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const logo = this.logo;
     const highestFreq = this.analyzerService.getHighestFrequency(this.series).freq;
     const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
+    const dates = this.dates;
     const rangeSelectorSetExtremes = (eventMin, eventMax, freq, dates, xAxisExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, dates, xAxisExtremes);
     this.chartOptions.accessibility.description = `${portal}\n${portalLink}`;
     this.chartOptions.series = series.map((s, index) => {
@@ -489,7 +491,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       events: {
         setExtremes: function(e) {
           if (e.trigger === 'rangeSelectorButton') {
-            rangeSelectorSetExtremes(e.min, e.max, highestFreq, [], xAxisExtremes);
+            rangeSelectorSetExtremes(e.min, e.max, highestFreq, dates, xAxisExtremes);
           }
         },
       },

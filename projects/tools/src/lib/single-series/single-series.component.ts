@@ -152,7 +152,7 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
 
   removeFromAnalyzer(series) {
     series.analyze = false;
-    this.analyzerService.removeFromAnalyzer(series.id);
+    this.analyzerService.removeFromAnalyzer(series.id, this.selectedDateRange.startDate);
   }
 
   changeRange(dateRange: DateRange) {

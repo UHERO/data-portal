@@ -10,14 +10,19 @@ import { AnalyzerService } from '../analyzer.service';
 })
 export class CategoryTableRenderComponent implements ICellRendererAngularComp {
   public params: any;
+  startDate: string;
 
   constructor(
     private tableHelper: TableHelperService,
-    private analyzerService: AnalyzerService
-  ) {  }
+    private analyzerService: AnalyzerService,
+  ) { 
+    
+  }
 
   agInit(params: any): void {
     this.params = params;
+    const displayedColumns = params.columnApi.getAllDisplayedColumns();
+    this.startDate = displayedColumns[displayedColumns.length - 2].colDef.field;
   }
 
   refresh(): boolean {
@@ -35,6 +40,6 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
 
   removeFromAnalyzer(series) {
     series.analyze = false;
-    this.analyzerService.removeFromAnalyzer(series.id);
+    this.analyzerService.removeFromAnalyzer(series.id, this.startDate);
   }
 }

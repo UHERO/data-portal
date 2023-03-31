@@ -158,8 +158,6 @@ export interface AnalyzerDataInterface {
   rightMin: number;
   rightMax: number;
   urlChartSeries: Array<any>;
-  minDate: string;
-  maxDate: string;
   requestComplete: boolean;
   indexed: boolean;
   baseYear: string;

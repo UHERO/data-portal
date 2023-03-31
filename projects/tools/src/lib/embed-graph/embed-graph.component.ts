@@ -83,7 +83,7 @@ export class EmbedGraphComponent implements OnInit, OnDestroy {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
     if (this.analyzerIds) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerIds, true);
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerIds, this.startDate, true);
     }
   }
 

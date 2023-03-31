@@ -137,7 +137,7 @@ export class HighstockComponent implements OnChanges {
       };
     const logo = this.logo;
     const addToAnalyzer = (seriesId: number) => this.analyzerService.addToAnalyzer(seriesId);
-    const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId);
+    const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId, startDate);
     this.chartOptions.accessibility.description = accessibilityDescription;
     this.chartOptions.chart.events = {
       render() {
