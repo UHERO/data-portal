@@ -6,8 +6,7 @@
 				<a href="#" [routerLink]="['/series']" [queryParams]="{id: series.id, sa: series.saParam}"
 					queryParamsHandling='merge' *ngIf="series.id && series.display">
 					<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
-						[chartStart]="selectedStart" [chartEnd]="selectedEnd" [seriesData]="series" [indexChecked]="indexChecked"
-						[baseYear]="selectedStart">
+						[seriesData]="series" [indexChecked]="indexChecked" [baseYear]="selectedStart">
 					</lib-highchart>
 				</a>
 				<a *ngIf="series.displaySeasonalMessage">

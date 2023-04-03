@@ -129,8 +129,8 @@
 			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings"
 				[displayedMeasurements]="data.displayedMeasurements" [measurementOrder]="data.measurementOrder"
 				[dates]="data.categoryDates" [freq]="selectedFreq?.freq || data.currentFreq.freq" [noSeries]="data.noData"
-				[dateRange]="selectedDateRange" [showSeasonal]="queryParams.sa === 'true'" [findMinMax]="data.findMinMax"
-				[hasSeasonal]="data.hasSeasonal" [analyzerView]="false" (updateURLFragment)="updateRoute()">
+				[showSeasonal]="queryParams.sa === 'true'" [findMinMax]="data.findMinMax" [hasSeasonal]="data.hasSeasonal"
+				[analyzerView]="false" (updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && data.noData && !search">

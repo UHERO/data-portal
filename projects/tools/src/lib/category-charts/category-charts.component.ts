@@ -22,7 +22,6 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() analyzerView: boolean;
   @Input() indexChecked: boolean;
   @Input() indexBaseYear: string;
-  @Input() dateRange;
   @Output() updateURLFragment = new EventEmitter();
   minValue: number;
   maxValue: number;

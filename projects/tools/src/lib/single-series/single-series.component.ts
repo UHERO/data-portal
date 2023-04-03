@@ -19,8 +19,6 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
   tableHeaders;
   summaryStats;
   seasonallyAdjusted = false;
-  // startDate;
-  // endDate;
   chartStart;
   chartEnd;
   portalSettings;
@@ -133,8 +131,6 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
         start: this.routeStart ? this.routeStart : null,
         end: this.routeEnd ? this.routeEnd : null
       };
-      // this.startDate = this.chartStart;
-      // this.endDate = this.chartEnd;
       this.router.navigate(['/series/'], { queryParams, queryParamsHandling: 'merge' });
     } else {
       this.noSelection = 'Selection Not Available';

@@ -33,7 +33,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   freqSub: Subscription;
   fcSub: Subscription;
   geoSub: Subscription;
-  dateRangeSub: Subscription;
   selectedGeo: Geography;
   selectedFreq: Frequency;
   selectedFc: string;
@@ -55,12 +54,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     });
     this.fcSub = helperService.currentFc.subscribe((fc) => {
       this.selectedFc = fc;
-    });
-    this.dateRangeSub = helperService.currentDateRange.subscribe((dateRange) => {
-      this.selectedDateRange = dateRange;
-      if (dateRange) {
-        //this.changeRange(this.selectedDateRange);
-      }
     });
   }
 
@@ -98,20 +91,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       const dataListId = this.dataListId;
       const selectedMeasure = params[`m`];
-      /* if (this.routeStart) {
-        this.helperService.updateCurrentDateRange({
-          startDate: this.routeStart,
-          useDefaultRange: false,
-          ...this.selectedDateRange
-        });
-      }
-      if (this.routeEnd) {
-        this.helperService.updateCurrentDateRange({
-          endDate: this.routeEnd,
-          useDefaultRange: false,
-          ...this.selectedDateRange
-        });
-      } */
       this.categoryData = this.portal.universe === 'nta' ?
         this.catHelper.initContent(this.id, this.noCache, { dataListId, selectedMeasure }) :
         this.catHelper.initContent(this.id, this.noCache, { dataListId, geo, freq, fc })
@@ -127,7 +106,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
-    this.dateRangeSub.unsubscribe();
   }
 
   // Redraw series when a new measurement is selected

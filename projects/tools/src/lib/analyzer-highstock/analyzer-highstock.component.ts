@@ -35,8 +35,6 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {frequencyShort: strin
 export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;
   @Input() portalSettings;
-  //@Input() start;
-  //@Input() end;
   @Input() dates;
   @Input() indexChecked;
   @Output() xAxisExtremes = new EventEmitter(true);
@@ -344,7 +342,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       const { startDate, endDate } = this.selectedDateRange;
       this.drawChart(startDate, endDate)
     }
-
   }
 
   ngOnDestroy(): void {
@@ -377,8 +374,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
 
   updateChartOptions(series, startDate: string, endDate: string) {
     const { portal, portalLink } = this.portalSettings.highstock.labels;
-    //const startDate = this.start || null;
-    //const endDate = this.end || null;
     const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
     const xAxisExtremes = this.xAxisExtremes;
     const logo = this.logo;

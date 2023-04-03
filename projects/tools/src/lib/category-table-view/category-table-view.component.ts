@@ -23,8 +23,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() ytdActive;
   @Input() c5maActive;
   @Input() params;
-  //@Input() tableStart;
-  //@Input() tableEnd;
   @Input() portalSettings;
   @Input() showSeasonal: boolean;
   @Input() hasSeasonal;
