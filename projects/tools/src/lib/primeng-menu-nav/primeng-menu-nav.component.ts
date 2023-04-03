@@ -37,7 +37,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     @Inject('portal') private portal,
     public analyzerService: AnalyzerService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {
     this.analyzerSeriesCount = this.analyzerService.analyzerSeriesCount$.subscribe((data: any) => {
       this.analyzerSeries = data;
@@ -94,11 +94,8 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       data_list_id: subcategoryId,
       analyzerSeries: null,
       chartSeries: null,
-      start: null,
-      end: null,
       name: null,
       units: null,
-      geography: null
     };
   }
 

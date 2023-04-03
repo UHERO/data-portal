@@ -1,0 +1,17 @@
+.summary-stats {
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  padding: 10px 0;
+  margin: 1% 0;
+  
+  .stat {
+    display: table-cell;
+    text-align: center;
+    font-size: 0.9em;
+
+    p {
+      margin-bottom: 0;
+    }
+  }
+}

@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { Frequency, Geography, DateWrapper } from './tools.models';
+import { BehaviorSubject } from 'rxjs';
+import { Frequency, Geography, DateWrapper, DateRange } from './tools.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
-  private categoryData = new Subject();
+  // private categoryData = new Subject();
   currentFreqChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentFreq = this.currentFreqChange.asObservable();
   currentGeoChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentGeo = this.currentGeoChange.asObservable();
   currentFcChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentFc = this.currentFcChange.asObservable();
+  currentDateRangeChange: BehaviorSubject<any> = new BehaviorSubject(<DateRange>{});
+  currentDateRange = this.currentDateRangeChange.asObservable();
 
 
   constructor() { }
@@ -20,7 +22,9 @@ export class HelperService {
   setCacheId(category: any, routeParams: any) {
     let id = `category${category}`;
     Object.keys(routeParams).forEach((param) => {
-      id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
+      if (param !== 'routeStart' && param !== 'routeEnd') {
+        id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
+      }
     });
     return id;
   }
@@ -38,6 +42,20 @@ export class HelperService {
   updateCurrentGeography = (newGeo: Geography) => {
     this.currentGeoChange.next(newGeo);
     return newGeo;
+  }
+
+  updateCurrentDateRange = (newDateRange: DateRange) => {
+    this.currentDateRangeChange.next(newDateRange);
+    return newDateRange;
+  }
+
+  setCurrentDateRange = (start: string, end: string, useDefault: boolean, dates: Array<any>) => {
+    this.updateCurrentDateRange({
+      startDate: start,
+      endDate: end,
+      useDefaultRange: useDefault,
+      endOfSample: end === dates[dates.length - 1].date
+    });
   }
 
   getIdParam = (id: any) => {

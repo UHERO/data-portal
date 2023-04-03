@@ -4,10 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
-import { Frequency, Geography } from '../tools.models';
+import { Frequency, Geography, DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
-import { DialogModule } from 'primeng/dialog';
-import { TabViewModule } from 'primeng/tabview';
 
 @Component({
   selector: 'lib-landing-page',
@@ -38,6 +36,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   selectedGeo: Geography;
   selectedFreq: Frequency;
   selectedFc: string;
+  selectedDateRange: DateRange;
 
   constructor(
     @Inject('portal') public portal,
@@ -55,7 +54,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     });
     this.fcSub = helperService.currentFc.subscribe((fc) => {
       this.selectedFc = fc;
-    })
+    });
   }
 
   ngOnInit(): void {
@@ -161,13 +160,9 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.displayHelp = true;
   }
 
-  changeRange(e, category) {
-    category.seriesStart = e.seriesStart;
-    category.seriesEnd = e.seriesEnd;
-    console.log('e', e)
-    this.routeStart = e.seriesStart;
-    this.routeEnd = /* e.endOfSample ? null : */ e.seriesEnd;
-    this.seriesRange = e;
+  changeRange(e) {
+    this.routeStart = e.useDefaultRange ? null : e.startDate;
+    this.routeEnd = e.endOfSample ? null : e.endDate;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;
     this.updateRoute();

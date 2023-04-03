@@ -18,11 +18,11 @@
   </button>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" domLayout="autoHeight"
     [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true" [suppressDragLeaveHidesColumns]="true"
-    (gridReady)="onGridReady($event)" [singleClickEdit]="true">
+    (gridReady)="onGridReady($event, 'data')" [singleClickEdit]="true">
   </ag-grid-angular>
   <p class="stat-note">*Scroll to the right for additional statistics</p>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham summary-table" [rowData]="summaryRows" [columnDefs]="summaryColumns" domLayout="autoHeight"
-    [gridOptions]="statGridOptions" [frameworkComponents]="frameworkComponents" [singleClickEdit]="true">
+    [gridOptions]="statGridOptions" [frameworkComponents]="frameworkComponents" [singleClickEdit]="true" (gridReady)="onGridReady($event, 'summary')">
   </ag-grid-angular>
 </ng-template>
 <p *ngIf="missingSummaryStat" class="stat-warning">

@@ -3,7 +3,7 @@ import { of as observableOf, Observable, forkJoin, of } from 'rxjs';
 import { Injectable, Inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
-import { CategoryData, DateWrapper, Geography, Frequency } from './tools.models';
+import { CategoryData, DateWrapper, Geography, Frequency, DateRange } from './tools.models';
 import { switchMap, tap } from 'rxjs/operators';
 import { DataPortalSettingsService } from './data-portal-settings.service';
 
@@ -91,7 +91,11 @@ export class CategoryHelperService {
   }
 
   updateSelectors(cachedCategoryData: any, portal: string) {
-    const { updateCurrentFrequency, updateCurrentForecast, updateCurrentGeography } = this.helperService;
+    const {
+      updateCurrentFrequency,
+      updateCurrentForecast,
+      updateCurrentGeography,
+    } = this.helperService;
     if (portal !== 'nta') {
       updateCurrentGeography(cachedCategoryData.currentGeo);
     }

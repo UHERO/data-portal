@@ -1,17 +1,19 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { Location } from '@angular/common';
 import { AnalyzerService } from '../analyzer.service';
+import { DateRange } from '../tools.models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { forkJoin, Subscription } from 'rxjs';
 import { ApiService } from '../api.service';
+import { HelperService } from '../helper.service';
 
 @Component({
   selector: 'lib-analyzer',
   templateUrl: './analyzer.component.html',
   styleUrls: ['./analyzer.component.scss']
 })
-export class AnalyzerComponent implements OnInit, OnDestroy {
+export class AnalyzerComponent implements OnInit, OnDestroy, AfterContentChecked {
   portalSettings;
   tableYoy: boolean;
   tableYtd: boolean;
@@ -35,6 +37,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   urlParams;
   displayHelp: boolean = false;
   displaySelectionNA: boolean = false;
+  routeStart: string;
+  routeEnd: string;
+  dateRangeSubscription: Subscription;
+  selectedDateRange: DateRange;
 
   constructor(
     @Inject('environment') private environment,
@@ -44,7 +50,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private apiService: ApiService,
     private router: Router,
+    private cdRef: ChangeDetectorRef,
     private location: Location,
+    private helperService: HelperService
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
@@ -53,6 +61,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+    });
+
     if (this.route) {
       this.route.queryParams.subscribe(params => {
         if (params[`analyzerSeries`]) {
@@ -61,8 +73,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         if (params[`chartSeries`]) {
           this.analyzerService.storeUrlChartSeries(params[`chartSeries`]);
         }
-        this.analyzerService.analyzerData.minDate = params['start'] || '';
-        this.analyzerService.analyzerData.maxDate = params['end'] || '';
+        this.routeStart = params[`start`] || null;
+        this.routeEnd = params[`end`] || null;
         this.indexSeries = params['index'] || null;
         this.leftMin = params['leftMin'] || null;
         this.leftMax = params['leftMax'] || null;
@@ -98,17 +110,22 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
+  }
+
   evalParamAsTrue = (param: string) => param === 'true';
 
   updateAnalyzer (analyzerSeries: Array<any>) {
-    if (analyzerSeries.length) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache);
+    if (analyzerSeries.length && this.selectedDateRange) {
+      this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.selectedDateRange.startDate, this.noCache);
       this.analyzerService.analyzerData.indexed = this.indexSeries;
     }
   }
 
   ngOnDestroy() {
     this.analyzerSeriesSub.unsubscribe();
+    this.dateRangeSubscription.unsubscribe();
   }
 
   storeUrlSeries(urlSeries: string) {
@@ -119,7 +136,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   indexActive(e) {
     this.indexSeries = e.target.checked;
     this.queryParams.index = e.target.checked || null;
-    this.analyzerService.toggleIndexValues(e.target.checked, this.analyzerService.analyzerData.minDate);
+    this.analyzerService.toggleIndexValues(e.target.checked, this.selectedDateRange.startDate);
     this.updateUrlLocation();
   }
 
@@ -186,10 +203,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   changeRange(e) {
-    this.analyzerService.analyzerData.minDate = e.seriesStart;
-    this.analyzerService.analyzerData.maxDate = e.seriesEnd;
+    this.routeStart = e.startDate;
+    this.routeEnd = e.endDate;
     if (this.analyzerService.analyzerData.indexed) {
-      this.analyzerService.updateBaseYear();
+      this.analyzerService.updateBaseYear(e.startDate);
     }
     this.updateUrlLocation();
   }
@@ -198,8 +215,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     const analyzerData = this.analyzerService.analyzerData;
     const {
       analyzerSeries,
-      minDate,
-      maxDate,
       yLeftSeries,
       yRightSeries,
       leftMin,
@@ -207,8 +222,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       rightMin,
       rightMax
     } = analyzerData;
-    this.queryParams.start = minDate;
-    this.queryParams.end = maxDate;
+    this.queryParams.start = this.routeStart;
+    this.queryParams.end = this.routeEnd;
     this.queryParams.analyzerSeries = analyzerSeries.map(s => s.id).join('-');
     this.queryParams.chartSeries = analyzerSeries.filter(s => s.visible).map(s => s.id).join('-') || null;
     this.queryParams.yright = yRightSeries.length ? yRightSeries.join('-') : null;

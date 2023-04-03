@@ -1,8 +1,9 @@
-import { Component, Inject, OnChanges, Input } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, OnDestroy, Input, SimpleChanges } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { AnalyzerService } from '../analyzer.service';
 import * as Highcharts from 'highcharts';
-import { HighchartsObject } from '../tools.models';
+import { DateRange } from '../tools.models';
+import { Subscription } from 'rxjs';
 
 type CustomSeriesOptions = Highcharts.SeriesOptionsType & {endDate: string, _indexed: boolean};
 
@@ -11,11 +12,9 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {endDate: string, _ind
   templateUrl: './highchart.component.html',
   styleUrls: ['./highchart.component.scss']
 })
-export class HighchartComponent implements OnChanges {
+export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
   @Input() portalSettings;
   @Input() seriesData;
-  @Input() chartStart;
-  @Input() chartEnd;
   @Input() minValue;
   @Input() maxValue;
   @Input() indexChecked;
@@ -25,6 +24,8 @@ export class HighchartComponent implements OnChanges {
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = {} //as HighchartsObject;
   updateChart = false;
+  dateRangeSubscription: Subscription;
+  selectedDateRange: DateRange;
 
   static findLastValue(valueArray, endDate, start) {
     const firstSeriesObs = valueArray[0].x;
@@ -48,22 +49,55 @@ export class HighchartComponent implements OnChanges {
     };
   }
 
-  ngOnChanges() {
-    if (this.seriesData === 'No data available') {
-      this.noDataChart(this.seriesData);
-      this.updateChart = true;
-    } else {
-      this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
-      this.updateChart = true;
-    }
-    if (this.chartObject) {
-      this.chartObject.redraw();
+  ngOnInit(): void {
+    this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      const { startDate, endDate } = dateRange;
+      if (this.seriesData === 'No data available') {
+        this.noDataChart(this.seriesData, `<b>${this.seriesData.displayTitle}</b><br />No Data Available`, '');
+        this.updateChart = true;
+      } else {
+        this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, startDate, endDate);
+      }
+      if (this.chartObject) {
+        this.chartObject.redraw();
+      }
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const indexCheckChange = changes['indexChecked'];
+    const baseYearChange = changes['baseYear'];
+    const seriesDataChange = changes['seriesData']; 
+    const maxValueChange = changes['maxValue'];
+    const minValueChange = changes['minValue'];
+    if (
+      (indexCheckChange && !indexCheckChange.firstChange) ||
+      (baseYearChange && !baseYearChange.firstChange) ||
+      (seriesDataChange && !seriesDataChange.firstChange) ||
+      (minValueChange && !minValueChange.firstChange) ||
+      (maxValueChange && !maxValueChange.firstChange)
+    ) {
+      const { startDate, endDate } = this.selectedDateRange;
+      this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, startDate, endDate);
+      if (this.chartObject) {
+        this.chartObject.redraw();
+      }
     }
   }
 
-  noDataChart = (seriesData) => {
-    const title = seriesData.displayName;
-    this.chartOptions.title = this.setChartTitle(`<b>${title}</b><br />No Data Available`);
+  drawChart = (seriesData, portalSettings, minValue: number, maxValue: number, startDate: string, endDate: string) => {
+    this.updateChartOptions(seriesData, portalSettings, minValue, maxValue, startDate, endDate);
+    this.updateChart = true;
+  }
+
+  ngOnDestroy(): void {
+    this.dateRangeSubscription.unsubscribe();
+  }
+
+  noDataChart = (seriesData, chartTitle: string, subtitle: string) => {
+    this.chartOptions.title = this.setChartTitle(chartTitle);
+    this.chartOptions.subtitle = this.setSubtitle(subtitle);
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
@@ -94,14 +128,22 @@ export class HighchartComponent implements OnChanges {
     return {
       text: title,
       useHTML: true,
-      align: 'left' as Highcharts.AlignValue,
+      align: 'left',
       widthAdjust: 0,
       x: 0,
       y: -5,
       style: {
         margin: 75
       }
-    };
+    } as Highcharts.TitleOptions;
+  }
+
+  setSubtitle = (subtitle: string) => {
+    return {
+      text: subtitle,
+      verticalAlign: 'middle',
+      y: -20
+    } as Highcharts.SubtitleOptions
   }
 
   setYAxis = (min: number, max: number) => {
@@ -165,7 +207,7 @@ export class HighchartComponent implements OnChanges {
     return chartSeries;
   }
 
-  drawChart = (seriesData, portalSettings, min: number, max: number, chartStart, chartEnd) => {
+  updateChartOptions = (seriesData, portalSettings, min: number, max: number, chartStart, chartEnd) => {
     const {
       percent,
       title,
@@ -179,7 +221,7 @@ export class HighchartComponent implements OnChanges {
     const { start, end } = gridDisplay;
     const decimals = seriesData.decimals || 1;
     let { series0, series1, pseudoZones } = gridDisplay.chartData;
-    series0 = this.indexChecked ? this.helperService.getIndexedTransformation(observations[0], this._analyzerService.analyzerData.baseYear) : series0;
+    series0 = this.indexChecked ? this.helperService.getIndexedTransformation(observations[0], chartStart) : series0;
     const startDate = Date.parse(chartStart) || Date.parse(start);
     const endDate = Date.parse(chartEnd) || Date.parse(end);
     // Check how many non-null points exist in level series
@@ -260,7 +302,7 @@ export class HighchartComponent implements OnChanges {
             checkPointCount(currentFreq, s0, s0.points[lastValue0], this);
           }
           // If no data available for a given date range, display series title and display dates where data is available for a series
-          if (lastValue0 === -1 && lastValue1 === -1) {
+         if (lastValue0 === -1 && lastValue1 === -1) {
             this.setClassName(undefined);
             const categoryDisplayStart = formatDate(Date.parse(start), currentFreq);
             const categoryDisplayEnd = formatDate(Date.parse(end), currentFreq);
@@ -333,8 +375,8 @@ export class HighchartComponent implements OnChanges {
     };
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
-    this.chartOptions.xAxis = this.setXAxis(startDate, endDate);
-    this.chartOptions.yAxis = this.setYAxis(min, max);
+    this.chartOptions.xAxis = end < chartStart ? this.setXAxis(null, null) : this.setXAxis(startDate, endDate);
+    this.chartOptions.yAxis = end < chartStart ? this.setYAxis(null, null) :  this.setYAxis(min, max);
     this.chartOptions.plotOptions = {
       line: {
         marker: {

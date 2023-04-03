@@ -89,6 +89,7 @@ export class SeriesHelperService {
         this.seriesData.eror = true;
         this.seriesData.requestComplete = true;
       });
+      console.log('SERIES DATA', this.seriesData)
     return observableForkJoin([observableOf(this.seriesData)]);
   }
 
@@ -149,7 +150,7 @@ export class SeriesHelperService {
       total: 'N/A',
       avg: 'N/A',
       cagr: 'N/A',
-      missing: null,
+      missing: false,
       range: null,
     };
     const { formatNum, formatDate } = this.helperService;

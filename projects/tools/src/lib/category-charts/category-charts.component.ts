@@ -1,5 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { Component, Input, OnChanges, Inject, Output, EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
 
@@ -17,24 +18,30 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() noSeries: boolean;
   @Input() showSeasonal: boolean;
   @Input() hasSeasonal: boolean;
-  @Input() chartStart: string;
-  @Input() chartEnd: string;
   @Input() dates: Array<{date: string, tableDate: string}>;
   @Input() analyzerView: boolean;
   @Input() indexChecked: boolean;
   @Input() indexBaseYear: string;
-  @Input() routeStart;
-  @Input() routeEnd;
   @Output() updateURLFragment = new EventEmitter();
   minValue: number;
   maxValue: number;
   noSeriesToDisplay: boolean;
+  dateRangeSubscription: Subscription;
+  selectedDateRange;
+  selectedStart;
+  selectedEnd;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
     private analyzerService: AnalyzerService,
-  ) { }
+  ) {
+    this.dateRangeSubscription = helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      this.selectedStart = dateRange.startDate;
+      this.selectedEnd = dateRange.endDate;
+    });
+  }
 
   ngOnChanges() {
     if (this.displayedMeasurements) {
@@ -42,21 +49,15 @@ export class CategoryChartsComponent implements OnChanges {
         this.helperService.toggleSeriesDisplay(this.hasSeasonal, this.showSeasonal, this.displayedMeasurements[measurement], this.analyzerView);
         this.isSeriesInAnalyzer(this.displayedMeasurements[measurement]);
       });
-      const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
-      this.chartStart = this.dates[seriesStart].date;
-      this.chartEnd = this.dates[seriesEnd].date;
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.displayedMeasurements);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
     if (this.portalSettings.highcharts.setYAxes) {
-      const defaultStartEnd = this.defaultRange.find(ranges => ranges.freq === this.freq);
-      const start = this.chartStart || Date.parse(defaultStartEnd.start);
-      const end = this.chartEnd || Date.parse(defaultStartEnd.end);
       if (this.findMinMax) {
         // Find minimum and maximum values out of all series within a sublist; Use values to set min/max of yAxis
-        this.minValue = this.findMin(this.displayedMeasurements, start, end);
-        this.maxValue = this.findMax(this.displayedMeasurements, start, end);
+        this.minValue = this.findMin(this.displayedMeasurements, this.selectedStart, this.selectedEnd);
+        this.maxValue = this.findMax(this.displayedMeasurements, this.selectedStart, this.selectedEnd);
       }
     }
   }
@@ -118,16 +119,16 @@ export class CategoryChartsComponent implements OnChanges {
 
   removeFromAnalyzer(series) {
     series.analyze = false;
-    this.analyzerService.removeFromAnalyzer(series.id);
+    this.analyzerService.removeFromAnalyzer(series.id, this.selectedDateRange.startDate);
   }
 
   addCompare(series) {
     series.visible = true;
-    this.analyzerService.makeCompareSeriesVisible(series);
+    this.analyzerService.makeCompareSeriesVisible(series, this.selectedDateRange.startDate);
   }
 
   removeCompare(series) {
     series.visible = false;
-    this.analyzerService.removeFromComparisonChart(series.id);
+    this.analyzerService.removeFromComparisonChart(series.id, this.selectedDateRange.startDate);
   }
 }

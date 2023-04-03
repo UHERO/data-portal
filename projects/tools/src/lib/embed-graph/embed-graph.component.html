@@ -1,11 +1,17 @@
 <ng-template ngFor let-data [ngForOf]="seriesData | async">
-  <lib-highstock *ngIf="!data.noData" [portalSettings]="portalSettings" [chartData]="data.chartData"
-    [seriesDetail]="data.seriesDetail" [showTitle]="true" [start]="startDate" [end]="endDate"></lib-highstock>
+  <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+    [dates]="data.sliderDates" [freq]="data.seriesDetail.frequencyShort" [routeStart]="startDate"
+    [routeEnd]="endDate"></lib-date-slider>
+  <lib-highstock *ngIf="!data.noData && data.requestComplete" [portalSettings]="portalSettings"
+    [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" [showTitle]="true"></lib-highstock>
 </ng-template>
 <ng-template ngFor let-data [ngForOf]="analyzerData | async">
-  <div>
+  <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+    [dates]="data.sliderDates" [routeStart]="startDate" [routeEnd]="endDate"
+    [freq]="data.analyzerFrequency.freq"></lib-date-slider>
+  <div class="analyzer-view">
     <lib-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings"
-      [series]="data.analyzerSeries" [start]="startDate" [end]="endDate" [indexChecked]="indexSeries">
+      [series]="data.analyzerSeries" [indexChecked]="indexSeries">
     </lib-analyzer-highstock>
   </div>
 </ng-template>

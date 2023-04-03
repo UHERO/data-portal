@@ -3,6 +3,13 @@ export interface Frequency {
   label: string;
 }
 
+export interface DateRange {
+  startDate: string,
+  endDate: string,
+  useDefaultRange: boolean,
+  endOfSample: boolean
+}
+
 export interface Geography {
   fips: number;
   name: string;
@@ -151,8 +158,6 @@ export interface AnalyzerDataInterface {
   rightMin: number;
   rightMax: number;
   urlChartSeries: Array<any>;
-  minDate: string;
-  maxDate: string;
   requestComplete: boolean;
   indexed: boolean;
   baseYear: string;
