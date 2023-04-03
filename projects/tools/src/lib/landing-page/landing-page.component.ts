@@ -160,12 +160,9 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.displayHelp = true;
   }
 
-  changeRange(e/*,  category */) {
-    // category.seriesStart = e.seriesStart;
-    // category.seriesEnd = e.seriesEnd;
+  changeRange(e) {
     this.routeStart = e.useDefaultRange ? null : e.startDate;
     this.routeEnd = e.endOfSample ? null : e.endDate;
-    //this.seriesRange = e;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;
     this.updateRoute();

@@ -52,7 +52,8 @@ export class DateSliderComponent implements OnChanges {
     if (this.routeStart && this.routeEnd) {
       this.updateDateRange(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange, false);
     } else if (this.routeStart && !this.routeEnd) {
-      this.updateDateRange(this.dates, this.routeStart, '', this.freq, this.defaultRange, false);
+      // if start date specified without an end date, display until end of availble data
+      this.updateDateRange(this.dates, this.routeStart, this.dates[this.dates.length - 1].date, this.freq, this.defaultRange, false);
     } else {
       this.updateDateRange(this.dates, '', '', this.freq, this.defaultRange, true);
     }
