@@ -84,7 +84,7 @@
 					(selectedGeoChange)="redrawSeriesGeo($event, selectedFreq, selectedFc)" class="selector">
 				</lib-geo-selector>
 				<lib-freq-selector *ngIf="portal.universe !== 'nta'" [freqs]="data.frequencies"
-					(selectedFreqChange)="redrawSeriesFreq($event, selectedGeo, selectedFc)" class="selector">
+					(selectedFreqChange)="redrawSeriesFreq($event, selectedFreq, selectedGeo, selectedFc)" class="selector">
 				</lib-freq-selector>
 				<lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecasts"
 					(selectedFcChange)="redrawSeriesFc($event, selectedGeo, selectedFreq)" class="selector">
@@ -113,7 +113,7 @@
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
 				<lib-date-slider *ngIf="data.displayedMeasurements" class="sliders" [portalSettings]="portalSettings"
-					[dates]="data.categoryDates" [freq]="selectedFreq?.freq || data.currentFreq.freq" [routeStart]="routeStart"
+					[dates]="data.categoryDates" [previousFreq]="previousFreq" [freq]="selectedFreq?.freq || data.currentFreq.freq" [routeStart]="routeStart"
 					[routeEnd]="routeEnd" (updateRange)="changeRange($event)"></lib-date-slider>
 			</div>
 		</ng-template>

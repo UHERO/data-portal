@@ -27,6 +27,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   portalSettings;
   seriesRange;
   displayHelp: boolean = false;
+  previousFreq: string = '';
 
   // Variables for geo and freq selectors
   public categoryData;
@@ -122,7 +123,22 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.updateRoute();
   }
 
-  redrawSeriesFreq(event, currentGeo: Geography, currentFc: string) {
+  redrawSeriesFreq(event, currentFreq: Frequency, currentGeo: Geography, currentFc: string) {
+    /* if (this.queryParams.end) {
+      const year = this.queryParams.end.slice(0, 4);
+      if (currentFreq.freq === 'A' && event.freq === 'Q') {
+        this.queryParams.end = `${year}-10-01`;
+      }
+      if (currentFreq.freq === 'A' && event.freq === 'M') {
+        this.queryParams.end = `${year}-12-01`;
+      }
+      if (currentFreq.freq === 'A' && event.freq === 'S') {
+        this.queryParams.end = `${year}-07-01`;
+      }
+      console.log('CURRENT FREQ', currentFreq)
+
+    } */
+    this.previousFreq = currentFreq.freq;
     this.queryParams.geo = currentGeo.handle;
     this.queryParams.freq = event.freq;
     this.queryParams.fc = currentFc;
@@ -161,6 +177,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   changeRange(e) {
+    this.previousFreq = '';
     this.routeStart = e.useDefaultRange ? null : e.startDate;
     this.routeEnd = e.endOfSample ? null : e.endDate;
     this.queryParams.start = this.routeStart;

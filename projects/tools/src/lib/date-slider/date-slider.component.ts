@@ -1,4 +1,4 @@
-import { Component, Input, Inject, OnChanges, EventEmitter, Output, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, Inject, OnChanges, EventEmitter, Output, ViewEncapsulation, ViewChild, SimpleChanges } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { DateRange } from '../tools.models';
 import { Subscription } from 'rxjs';
@@ -20,6 +20,7 @@ export class DateSliderComponent implements OnChanges {
   @Input() dateTo;
   @Input() routeStart: string;
   @Input() routeEnd: string;
+  @Input() previousFreq: string;
   @Output() updateRange = new EventEmitter(true);
   start;
   end;
@@ -47,10 +48,17 @@ export class DateSliderComponent implements OnChanges {
     private helperService: HelperService,
   ) {}
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
     this.sliderDates = this.dates.map(d => d.date);
-    if (this.routeStart && this.routeEnd) {
+    if (this.routeStart && this.routeEnd && (this.previousFreq === '' || this.previousFreq === this.freq)) {
       this.updateDateRange(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange, false);
+    } else if (this.routeEnd && this.previousFreq !== '' && this.previousFreq !== this.freq) {
+      // when switching frequencies (i.e. annual to quarterly), the date ranges should adjust to cover the same range
+      // for example, if 2010 - 2020 is selected at the annual level, and the user switches the frequency to quarterly
+      // the quarterly date range should adjust to 2010 Q1 - 2020 Q4 rather than 2010 Q1 - 2020 Q1
+      // otherwise matching on the annual date (stored as Jan. 1 of selected year in DB) will match with Q1 rather than Q4
+      const newEndDate = this.updateEndDateAfterFreqChange(this.previousFreq, this.freq, this.dates, this.routeEnd) || '';
+      this.updateDateRange(this.dates, this.routeStart, newEndDate, this.freq, this.defaultRange, false);
     } else if (this.routeStart && !this.routeEnd) {
       // if start date specified without an end date, display until end of availble data
       this.updateDateRange(this.dates, this.routeStart, this.dates[this.dates.length - 1].date, this.freq, this.defaultRange, false);
@@ -60,6 +68,31 @@ export class DateSliderComponent implements OnChanges {
     this.setDatePickerInputs();
   }
 
+  updateEndDateAfterFreqChange = (previousFreq: string, currentFreq: string, dates: any, routeEnd: string) => {
+    const year = routeEnd.substring(0, 4);
+    if (previousFreq === 'A') {
+      return dates.findLast(date => date.date.includes(year))?.date;
+    }
+    if (previousFreq === 'Q' || previousFreq === 'S') {
+      const month = this.routeEnd.substring(5, 7);
+      const newMonth = this.findMonthLimit(previousFreq, +month);
+      return currentFreq === 'A' ? 
+        this.dates.findLast(date => date.date.includes(year))?.date :
+        this.dates.findLast(date => date.date < `${month === '10' ? +year + 1 : year}-${newMonth}-01`)?.date;
+    }
+    return currentFreq === 'A' ?
+      this.dates.findLast(date => date.date.substring(0, 4) <= year)?.date :
+      this.dates.findLast(date => date.date <= this.routeEnd)?.date;
+  }
+
+  findMonthLimit = (previousFreq: string, month: number) => {
+    if (previousFreq === 'Q') {
+      return month === 10 ? `01` : month === 7 ? '10' : `0${month + 3}`;
+    }
+    // semi-annual case
+    return month === 7 ? `01` : `07`;
+  }
+
   updateDateRange(dates: Array<any>, start: string, end: string, freq: string, defaultRange, useDefaultRange: boolean) {
     const defaultRanges = this.helperService.getSeriesStartAndEnd(dates, start, end, freq, defaultRange);
     const { seriesStart, seriesEnd } = defaultRanges;
@@ -67,6 +100,9 @@ export class DateSliderComponent implements OnChanges {
     this.end = seriesEnd;
     this.helperService.setCurrentDateRange(dates[seriesStart].date, dates[seriesEnd].date, useDefaultRange, dates);
     this.sliderSelectedRange = [seriesStart, seriesEnd];
+    if (this.previousFreq && this.previousFreq !== this.freq) {
+      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end]);
+    }
   }
 
   setDatePickerInputs() {
