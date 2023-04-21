@@ -18,7 +18,7 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
   newTableData;
   tableHeaders;
   summaryStats;
-  seasonallyAdjusted = false;
+  seasonallyAdjusted = true;
   chartStart;
   chartEnd;
   portalSettings;
