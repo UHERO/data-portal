@@ -312,7 +312,6 @@ export class HelperService {
         levelValue.push(this.createDateValuePairs(level.dates, date.date, level.values));
       }
       if (yoy) {
-        console.log('yoy', yoy)
         yoyValue.push(this.createDateValuePairs(yoy.dates, date.date, yoy.values));
       }
       if (ytd) {
@@ -458,7 +457,6 @@ export class HelperService {
         this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
       }
       if (yoy) {
-        console.log('yoy table value', yoy)
         this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', 1);
       }
       if (ytd) {

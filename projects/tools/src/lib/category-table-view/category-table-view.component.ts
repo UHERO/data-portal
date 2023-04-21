@@ -84,7 +84,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
         this.displayedMeasurements[measurement].forEach((series) => {
           if (series.display || series.displaySeasonalMessage) {
             series.analyze = this.analyzerService.checkAnalyzer(series);
-            console.log('series', series)
             const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
             const { level, yoy, ytd, c5ma } = transformations;
             const dataListId = this.selectedDataList?.id || null
@@ -92,7 +91,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
             this.rows.push(seriesData);
             if (this.yoyActive) {
               const yoyData = this.formatTransformationData(series, yoy, 'pc1', 1);
-              console.log('yoyData', yoyData)
               if (series.display) { this.rows.push(yoyData); }
             }
             if (this.ytdActive && this.selectedFreq.freq !== 'A') {
