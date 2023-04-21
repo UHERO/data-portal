@@ -84,21 +84,23 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
         this.displayedMeasurements[measurement].forEach((series) => {
           if (series.display || series.displaySeasonalMessage) {
             series.analyze = this.analyzerService.checkAnalyzer(series);
+            console.log('series', series)
             const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
             const { level, yoy, ytd, c5ma } = transformations;
             const dataListId = this.selectedDataList?.id || null
             const seriesData = this.formatLvlData(series, level, dataListId);
             this.rows.push(seriesData);
             if (this.yoyActive) {
-              const yoyData = this.formatTransformationData(series, yoy, 'pc1');
+              const yoyData = this.formatTransformationData(series, yoy, 'pc1', 1);
+              console.log('yoyData', yoyData)
               if (series.display) { this.rows.push(yoyData); }
             }
             if (this.ytdActive && this.selectedFreq.freq !== 'A') {
-              const ytdData = this.formatTransformationData(series, ytd, 'ytd');
+              const ytdData = this.formatTransformationData(series, ytd, 'ytd', 1);
               if (series.display) { this.rows.push(ytdData); }
             }
             if (this.c5maActive) {
-              const c5maData = this.formatTransformationData(series, c5ma, 'c5ma');
+              const c5maData = this.formatTransformationData(series, c5ma, 'c5ma', series.decimals);
               if (series.display) { this.rows.push(c5maData); }
             }
           }
@@ -167,7 +169,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     return seriesData;
   }
 
-  formatTransformationData = (series, transformation, transformationName) => {
+  formatTransformationData = (series, transformation, transformationName, decimals) => {
     const data = {
       series: '',
       seriesInfo: series,
@@ -178,7 +180,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       const disName = this.formatTransformationName(transformation.transformation, series.percent);
       data.series = disName;
       dates.forEach((d, index) => {
-        data[d] = values[index];
+        data[d] = this.helperService.formatNum(+values[index], decimals);
       });
       return data;
     }
