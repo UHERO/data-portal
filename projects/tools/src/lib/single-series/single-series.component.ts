@@ -38,6 +38,7 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
   queryParams: any = {};
   routeStart: string;
   routeEnd: string;
+  previousFreq: string = '';
 
   constructor(
     @Inject('environment') private environment,
@@ -91,8 +92,6 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
       }
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId);
     });
-
-    
   }
 
   ngAfterContentChecked() {
@@ -116,6 +115,7 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
 
   // Redraw chart when selecting a new region or frequency
   goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean, forecast = null) => {
+    this.previousFreq = freq === this.selectedFreq.freq ? '' : this.selectedFreq.freq;
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq

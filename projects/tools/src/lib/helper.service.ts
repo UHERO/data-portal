@@ -258,6 +258,49 @@ export class HelperService {
     return (valueList[middle] !== date) ? -1 : middle;
   }
 
+  // find first date that is greater than or equal to dateToFind
+  binarySearchStartDate = (dateList: Array<any>, dateToFind: string) => {
+    let start = 0;
+    let end = dateList.length - 1;
+    while (start <= end) {
+      const updatedBoundaries = this.findFirstDateGreaterOrEqualTarget(start, end, dateList, dateToFind);
+      start = updatedBoundaries.start;
+      end = updatedBoundaries.end;
+    }
+    return start;
+  }
+
+  binarySearchEndDate = (dateList: Array<any>, dateToFind: string) => {
+    let start = 0;
+    let end = dateList.length - 1;
+    while (start <= end) {
+      const updatedBoundaries = this.findLastDateLessOrEqualTarget(start, end, dateList, dateToFind);
+      start = updatedBoundaries.start;
+      end = updatedBoundaries.end;
+    }
+    return end;
+  }
+
+  findLastDateLessOrEqualTarget = (start: number, end: number, dateList: Array<any>, dateToFind: string) => {
+    let middle = Math.floor((start + end) / 2);
+    if (dateList[middle] > dateToFind) {
+      end = middle - 1;
+    } else {
+      start = middle + 1;
+    }
+    return { start, end };
+  }
+
+  findFirstDateGreaterOrEqualTarget = (start: number, end: number, dateList: Array<any>, dateToFind: string) => {
+    let middle = Math.floor((start + end) / 2);
+    if (dateList[middle] < dateToFind) {
+      start = middle + 1;
+    } else {
+      end = middle - 1;
+    }
+    return { start, end };
+  }
+
   createSeriesChart(dateRange, transformations) {
     const { level, yoy, ytd, c5ma } = transformations;
     const levelValue = [];
@@ -472,31 +515,31 @@ export class HelperService {
     return this.getRanges(freq, counter, defaultSettings.range);
   }
 
-  getSeriesStartAndEnd = (dates: Array<any>, start: string, end: string, freq: string, defaultRange) => {
+  getSeriesStartAndEnd = (dates: any, start: string, end: string, freq: string, defaultRange) => {
     const defaultRanges = this.setDefaultCategoryRange(freq, dates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     if (start) {
-      const dateFromExists = this.checkDateExists(start, dates, freq);
+      const dateFromExists = this.checkDateExists(start, dates, freq, 'start');
       if (dateFromExists > -1) {
         startIndex = dateFromExists;
-      }
-      if (start < dates[0].date) {
-        startIndex = defaultRanges.startIndex;
+      } 
+      if (dateFromExists === -1) {
+        startIndex = 0;
       }
     }
     if (end) {
-      const dateToExists = this.checkDateExists(end, dates, freq);
+      const dateToExists = this.checkDateExists(end, dates, freq, 'end');
       if (dateToExists > -1) {
         endIndex = dateToExists;
-      }
-      if (end > dates[dates.length - 1].date) {
-        endIndex = defaultRanges.endIndex;
+      } 
+      if (dateToExists === -1) {
+        endIndex = dates.length - 1;
       }
     }
     return { seriesStart: startIndex, seriesEnd: endIndex };
   }
 
-  checkDateExists = (date: string, dates: Array<any>, freq: string) => {
+  checkDateExists = (date: string, dates: Array<any>, freq: string, boundary: string) => {
     let dateToCheck = date;
     const year = date.substring(0, 4);
     if (freq === 'A') {
@@ -518,7 +561,9 @@ export class HelperService {
       }
     }
     const dateArray = dates.map(d => d.date);
-    return this.binarySearch(dateArray, dateToCheck);
+    return boundary === 'start' ? 
+      this.binarySearchStartDate(dateArray, dateToCheck) :
+      this.binarySearchEndDate(dateArray, dateToCheck);
   }
 
   getRanges(freq: string, counter: number, range: number) {

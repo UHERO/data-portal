@@ -111,12 +111,14 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   // Redraw series when a new measurement is selected
   redrawSeriesMeasurements(event) {
+    this.previousFreq = '';
     this.queryParams.m = event.name;
     this.updateRoute();
   }
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq: Frequency, currentFc: string) {
+    this.previousFreq = '';
     this.queryParams.geo = event.handle;
     this.queryParams.freq = currentFreq.freq;
     this.queryParams.fc = currentFc;
@@ -124,20 +126,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   redrawSeriesFreq(event, currentFreq: Frequency, currentGeo: Geography, currentFc: string) {
-    /* if (this.queryParams.end) {
-      const year = this.queryParams.end.slice(0, 4);
-      if (currentFreq.freq === 'A' && event.freq === 'Q') {
-        this.queryParams.end = `${year}-10-01`;
-      }
-      if (currentFreq.freq === 'A' && event.freq === 'M') {
-        this.queryParams.end = `${year}-12-01`;
-      }
-      if (currentFreq.freq === 'A' && event.freq === 'S') {
-        this.queryParams.end = `${year}-07-01`;
-      }
-      console.log('CURRENT FREQ', currentFreq)
-
-    } */
     this.previousFreq = currentFreq.freq;
     this.queryParams.geo = currentGeo.handle;
     this.queryParams.freq = event.freq;
@@ -146,6 +134,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   redrawSeriesFc(event, currentGeo: Geography, currentFreq: Frequency) {
+    this.previousFreq = '';
     this.queryParams.geo = currentGeo.handle;
     this.queryParams.freq = currentFreq.freq;
     this.queryParams.fc = event
@@ -158,16 +147,19 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   yoyActive(e) {
+    this.previousFreq = '';
     this.queryParams.yoy = e.target.checked;
     this.updateRoute();
   }
 
   ytdActive(e) {
+    this.previousFreq = '';
     this.queryParams.ytd = e.target.checked;
     this.updateRoute();
   }
 
   c5maActive(e) {
+    this.previousFreq = '';
     this.queryParams.c5ma = e.target.checked;
     this.updateRoute();
   }
