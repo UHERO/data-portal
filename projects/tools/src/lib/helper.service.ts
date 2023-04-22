@@ -359,6 +359,10 @@ export class HelperService {
     return transformationResults.map((t) => {
       const pseudoZones = this.getPseudoZones(t);
       const dateValuePairs = [];
+      // YTD and YOY transformations should be rounded to 1 decimal place
+      if (t.transformation !== 'lvl' && t.transformation !== 'c5ma') {
+        t.values = t.values.map(val => this.formattedValue(val, 1));
+      }
       dateArray.forEach((date) => {
         dateValuePairs.push(this.createDateValuePairs(t.dates, date.date, t.values));
       })

@@ -221,9 +221,6 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
     const { start, end } = gridDisplay;
     const decimals = seriesData.decimals || 1;
     let { series0, series1, pseudoZones } = gridDisplay.chartData;
-    if (series1.name !== 'c5ma') {
-      series1.values = series1.values.map(val => [val[0], +Highcharts.numberFormat(val[1], 1, '.', ',')])
-    }
     series0 = this.indexChecked ? this.helperService.getIndexedTransformation(observations[0], chartStart) : series0;
     const startDate = Date.parse(chartStart) || Date.parse(start);
     const endDate = Date.parse(chartEnd) || Date.parse(end);
@@ -239,11 +236,7 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
       subtitleText += `${Highcharts.numberFormat(point0.y, decimals, '.', ',')} <br> (${this.indexChecked ? 'Index' : unitsLabelShort})`;
       subtitleText += s1 ?
       `${this.formatTransformLabel(s1.name, percent, currentFreq)}<br>
-        ${
-          s1.name !== 'c5ma' ? 
-          Highcharts.numberFormat(point1.y, 1, '.', ',') : 
-          Highcharts.numberFormat(point1.y, decimals, '.', ',')
-        }<br>${dateLabel}` :
+        ${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
         dateLabel;
       chart.setSubtitle({
         text: subtitleText,
@@ -343,8 +336,8 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
           points.forEach((point) => {
             if (point.y !== null) {
               const pointName = point.series.userOptions.name;
-              const displayValue = (pointName === 'level' || pointName === 'c5ma') ? 
-                Highcharts.numberFormat(point.y, decimals, '.', ',') :
+              const displayValue = /* (pointName === 'level' || pointName === 'c5ma') ? 
+                Highcharts.numberFormat(point.y, decimals, '.', ',') : */
                 Highcharts.numberFormat(point.y, 1, '.', ',');
               const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
               const { name } = point.series;

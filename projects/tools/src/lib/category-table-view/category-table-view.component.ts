@@ -90,15 +90,15 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
             const seriesData = this.formatLvlData(series, level, dataListId);
             this.rows.push(seriesData);
             if (this.yoyActive) {
-              const yoyData = this.formatTransformationData(series, yoy, 'pc1', 1);
+              const yoyData = this.formatTransformationData(series, yoy, 'pc1');
               if (series.display) { this.rows.push(yoyData); }
             }
             if (this.ytdActive && this.selectedFreq.freq !== 'A') {
-              const ytdData = this.formatTransformationData(series, ytd, 'ytd', 1);
+              const ytdData = this.formatTransformationData(series, ytd, 'ytd');
               if (series.display) { this.rows.push(ytdData); }
             }
             if (this.c5maActive) {
-              const c5maData = this.formatTransformationData(series, c5ma, 'c5ma', series.decimals);
+              const c5maData = this.formatTransformationData(series, c5ma, 'c5ma');
               if (series.display) { this.rows.push(c5maData); }
             }
           }
@@ -167,7 +167,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     return seriesData;
   }
 
-  formatTransformationData = (series, transformation, transformationName, decimals) => {
+  formatTransformationData = (series, transformation, transformationName) => {
     const data = {
       series: '',
       seriesInfo: series,
@@ -178,7 +178,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       const disName = this.formatTransformationName(transformation.transformation, series.percent);
       data.series = disName;
       dates.forEach((d, index) => {
-        data[d] = this.helperService.formatNum(+values[index], decimals);
+        data[d] = +values[index];
       });
       return data;
     }
