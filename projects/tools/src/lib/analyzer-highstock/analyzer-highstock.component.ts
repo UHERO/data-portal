@@ -105,7 +105,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
           let str = '';
           const { colorIndex, userOptions } = point;
           const { geography, decimals, title, chartData, name } = userOptions;
-          console.log('userOptions', userOptions)
           const decimal = (name.includes('YOY') || name.includes('YTD')) ? 1 : decimals;
           const seriesColor = getSeriesColor(colorIndex);
           const displayName = `${title} (${geography.name})`;

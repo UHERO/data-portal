@@ -361,9 +361,8 @@ export class HelperService {
       const dateValuePairs = [];
       // YTD and YOY transformations should be rounded to 1 decimal place
       if (t.transformation !== 'lvl' && t.transformation !== 'c5ma') {
-        t.values = t.values.map(val => this.formattedValue(val, 1));
+        t.values = t.values.map(val => this.formattedValue(val, 1).replace(/,/g, ''));
       }
-      console.log('t', t)
       dateArray.forEach((date) => {
         dateValuePairs.push(this.createDateValuePairs(t.dates, date.date, t.values));
       })
