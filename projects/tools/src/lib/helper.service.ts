@@ -363,6 +363,7 @@ export class HelperService {
       if (t.transformation !== 'lvl' && t.transformation !== 'c5ma') {
         t.values = t.values.map(val => this.formattedValue(val, 1));
       }
+      console.log('t', t)
       dateArray.forEach((date) => {
         dateValuePairs.push(this.createDateValuePairs(t.dates, date.date, t.values));
       })

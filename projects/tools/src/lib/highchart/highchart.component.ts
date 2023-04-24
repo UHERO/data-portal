@@ -336,9 +336,8 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
           points.forEach((point) => {
             if (point.y !== null) {
               const pointName = point.series.userOptions.name;
-              const displayValue = /* (pointName === 'level' || pointName === 'c5ma') ? 
-                Highcharts.numberFormat(point.y, decimals, '.', ',') : */
-                Highcharts.numberFormat(point.y, 1, '.', ',');
+              const decimal = (pointName === 'level' || pointName === 'c5ma') ? seriesData.decimals : 1;
+              const displayValue = Highcharts.numberFormat(point.y, decimal, '.', ',');
               const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
               const { name } = point.series;
               const labelName = formatLabel(name, percent, currentFreq);
