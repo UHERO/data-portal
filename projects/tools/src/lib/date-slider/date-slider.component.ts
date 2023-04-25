@@ -147,14 +147,24 @@ export class DateSliderComponent implements OnChanges {
     // For quarterly and semi-annual series
     // Months not evenly divisible by 3 should be invalidated for quarterly series
     // Month not evenly divisible by 6 should be invalidated for semi-annual series
-    const invalidDates = [];
+    let invalidDates = [];
     const m = freq === 'Q' ? 3 : 6;
     for (let month = 0; month < 12; month++) {
       if ((month % m)) {
-        invalidDates.push(new Date(year, month, 1));
+        invalidDates = invalidDates.concat(this.getAllDaysInMonth(year, month));
       }
     }
     return invalidDates;
+  }
+
+  getAllDaysInMonth = (year: number, month: number) => {
+    let date = new Date(year, month, 1);
+    let dateArray = [];
+    while (date.getMonth() === month) {
+      dateArray.push(new Date(date));
+      date.setDate(date.getDate() + 1);
+    }
+    return dateArray;
   }
 
   getInvalidWeeklyDates = (year: number, month: number) => {
