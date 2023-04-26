@@ -3,7 +3,7 @@
 		<ng-template ngFor let-series [ngForOf]="measurement.value">
 			<div [class.seasonal-alert-container]="series.displaySeasonalMessage" class="multi-charts"
 				*ngIf="series.display || series.displaySeasonalMessage">
-				<a href="#" [routerLink]="['/series']" [queryParams]="{id: series.id, sa: series.saParam}"
+				<a href="#" [routerLink]="['/series']" [queryParams]="{id: series.id}"
 					queryParamsHandling='merge' *ngIf="series.id && series.display">
 					<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
 						[seriesData]="series" [indexChecked]="indexChecked" [baseYear]="selectedStart">

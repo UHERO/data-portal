@@ -27,6 +27,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   portalSettings;
   seriesRange;
   displayHelp: boolean = false;
+  previousFreq: string = '';
 
   // Variables for geo and freq selectors
   public categoryData;
@@ -110,19 +111,22 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   // Redraw series when a new measurement is selected
   redrawSeriesMeasurements(event) {
+    this.previousFreq = '';
     this.queryParams.m = event.name;
     this.updateRoute();
   }
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq: Frequency, currentFc: string) {
+    this.previousFreq = '';
     this.queryParams.geo = event.handle;
     this.queryParams.freq = currentFreq.freq;
     this.queryParams.fc = currentFc;
     this.updateRoute();
   }
 
-  redrawSeriesFreq(event, currentGeo: Geography, currentFc: string) {
+  redrawSeriesFreq(event, currentFreq: Frequency, currentGeo: Geography, currentFc: string) {
+    this.previousFreq = currentFreq.freq;
     this.queryParams.geo = currentGeo.handle;
     this.queryParams.freq = event.freq;
     this.queryParams.fc = currentFc;
@@ -130,6 +134,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   redrawSeriesFc(event, currentGeo: Geography, currentFreq: Frequency) {
+    this.previousFreq = '';
     this.queryParams.geo = currentGeo.handle;
     this.queryParams.freq = currentFreq.freq;
     this.queryParams.fc = event
@@ -142,16 +147,19 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   yoyActive(e) {
+    this.previousFreq = '';
     this.queryParams.yoy = e.target.checked;
     this.updateRoute();
   }
 
   ytdActive(e) {
+    this.previousFreq = '';
     this.queryParams.ytd = e.target.checked;
     this.updateRoute();
   }
 
   c5maActive(e) {
+    this.previousFreq = '';
     this.queryParams.c5ma = e.target.checked;
     this.updateRoute();
   }
@@ -161,6 +169,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   changeRange(e) {
+    this.previousFreq = '';
     this.routeStart = e.useDefaultRange ? null : e.startDate;
     this.routeEnd = e.endOfSample ? null : e.endDate;
     this.queryParams.start = this.routeStart;

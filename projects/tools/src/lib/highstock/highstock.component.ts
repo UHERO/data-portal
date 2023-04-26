@@ -435,7 +435,8 @@ export class HighstockComponent implements OnInit, OnDestroy {
     let s = `<b>${getFreqLabel(freq.freq, x)}</b>`;
     points.forEach((point) => {
       if (!point.series.name.includes('YTD')) {
-        const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
+        const decimal = point.series.name.includes('YOY') ? 1 : this.seriesDetail.decimals;
+        const displayValue = Highcharts.numberFormat(point.y, decimal, '.', ',');
         const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
         const seriesColor = `<br><span class='series-${point.colorIndex}'>\u25CF</span>`;
         const seriesNameValue =`${point.series.name}: ${formattedValue}`;

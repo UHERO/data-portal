@@ -178,7 +178,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       const disName = this.formatTransformationName(transformation.transformation, series.percent);
       data.series = disName;
       dates.forEach((d, index) => {
-        data[d] = values[index];
+        data[d] = +values[index];
       });
       return data;
     }

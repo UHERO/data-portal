@@ -209,7 +209,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       lvlData: false
     };
     formattedDates.forEach((d, index) => {
-      data[d] = this.helperService.formatNum(+values[index], series.decimals);
+      data[d] = +values[index];
     });
     return data;
   }

@@ -104,10 +104,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
         const formatSeriesLabel = (point, seriesValue: number, date: string, pointX) => {
           let str = '';
           const { colorIndex, userOptions } = point;
-          const { geography, decimals, title, chartData } = userOptions;
+          const { geography, decimals, title, chartData, name } = userOptions;
+          const decimal = (name.includes('YOY') || name.includes('YTD')) ? 1 : decimals;
           const seriesColor = getSeriesColor(colorIndex);
           const displayName = `${title} (${geography.name})`;
-          const value = formatObsValue(seriesValue, decimals);
+          const value = formatObsValue(seriesValue, decimal);
           const label = `${displayName} ${date}: ${value}`;
           const pseudoZones = chartData.pseudoZones;
           if (pseudoZones.length) {

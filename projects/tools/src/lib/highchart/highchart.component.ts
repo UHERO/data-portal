@@ -235,7 +235,8 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
       let subtitleText = '';
       subtitleText += `${Highcharts.numberFormat(point0.y, decimals, '.', ',')} <br> (${this.indexChecked ? 'Index' : unitsLabelShort})`;
       subtitleText += s1 ?
-      `${this.formatTransformLabel(s1.name, percent, currentFreq)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
+      `${this.formatTransformLabel(s1.name, percent, currentFreq)}<br>
+        ${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
         dateLabel;
       chart.setSubtitle({
         text: subtitleText,
@@ -334,7 +335,9 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
           }
           points.forEach((point) => {
             if (point.y !== null) {
-              const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
+              const pointName = point.series.userOptions.name;
+              const decimal = (pointName === 'level' || pointName === 'c5ma') ? seriesData.decimals : 1;
+              const displayValue = Highcharts.numberFormat(point.y, decimal, '.', ',');
               const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
               const { name } = point.series;
               const labelName = formatLabel(name, percent, currentFreq);
@@ -362,7 +365,7 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
           });
           return labelString;
         };
-        if (this.x >= startDate && this.x <= endDate) {
+        if (this.x as number >= startDate && this.x as number <= endDate) {
           let s = `<b>${indexed ? indexDisplayName : displayName}</b><br>`;
           // Get Quarter or Month for Q/M frequencies
           s = s + formatDate(this.x, currentFreq);

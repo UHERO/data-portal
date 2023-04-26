@@ -41,6 +41,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy, AfterContentChecked
   routeEnd: string;
   dateRangeSubscription: Subscription;
   selectedDateRange: DateRange;
+  previousFreq: string = '';
 
   constructor(
     @Inject('environment') private environment,
@@ -160,7 +161,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy, AfterContentChecked
     this.updateUrlLocation();
   }
 
-  changeAnalyzerFrequency(freq, analyzerSeries) {
+  changeAnalyzerFrequency(freq, previousFreq: string, analyzerSeries) {
+    this.previousFreq = previousFreq === freq ? '' : previousFreq;
     const siblingIds = [];
     this.analyzerService.analyzerData.urlChartSeries = [];
     const siblingsList = analyzerSeries.map((serie) => {

@@ -1,7 +1,7 @@
 <ng-template ngIf [ngIf]="params.data.lvlData">
   <span>
     <a [class.disabledLink]="params.data.seriesInfo.displaySeasonalMessage ? true : null" class="{{params.data.seriesInfo.indent ? 'indent' + params.data.seriesInfo.indent : ''}}"
-      [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id, sa: params.data.seriesInfo.saParam }"
+      [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id }"
       queryParamsHandling='merge'>{{params.value}}</a>
   </span>
   <div class="th-buttons">

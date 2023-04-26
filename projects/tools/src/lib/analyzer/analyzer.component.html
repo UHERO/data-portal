@@ -65,7 +65,7 @@
       </div>
       <div id="analyzer-customizations">
         <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
-          (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">
+          (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerFrequency.freq, data.analyzerSeries)" class="selector">
         </lib-freq-selector>
         <label *ngIf="data.requestComplete && data.displayFreqSelector" class="mx-2 form-check-inline">
           <input type="checkbox" (change)="indexActive($event)"
@@ -73,7 +73,7 @@
             [disabled]="!data.displayFreqSelector">Index
         </label>
         <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-          [dates]="data.sliderDates" [routeStart]="routeStart" [routeEnd]="routeEnd"
+          [dates]="data.sliderDates" [previousFreq]="previousFreq" [routeStart]="routeStart" [routeEnd]="routeEnd"
           [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
         <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
           (click)="removeAllAnalyzerSeries()">
