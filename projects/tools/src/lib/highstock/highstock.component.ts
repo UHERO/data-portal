@@ -75,7 +75,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
     exporting(this.Highcharts);
     exportData(this.Highcharts);
     offlineExport(this.Highcharts);
-    Accessibility(this.Highcharts);
+    //Accessibility(this.Highcharts);
 
     Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
       // Add metadata to top of CSV export

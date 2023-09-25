@@ -358,6 +358,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       this.chartObject?.xAxis[0].setExtremes(Date.parse(startDate), Date.parse(endDate));
       this.setYMinMax();
     }
+    console.log('chartOptions', this.chartOptions)
   }
 
   // Labels used for metadata in CSV download
