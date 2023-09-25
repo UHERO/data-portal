@@ -82,11 +82,7 @@ import { SingleSeriesTableComponent } from './single-series-table/single-series-
     CalendarModule,
     TabViewModule,
     HighchartsChartModule,
-    AgGridModule.withComponents([
-      CategoryTableRenderComponent,
-      AnalyzerTableRendererComponent,
-      AnalyzerStatsRendererComponent,
-    ])
+    AgGridModule
   ],
   exports: [
     ToolsComponent,
