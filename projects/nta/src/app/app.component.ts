@@ -1,13 +1,16 @@
 import { Component, Inject, PLATFORM_ID, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { isPlatformBrowser, NgIf } from '@angular/common';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { ToolsModule } from 'tools';
 
 declare var gtag: (str: string, gaId: string, path: object) => void;
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: true,
+    imports: [NgIf, ToolsModule, RouterOutlet]
 })
 export class AppComponent implements AfterViewInit, OnInit {
   private isBrowser;

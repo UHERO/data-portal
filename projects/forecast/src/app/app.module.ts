@@ -7,7 +7,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
-@NgModule({
+@NgModule(/* TODO(standalone-migration): clean up removed NgModule class manually. 
+{
   declarations: [
     AppComponent
   ],
@@ -62,5 +63,5 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     }*/
   ],
   bootstrap: [AppComponent]
-})
+} */)
 export class AppModule { }

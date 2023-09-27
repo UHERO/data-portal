@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start-dev": "ng build tools --configuration production && ng serve --project=${PROJECT:-uhero}",
+    "start-dev": "ng serve --project=${PROJECT:-uhero}",
     "start-staging": "ng build tools --configuration production && ng serve --project=${PROJECT:-uhero} -c=staging --port=4200",
     "start-api-dev": "ng build tools --configuration production && ng serve --project=${PROJECT:-uhero} -c=apiDev",
     "build-staging": "ng build tools --configuration production && ng build --project=${PROJECT:-uhero} -c=staging",
-    "build": "ng build tools --configuration production && ng build --project=${PROJECT:-uhero} --configuration production",
+    "build": "ng build --project=${PROJECT:-uhero} --configuration production",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
