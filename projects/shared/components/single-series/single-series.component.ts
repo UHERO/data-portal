@@ -1,4 +1,4 @@
-import { Inject, Component, OnInit, OnDestroy, AfterContentChecked, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, OnChanges, OnDestroy, AfterContentChecked, ChangeDetectorRef, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from 'projects/shared/services/analyzer.service';
 import { DataPortalSettingsService } from 'projects/shared/services/data-portal-settings.service';
@@ -25,9 +25,30 @@ import { DialogModule } from 'primeng/dialog';
     templateUrl: './single-series.component.html',
     styleUrls: ['./single-series.component.scss'],
     standalone: true,
-    imports: [NgFor, NgIf, DialogModule, GeoSelectorComponent, FreqSelectorComponent, ForecastSelectorComponent, ShareLinkComponent, FormsModule, DateSliderComponent, HighstockComponent, SummaryStatisticsComponent, SingleSeriesTableComponent, AsyncPipe]
+    imports: [
+      NgFor,
+      NgIf,
+      DialogModule,
+      GeoSelectorComponent,
+      FreqSelectorComponent,
+      ForecastSelectorComponent,
+      ShareLinkComponent,
+      FormsModule,
+      DateSliderComponent,
+      HighstockComponent,
+      SummaryStatisticsComponent,
+      SingleSeriesTableComponent,
+      AsyncPipe
+    ]
 })
-export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChecked {
+export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, AfterContentChecked {
+  @Input() id: string;
+  @Input() sa: string;
+  @Input() data_list_id: string;
+  @Input() start: string;
+  @Input() end: string;
+  @Input() nocache: string;
+
   noSelection: string;
   newTableData;
   tableHeaders;
@@ -50,8 +71,6 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
   displayHelp: boolean = false;
   public seriesData;
   queryParams: any = {};
-  routeStart: string;
-  routeEnd: string;
   previousFreq: string = '';
 
   constructor(
@@ -78,33 +97,27 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
     
   }
 
+  ngOnChanges() {
+    let categoryId;
+    let noCache;
+    this.seriesId = Number(this.id);
+    if (this.sa !== undefined) {
+      this.seasonallyAdjusted = this.sa === 'true';
+    }
+    if (this.data_list_id) {
+      categoryId = Number(this.data_list_id);
+    }
+    if (this.nocache) {
+      noCache = this.nocache;
+    }
+    this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId);
+  }
+
   ngOnInit() {
     this.portalSettings = this.dataPortalSettings.dataPortalSettings[this.portal.universe];
     this.displayFcSelector = this.portalSettings.selectors.includes('forecast');
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
       this.selectedDateRange = dateRange;
-    });
-    this.route.queryParams.subscribe(params => {
-      this.queryParams = {...params};
-      this.seriesId = Number(params[`id`]);
-      let categoryId;
-      let noCache: boolean;
-      if (params[`sa`] !== undefined) {
-        this.seasonallyAdjusted = (params[`sa`] === 'true');
-      }
-      if (params[`data_list_id`]) {
-        categoryId = Number(params[`data_list_id`]);
-      }
-      if (params[`start`]) {
-        this.routeStart = params[`start`];
-      }
-      if (params[`end`]) {
-        this.routeEnd = params[`end`];
-      }
-      if (params[`nocache`]) {
-        noCache = params[`nocache`] === 'true';
-      }
-      this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, noCache, categoryId);
     });
   }
 
@@ -142,8 +155,8 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
         ...(forecast?.forecast && { fc: forecast.forecast }),
         geo,
         freq,
-        start: this.routeStart ? this.routeStart : null,
-        end: this.routeEnd ? this.routeEnd : null
+        start: this.start ? this.start : null,
+        end: this.end ? this.end : null
       };
       this.router.navigate(['/series/'], { queryParams, queryParamsHandling: 'merge' });
     } else {
@@ -174,10 +187,10 @@ export class SingleSeriesComponent implements OnInit, OnDestroy, AfterContentChe
     } = dateRange;
     this.queryParams.start = useDefaultRange ? null : startDate;
     this.queryParams.end = endOfSample ? null : endDate;
-    this.routeStart = this.queryParams.start;
-    this.routeEnd = this.queryParams.end;
     const url = this.router.createUrlTree([], {
-      relativeTo: this.route, queryParams: this.queryParams
+      relativeTo: this.route,
+      queryParams: this.queryParams,
+      queryParamsHandling: 'merge'
     }).toString();
     this.location.go(url);
   }

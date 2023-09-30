@@ -23,7 +23,6 @@ export class ApiService {
   // Get data from API
   // Gets all available categories. Used for navigation & displaying sublists
   fetchCategories(): Observable<Category[]> {
-    console.log('this.portal', this.portal)
     let categories$ = this.http.get(`${this.baseUrl}/category?u=${this.portal.universe}`).pipe(
       map(mapCategories, this),
       tap(val => {

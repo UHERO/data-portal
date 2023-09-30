@@ -61,8 +61,8 @@
           </label>
         </div>
         <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-          [dates]="data.sliderDates" [previousFreq]="previousFreq" [freq]="data.seriesDetail.frequencyShort" [routeStart]="routeStart"
-          [routeEnd]="routeEnd" (updateRange)="changeRange($event)"></lib-date-slider>
+          [dates]="data.sliderDates" [previousFreq]="previousFreq" [freq]="data.seriesDetail.frequencyShort" [routeStart]="start"
+          [routeEnd]="end" (updateRange)="changeRange($event)"></lib-date-slider>
       </div>
       <p *ngIf="noSelection">{{noSelection}}</p>
       <p *ngIf="data.noData">{{data.noData}}</p>

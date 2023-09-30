@@ -1,10 +1,13 @@
 import {
   Component,
   OnInit,
+  OnChanges,
   Inject,
+  Input,
   OnDestroy,
   ChangeDetectorRef,
   AfterContentChecked,
+  SimpleChanges,
 } from "@angular/core";
 import { Location, NgIf, NgFor, AsyncPipe } from "@angular/common";
 import { AnalyzerService } from "projects/shared/services/analyzer.service";
@@ -43,8 +46,28 @@ import { DialogModule } from "primeng/dialog";
   ],
 })
 export class AnalyzerComponent
-  implements OnInit, OnDestroy, AfterContentChecked
+  implements OnInit, OnChanges, OnDestroy, AfterContentChecked
 {
+  @Input() analyzerSeries: string;
+  @Input() chartSeries: string;
+  @Input() start: string;
+  @Input() end: string;
+  @Input() index: string;
+  @Input() leftMin: string;
+  @Input() leftMax: string;
+  @Input() rightMin: string;
+  @Input() rightMax: string;
+  @Input() compare: string;
+  @Input() yoy: string;
+  @Input() ytd: string;
+  @Input() c5ma: string;
+  @Input() mom: string;
+  @Input() yright: string;
+  @Input() yleft: string;
+  @Input() column: string;
+  @Input() area: string;
+  @Input() nocache: string;
+
   portalSettings;
   tableYoy: boolean;
   tableYtd: boolean;
@@ -54,14 +77,14 @@ export class AnalyzerComponent
   analyzerData;
   yRightSeries: string;
   yLeftSeries: string;
-  leftMin: string;
-  leftMax: string;
-  rightMin: string;
-  rightMax: string;
+  //leftMin: string;
+  //leftMax: string;
+  //rightMin: string;
+  //rightMax: string;
   analyzerShareLink: string;
   indexSeries: boolean;
   analyzerSeriesSub: Subscription;
-  analyzerSeries;
+  seriesInAnalyzer;
   routeView: string;
   queryParams: any = {};
   displayCompare: boolean = false;
@@ -88,20 +111,88 @@ export class AnalyzerComponent
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe(
       (series) => {
-        this.analyzerSeries = series;
+        this.seriesInAnalyzer = series;
         this.updateAnalyzer(series);
       }
     );
-  }
 
-  ngOnInit() {
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
       (dateRange) => {
         this.selectedDateRange = dateRange;
       }
     );
+  }
 
-    if (this.route) {
+  ngOnChanges(simpleChanges: SimpleChanges) {
+    this.analyzerService.analyzerData.yLeftSeries = [];
+    this.analyzerService.analyzerData.yRightSeries = [];
+    this.analyzerService.analyzerData.leftMin = null;
+    this.analyzerService.analyzerData.leftMax = null;
+    this.analyzerService.analyzerData.rightMin = null;
+    this.analyzerService.analyzerData.rightMax = null;
+
+    if (this.analyzerSeries) {
+      this.storeUrlSeries(this.analyzerSeries);
+    }
+    if (this.chartSeries) {
+      this.analyzerService.storeUrlChartSeries(this.chartSeries);
+    }
+    if (this.compare) {
+      this.displayCompare = this.evalParamAsTrue(this.compare);
+    }
+    if (this.yoy) {
+      this.tableYoy = this.evalParamAsTrue(this.yoy);
+    }
+    if (this.ytd) {
+      this.tableYtd = this.evalParamAsTrue(this.ytd);
+    }
+    if (this.c5ma) {
+      this.tableC5ma = this.evalParamAsTrue(this.c5ma);
+    }
+    if (this.mom) {
+      this.tableMom = this.evalParamAsTrue(this.mom);
+    }
+    if (this.yright) {
+      this.yRightSeries = this.yright;
+      this.analyzerService.analyzerData.yRightSeries = this.yright.split('-').map(id => +id);
+    }
+    if (this.yleft) {
+      this.yLeftSeries = this.yleft;
+      this.analyzerService.analyzerData.yLeftSeries = this.yleft.split('-').map(id => +id);
+    }
+    if (this.column) {
+      this.analyzerService.analyzerData.column  = this.column.split('-').map(id => +id);
+    }
+    if (this.area) {
+      this.analyzerService.analyzerData.area  = this.area.split('-').map(id => +id);
+    }
+    if (this.leftMin) {
+      this.analyzerService.analyzerData.leftMin = this.leftMin;
+    }
+    if (this.leftMax) {
+      this.analyzerService.analyzerData.leftMax = this.leftMax;
+    }
+    if (this.rightMin) {
+      this.analyzerService.analyzerData.rightMin = this.rightMin;
+    }
+    if (this.rightMax) {
+      this.analyzerService.analyzerData.rightMax = this.rightMax;
+    }
+    this.noCache = this.evalParamAsTrue(this.nocache);
+    this.updateAnalyzer(this.seriesInAnalyzer);
+    this.portalSettings =
+      this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+
+  }
+
+  ngOnInit() {
+    /*this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
+      (dateRange) => {
+        this.selectedDateRange = dateRange;
+      }
+    );*/
+
+    /*if (this.route) {
       this.route.queryParams.subscribe((params) => {
         if (params[`analyzerSeries`]) {
           this.storeUrlSeries(params[`analyzerSeries`]);
@@ -192,9 +283,9 @@ export class AnalyzerComponent
         this.noCache = this.evalParamAsTrue(params["nocache"]);
       });
     }
-    this.updateAnalyzer(this.analyzerSeries);
+    this.updateAnalyzer(this.seriesInAnalyzer);
     this.portalSettings =
-      this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+      this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];*/
   }
 
   ngAfterContentChecked() {
@@ -210,7 +301,8 @@ export class AnalyzerComponent
         this.selectedDateRange.startDate,
         this.noCache
       );
-      this.analyzerService.analyzerData.indexed = this.indexSeries;
+      // this.analyzerService.analyzerData.indexed = this.indexSeries;
+      this.analyzerService.analyzerData.indexed = this.index === 'true';
     }
   }
 
@@ -225,7 +317,8 @@ export class AnalyzerComponent
   }
 
   indexActive(e) {
-    this.indexSeries = e.target.checked;
+    // this.indexSeries = e.target.checked;
+    this.index = e.target.checked;
     this.queryParams.index = e.target.checked || null;
     this.analyzerService.toggleIndexValues(
       e.target.checked,
@@ -331,9 +424,11 @@ export class AnalyzerComponent
       leftMax,
       rightMin,
       rightMax,
+      column,
+      area
     } = analyzerData;
-    this.queryParams.start = this.routeStart;
-    this.queryParams.end = this.routeEnd;
+    this.queryParams.start = this.start;
+    this.queryParams.end = this.end;
     this.queryParams.analyzerSeries = analyzerSeries.map((s) => s.id).join("-");
     this.queryParams.chartSeries =
       analyzerSeries
@@ -344,6 +439,8 @@ export class AnalyzerComponent
       ? yRightSeries.join("-")
       : null;
     this.queryParams.yleft = yLeftSeries.length ? yLeftSeries.join("-") : null;
+    this.queryParams.column = column.length ? column.join('-') : null;
+    this.queryParams.area = area.length ? area.join('-') : null;
     this.queryParams.leftMin = leftMin ? leftMin : null;
     this.queryParams.leftMax = leftMax ? leftMax : null;
     this.queryParams.rightMin = rightMin ? rightMin : null;

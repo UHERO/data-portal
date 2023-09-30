@@ -32,7 +32,6 @@ export class CategoryHelperService {
   // Gets data sublists available for a selected category
   initContent = (catId: any, noCache: boolean, routeParams: any): Observable<any> => {
     const cacheId = this.helperService.setCacheId(catId, routeParams);
-    console.log(cacheId)
     if (this.categoryData.hasOwnProperty(cacheId)) {
       this.updateSelectors(this.categoryData[cacheId], this.portal.universe);
     }
@@ -42,7 +41,6 @@ export class CategoryHelperService {
         this.getCategoryData(this.categoryData[cacheId], noCache, catId, routeParams) :
         this.initSearch(this.categoryData[cacheId], noCache, catId);
     }
-    console.log(this.categoryData)
     return observableOf([this.categoryData[cacheId]]);
   }
 
@@ -162,7 +160,6 @@ export class CategoryHelperService {
     const category = portalCategories.find(c => c.id === selectedCatId);  
     if (category) {
       const { children: categoryDataLists } = category;
-      console.log('find cat and store data lists', datalistId)
       const selectedDataList = datalistId ?
         this.helperService.findSelectedDataList(categoryDataLists, datalistId, '') :
         this.helperService.getCategoryDataLists(categoryDataLists[0], '');

@@ -113,7 +113,6 @@ export class HelperService {
   }
 
   findSelectedDataList = (dataList, dataListId, dataListName) => {
-    console.log('find datalistid', dataListId)
     for (const list of dataList) {
       let name = dataListName || '';
       if (list.id === dataListId) {

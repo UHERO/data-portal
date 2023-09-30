@@ -1,6 +1,6 @@
 // Component for multi-chart view
-import { Inject, Component, OnInit, OnChanges, OnDestroy, Input, SimpleChanges } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Inject, Component, OnChanges, OnDestroy, Input, SimpleChanges } from "@angular/core";
+import { Router } from "@angular/router";
 import { CategoryHelperService } from "projects/shared/services/category-helper.service";
 import { HelperService } from "projects/shared/services/helper.service";
 import { DataPortalSettingsService } from "projects/shared/services/data-portal-settings.service";
@@ -53,23 +53,13 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
   @Input() id: number | string | undefined;
   @Input() data_list_id: number;
   @Input() view: string;
-  @Input() routeStart: string | null = null;
-  @Input() routeEnd: string | null = null;
+  @Input() start: string | null = null;
+  @Input() end: string | null = null;
   @Input() nocache: string;
   private sub;
-  // private id: number;
-  // private dataListId: number;
-  // routeView: string;
-  // private noCache: boolean;
-  // routeStart;
-  // routeEnd;
-  // search = false;
   isSearch: boolean;
   queryParams: any = {};
-  seriesStart = null;
-  seriesEnd = null;
   portalSettings;
-  seriesRange;
   displayHelp: boolean = false;
   previousFreq: string = "";
 
@@ -88,7 +78,6 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
     private dataPortalSettingsServ: DataPortalSettingsService,
     private catHelper: CategoryHelperService,
     private helperService: HelperService,
-    private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
@@ -103,20 +92,13 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
   }
   
   ngOnChanges(simpleChanges: SimpleChanges): void  {
-    this.portalSettings =
-    this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-
-    console.log('simpleChanges', simpleChanges)
-    console.log('id', this.id)
-    console.log('data list', this.data_list_id)
+    this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     const idOrSearchParam = this.helperService.getIdParam(this.id);
     const dataListIdParam = this.helperService.getIdParam(this.data_list_id);
     const noCacheParam = this.nocache === 'true';
     if (this.sa === undefined) {
       this.sa = 'true'
     }
-    console.log('SA', this.sa)
-
     this.categoryData =
       this.portal.universe === "nta"
         ? this.catHelper.initContent(idOrSearchParam, noCacheParam, {
@@ -130,8 +112,6 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
               fc: this.fc,
           });
   }
-
-  
 
   ngOnDestroy() {
     if (this.sub) {
@@ -210,15 +190,15 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
 
   changeRange(e) {
     this.previousFreq = "";
-    this.routeStart = e.useDefaultRange ? null : e.startDate;
-    this.routeEnd = e.endOfSample ? null : e.endDate;
-    this.queryParams.start = this.routeStart;
-    this.queryParams.end = this.routeEnd;
+    this.start = e.useDefaultRange ? null : e.startDate;
+    this.end = e.endOfSample ? null : e.endDate;
+    this.queryParams.start = this.start;
+    this.queryParams.end = this.end;
     this.updateRoute();
   }
 
   updateRoute() {
-    this.queryParams.id = this.queryParams.id || this.id;
+    this.queryParams.id = this.id;
     this.queryParams.data_list_id =
       this.queryParams.data_list_id || this.data_list_id;
     const urlPath =
@@ -236,18 +216,9 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
 
   // navigate to Summary or first data list when clicking on a category
   navToFirstDataList(dataList) {
-    console.log('datalist', dataList)
     if (!dataList.children) {
-      console.log('no datalist children')
-      const urlPath = typeof this.helperService.getIdParam(this.id) === "string" ? "/search" : "/category";
-
       this.queryParams.data_list_id = dataList.id;
-      this.router.navigate([urlPath], {
-        queryParams: {data_list_id: dataList.id},
-        queryParamsHandling: 'merge'
-      });
-      console.log(this.router)
-      //this.updateRoute();
+      this.updateRoute();
     }
     if (dataList.children) {
       return this.navToFirstDataList(dataList.children[0]);

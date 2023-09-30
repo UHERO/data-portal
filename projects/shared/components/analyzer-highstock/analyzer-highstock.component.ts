@@ -11,6 +11,7 @@ import {
   ViewEncapsulation,
   SimpleChanges
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { AnalyzerService } from 'projects/shared/services/analyzer.service';
 import { DateRange } from 'projects/shared/models/DateRange';
 import { Dropdown } from 'bootstrap';
@@ -31,7 +32,7 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {frequencyShort: strin
     selector: 'lib-analyzer-highstock',
     templateUrl: './analyzer-highstock.component.html',
     styleUrls: ['./analyzer-highstock.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    //changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
     standalone: true,
     imports: [HighchartsChartModule, NgFor, NgIf]
@@ -254,7 +255,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     @Inject('logo') private logo,
     private highstockHelper: HighstockHelperService,
     private analyzerService: AnalyzerService,
-    private helperService: HelperService
+    private helperService: HelperService,
+    private router: Router
   ) {
     this.analyzerData = this.analyzerService.analyzerData;
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
@@ -298,12 +300,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
             e.stopPropagation();
             if (chartOptionSeries) {
               analyzerService.makeCompareSeriesVisible(chartOptionSeries, this.selectedDateRange.startDate);
-              this.updateUrl.emit(chartOptionSeries);
+              // this.updateUrl.emit(chartOptionSeries);
             }
           });
           removeFromComparisonChartItem.addEventListener('click', () => {
             analyzerService.removeFromComparisonChart(seriesId, this.selectedDateRange.startDate);
-            this.updateUrl.emit(chartOptionSeries);
+            // this.updateUrl.emit(chartOptionSeries);
           });
           removeFromAnalyzerItem.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -362,7 +364,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       this.chartObject?.xAxis[0].setExtremes(Date.parse(startDate), Date.parse(endDate));
       this.setYMinMax();
     }
-    console.log('chartOptions', this.chartOptions)
   }
 
   // Labels used for metadata in CSV download
@@ -554,7 +555,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       this.addSelectorOptions(chartTypeSelect, series.chartType, series.selectedChartType)
       chartTypeMenuItem.appendChild(chartTypeSelect);
       chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
-      chartTypeSelect.addEventListener('change', e => this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value));  
+      chartTypeSelect.addEventListener('change', e => {
+        this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value);
+        this.updateUrl.emit();
+      });  
     }
   }
 
@@ -567,8 +571,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       yAxisSideMenuItem.appendChild(yAxisSelect);
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
       yAxisSelect.addEventListener('change', (e) => {
-        this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value);
-        this.updateUrl.emit()
+        const side = (e.target as HTMLSelectElement).value;
+        this.analyzerService.updateCompareSeriesAxis(seriesId, side);
+        this.updateUrl.emit();
       });
     }
   }

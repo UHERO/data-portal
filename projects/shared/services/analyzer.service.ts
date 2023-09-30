@@ -18,6 +18,8 @@ class AnalyzerData implements AnalyzerDataInterface {
   y0Series = null;
   yRightSeries = [];
   yLeftSeries = [];
+  column = [];
+  area = [];
   leftMin = null;
   leftMax = null;
   rightMin = null;
@@ -73,13 +75,14 @@ export class AnalyzerService {
     const chartValues = series.observations.map(obs => obs.displayName);
     const selectedChartTransformation = chartValues.find(name => name === 'Level') || chartValues[0];
     const selectedTransformation = series.observations.find(t => t.displayName === selectedChartTransformation).values;
+    const selectedChartType = this.assignChartType(series);
     series.yAxisText = this.setYAxisLabel(indexed, baseYear, series, selectedChartTransformation);
     series.className = series.id;
     series.name = this.formatDisplayName(series, indexed, selectedChartTransformation);
     series.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : [...selectedTransformation];
     series.levelData = [...selectedTransformation];
     series.yAxis = this.assignYAxisSide(series);
-    series.type = series.selectedChartType;
+    series.type = selectedChartType;
     series.currentFreq = { freq: series.frequencyShort, label: series.frequency };
     series.includeInDataExport = true;
     series.showInLegend = true;
@@ -95,7 +98,7 @@ export class AnalyzerService {
       'column',
       'area'
     ];
-    series.selectedChartType = 'line';
+    series.selectedChartType = selectedChartType;
     series.yAxisSides = [
       'left',
       'right'
@@ -173,8 +176,26 @@ export class AnalyzerService {
   }
 
   updateCompareChartType(seriesId: number, chartType: string) {
-    const { analyzerSeries } = this.analyzerData;
+    const { analyzerSeries, column, area } = this.analyzerData;
+    const matchInArea = area.find(id => id === seriesId);
+    const matchInColumn = column.find(id => id === seriesId);
     const selectedCompareSeries = this.findSelectedCompareSeries(seriesId);
+    if (chartType === 'column' && !matchInArea) {
+      column.push(seriesId);
+    }
+    if (chartType === 'column' && matchInArea) {
+      const matchIndex = area.findIndex(id => id === seriesId);
+      column.push(seriesId);
+      area.splice(matchIndex, 1);
+    }
+    if (chartType === 'area' && !matchInColumn) {
+      area.push(seriesId);
+    }
+    if (chartType === 'area' && matchInColumn) {
+      const matchIndex = column.findIndex(id => id === seriesId);
+      column.splice(matchIndex, 1);
+      area.push(seriesId);
+    }
     selectedCompareSeries.type = chartType;
     selectedCompareSeries.selectedChartType = chartType;
     this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
@@ -258,7 +279,6 @@ export class AnalyzerService {
     this.analyzerData.analyzerMeasurements = {}
     this.analyzerData.requestComplete = false;
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-    this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
@@ -401,6 +421,17 @@ export class AnalyzerService {
     const { analyzerSeries } = this.analyzerData;
     const units = analyzerSeries.map(s => s.yAxisText);
     return !units.length || units[0] === series.yAxisText || this.analyzerData.indexed ? 'left' : 'right';
+  }
+
+  assignChartType(series: any) {
+    const { column, area } = this.analyzerData;
+    if (column.length && column.some(id => id === series.id)) {
+      return 'column';
+    }
+    if (area.length && area.some(id => id === series.id)) {
+      return 'area';
+    }
+    return 'line';
   }
 
   singleFrequencyAnalyzer = (series: Array<any>) => {

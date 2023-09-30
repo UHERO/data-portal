@@ -18,6 +18,8 @@ export class ShareLinkComponent implements OnChanges {
   @Input() ytd: boolean;
   @Input() c5ma: boolean;
   @Input() index: boolean;
+  @Input() column: Array<any>;
+  @Input() area: Array<any>;
   @Input() yRightSeries: Array<any>;
   @Input() yLeftSeries: Array<any>;
   @Input() leftMin: number;
@@ -95,6 +97,8 @@ export class ShareLinkComponent implements OnChanges {
     seriesUrl += this.leftMax ? `&leftMax=${this.leftMax}` : '';
     seriesUrl += this.rightMin ? `&rightMin=${this.rightMin}` : '';
     seriesUrl += this.rightMax ? `&rightMax=${this.rightMax}` : '';
+    seriesUrl += this.column && this.column.length ? `&column=${this.column.join('-')}` : '';
+    seriesUrl += this.area && this.area.length ? `&area=${this.area.join('-')}` : '';
     seriesUrl += this.displayCompare && this.view === 'analyzer' ? `&compare=${this.displayCompare}` : '';
     return seriesUrl;
   }
