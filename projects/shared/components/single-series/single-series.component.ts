@@ -69,6 +69,8 @@ export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, Afte
   selectedFreq: Frequency;
   displayFcSelector: boolean;
   displayHelp: boolean = false;
+  routeStart: string;
+  routeEnd: string;
   public seriesData;
   queryParams: any = {};
   previousFreq: string = '';
@@ -100,6 +102,8 @@ export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, Afte
   ngOnChanges() {
     let categoryId;
     let noCache;
+    this.routeStart = this.start;
+    this.routeEnd = this.end;
     this.seriesId = Number(this.id);
     if (this.sa !== undefined) {
       this.seasonallyAdjusted = this.sa === 'true';
@@ -187,6 +191,9 @@ export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, Afte
     } = dateRange;
     this.queryParams.start = useDefaultRange ? null : startDate;
     this.queryParams.end = endOfSample ? null : endDate;
+
+    this.routeStart = this.queryParams.start;
+    this.routeEnd = this.queryParams.end;
     const url = this.router.createUrlTree([], {
       relativeTo: this.route,
       queryParams: this.queryParams,

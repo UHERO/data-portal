@@ -11,7 +11,6 @@ import {
   ViewEncapsulation,
   SimpleChanges
 } from '@angular/core';
-import { Router } from '@angular/router';
 import { AnalyzerService } from 'projects/shared/services/analyzer.service';
 import { DateRange } from 'projects/shared/models/DateRange';
 import { Dropdown } from 'bootstrap';
@@ -256,7 +255,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     private highstockHelper: HighstockHelperService,
     private analyzerService: AnalyzerService,
     private helperService: HelperService,
-    private router: Router
   ) {
     this.analyzerData = this.analyzerService.analyzerData;
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
@@ -557,7 +555,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
       chartTypeSelect.addEventListener('change', e => {
         this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value);
-        this.updateUrl.emit();
+        
+        // TODO:
+        //this.updateUrl.emit();
       });  
     }
   }
@@ -573,7 +573,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       yAxisSelect.addEventListener('change', (e) => {
         const side = (e.target as HTMLSelectElement).value;
         this.analyzerService.updateCompareSeriesAxis(seriesId, side);
-        this.updateUrl.emit();
+        
+        // TODO:
+        //this.updateUrl.emit();
       });
     }
   }
@@ -609,7 +611,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       .find(a => a.id === axis.userOptions.id).min = +e.target.value ?? null;
     this.analyzerService.analyzerData[`${axis.userOptions.id}Min`] = +e.target.value ?? null;
     this.updateChart = true;
-    this.updateUrl.emit();
+    console.log('axis', axis);
+    const axisSide = axis.userOptions.id;
+    const param = {};
+    param[`${axisSide}Min`] = +e.target.value ?? null;
+    this.updateUrl.emit(param);
+    //TODO:
+    //this.updateUrl.emit();
   }
 
   changeYAxisMax(e, axis) {
@@ -617,7 +625,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       .find(a => a.id === axis.userOptions.id).max = +e.target.value ?? null;
     this.analyzerService.analyzerData[`${axis.userOptions.id}Max`] = +e.target.value ?? null;
     this.updateChart = true;
-    this.updateUrl.emit();
+    const axisSide = axis.userOptions.id;
+    const param = {};
+    param[`${axisSide}Max`] = +e.target.value ?? null;
+    this.updateUrl.emit(param);
+
+    //TODO:
+    //this.updateUrl.emit();
   }
 
   calculateMinRange = (freq: string) => {

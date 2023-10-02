@@ -73,7 +73,7 @@
             [disabled]="!data.displayFreqSelector">Index
         </label>
         <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-          [dates]="data.sliderDates" [previousFreq]="previousFreq" [routeStart]="start" [routeEnd]="end"
+          [dates]="data.sliderDates" [previousFreq]="previousFreq" [routeStart]="routeStart" [routeEnd]="routeEnd"
           [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
         <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
           (click)="removeAllAnalyzerSeries()">
@@ -89,7 +89,7 @@
           </lib-category-charts>
           <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
             [series]="data.analyzerSeries" [dates]="data.sliderDates" [indexChecked]="index" (tableExtremes)="changeRange($event)"
-            (xAxisExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation()">
+            (xAxisExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation($event)">
           </lib-analyzer-highstock>
           <lib-analyzer-table *ngIf="data.analyzerSeries.length" [dates]="data.sliderDates" [yoyChecked]="tableYoy"
             [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom" [indexChecked]="index"
