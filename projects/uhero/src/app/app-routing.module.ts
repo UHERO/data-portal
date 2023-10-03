@@ -1,10 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
-//import { LandingPageComponent } from 'tools';
-//import { SingleSeriesComponent } from 'tools';
-//import { AnalyzerComponent } from 'tools';
-//import { EmbedGraphComponent } from 'tools';
 import { LandingPageComponent } from 'projects/shared/components/landing-page/landing-page.component';
 import { SingleSeriesComponent } from 'projects/shared/components/single-series/single-series.component';
 import { AnalyzerComponent } from 'projects/shared/components/analyzer/analyzer.component';
@@ -37,15 +32,3 @@ export const uheroRoutes: Routes = [
     component: EmbedGraphComponent
   }
 ];
-
-/*@NgModule({
-  imports: [RouterModule.forRoot(routes, {
-    useHash: true,
-    anchorScrolling: 'enabled',
-    scrollPositionRestoration: 'enabled',
-    scrollOffset: [0, 75],
-    onSameUrlNavigation: 'reload'
-})],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }*/

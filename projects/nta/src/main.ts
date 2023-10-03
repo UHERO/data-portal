@@ -5,9 +5,13 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { ToolsModule } from 'tools';
-import { AppRoutingModule } from './app/app-routing.module';
+import { ntaRoutes } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { BrowserAnimationsModule, provideAnimations, provideNoopAnimations } from '@angular/platform-browser/animations';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { RequestCache } from 'projects/shared/services/request-cache';
+import { CacheInterceptor } from 'projects/shared/services/cache.interceptor';
+import { provideRouter, withComponentInputBinding, withHashLocation, withRouterConfig } from '@angular/router';
 
 if (environment.production) {
   enableProdMode();
@@ -15,7 +19,31 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
     providers: [
-        importProvidersFrom(BrowserModule, AppRoutingModule, ToolsModule, ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })),
+        provideAnimations(),
+        provideNoopAnimations(),
+        provideHttpClient(
+            withInterceptorsFromDi()
+        ),
+        { provide: RequestCache, useClass: RequestCache },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: CacheInterceptor,
+            multi: true
+        },
+        provideRouter(ntaRoutes,
+            withComponentInputBinding(),
+            withHashLocation(),
+            withRouterConfig({
+                onSameUrlNavigation: 'reload'
+            })
+        ),
+        importProvidersFrom(
+            BrowserModule,
+            BrowserAnimationsModule,
+            ServiceWorkerModule.register('ngsw-worker.js', {
+                enabled: environment.production
+            })
+        ),
         {
             provide: 'environment',
             useValue: environment

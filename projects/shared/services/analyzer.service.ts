@@ -481,7 +481,7 @@ export class AnalyzerService {
       return 'MOM';
     }
     if (chartC5ma) {
-      return 'C5MA';
+      return 'Annual Change';
     }
     return 'Level';
   }

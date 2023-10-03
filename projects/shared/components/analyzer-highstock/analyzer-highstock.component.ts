@@ -701,7 +701,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       this.analyzerService.analyzerData.chartMom = true;
       param.chartMom = true;
     }
-    if (transformation === 'C5MA') {
+    if (transformation === 'Annual Change') {
       this.analyzerService.analyzerData.chartC5ma = true;
       param.chartC5ma = true;
     }
