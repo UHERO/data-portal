@@ -65,6 +65,10 @@ export class AnalyzerComponent
   @Input() yleft: string;
   @Input() column: string;
   @Input() area: string;
+  @Input() chartYoy: string;
+  @Input() chartYtd: string;
+  @Input() chartMom: string;
+  @Input() chartC5ma: string;
   @Input() nocache: string;
 
   portalSettings;
@@ -105,6 +109,7 @@ export class AnalyzerComponent
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe(
       (series) => {
+        console.log('compare', this.compare)
         this.seriesInAnalyzer = series;
         this.updateAnalyzer(series);
       }
@@ -126,6 +131,7 @@ export class AnalyzerComponent
     this.analyzerService.analyzerData.rightMax = null;
     this.routeStart = this.start;
     this.routeEnd = this.end;
+    console.log('on changes compare', this.compare)
     if (this.analyzerSeries) {
       this.storeUrlSeries(this.analyzerSeries);
     }
@@ -156,10 +162,22 @@ export class AnalyzerComponent
       this.analyzerService.analyzerData.yLeftSeries = this.yleft.split('-').map(id => +id);
     }
     if (this.column) {
-      this.analyzerService.analyzerData.column  = this.column.split('-').map(id => +id);
+      this.analyzerService.analyzerData.column = this.column.split('-').map(id => +id);
     }
     if (this.area) {
-      this.analyzerService.analyzerData.area  = this.area.split('-').map(id => +id);
+      this.analyzerService.analyzerData.area = this.area.split('-').map(id => +id);
+    }
+    if (this.chartYoy) {
+      this.analyzerService.analyzerData.chartYoy = this.evalParamAsTrue(this.chartYoy);
+    }
+    if (this.chartYtd) {
+      this.analyzerService.analyzerData.chartYtd = this.evalParamAsTrue(this.chartYtd);
+    }
+    if (this.chartMom) {
+      this.analyzerService.analyzerData.chartMom = this.evalParamAsTrue(this.chartMom);
+    }
+    if (this.chartC5ma) {
+      this.analyzerService.analyzerData.chartC5ma = this.evalParamAsTrue(this.chartC5ma);
     }
     if (this.leftMin) {
       this.analyzerService.analyzerData.leftMin = this.leftMin;
@@ -291,7 +309,9 @@ export class AnalyzerComponent
 
   toggleAnalyzerDisplay() {
     this.displayCompare = !this.displayCompare;
-    this.updateUrlLocation({ compare: this.displayCompare || null });
+    console.log('toggle display', this.displayCompare)
+
+    this.updateUrlLocation({ compare: `${this.displayCompare}`|| null });
   }
 
   changeRange(e) {
@@ -304,6 +324,23 @@ export class AnalyzerComponent
   }
 
   updateUrlLocation(param) {
+    const paramIncludesAnalyzerSeries = Object.keys(param).includes('analyzerSeries');
+    const paramIncludesChartSeries = Object.keys(param).includes('chartSeries');
+    if (!paramIncludesAnalyzerSeries) {
+      const analyzerData = this.analyzerService.analyzerData;
+      const { analyzerSeries } = analyzerData;
+      const analyzerSeriesParam = analyzerSeries.map((s) => s.id).join("-");
+      this.queryParams = { ...this.queryParams, analyzerSeries: analyzerSeriesParam };
+    }
+    if (!paramIncludesChartSeries) {
+      const analyzerData = this.analyzerService.analyzerData;
+      const { analyzerSeries } = analyzerData;
+      const chartSeriesParam = analyzerSeries
+        .filter((s) => s.visible)
+        .map((s) => s.id)
+        .join("-") || null;
+      this.queryParams = { ...this.queryParams, chartSeries: chartSeriesParam };
+    }
     /* const analyzerData = this.analyzerService.analyzerData;
     const {
       analyzerSeries,
@@ -319,7 +356,7 @@ export class AnalyzerComponent
     console.log('this.start', this.start)
     this.queryParams.start = this.start;
     this.queryParams.end = this.end;
-    this.queryParams.analyzerSeries = analyzerSeries.map((s) => s.id).join("-");
+    this.queryParams.analyzerSeries = this.queryParams.analyzerSeries = analyzerSeries.map((s) => s.id).join("-");
     this.queryParams.chartSeries =
       analyzerSeries
         .filter((s) => s.visible)
@@ -335,11 +372,12 @@ export class AnalyzerComponent
     this.queryParams.leftMax = leftMax ? leftMax : null;
     this.queryParams.rightMin = rightMin ? rightMin : null;
     this.queryParams.rightMax = rightMax ? rightMax : null; */
-
+    this.queryParams = { ...this.queryParams, ...param };
+    console.log(this.route)
     const url = this.router
       .createUrlTree([], {
         relativeTo: this.route,
-        queryParams: param,
+        queryParams: this.queryParams,
         queryParamsHandling: 'merge'
       })
       .toString();

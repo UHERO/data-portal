@@ -297,17 +297,35 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
           addToComparisonChartItem.addEventListener('click', (e) => {
             e.stopPropagation();
             if (chartOptionSeries) {
-              analyzerService.makeCompareSeriesVisible(chartOptionSeries, this.selectedDateRange.startDate);
-              // this.updateUrl.emit(chartOptionSeries);
+              const { analyzerSeries }  =
+                analyzerService.makeCompareSeriesVisible(chartOptionSeries, this.selectedDateRange.startDate);
+              const chartSeries = analyzerSeries
+                .filter((s) => s.visible)
+                .map((s) => s.id)
+                .join("-") || null;
+              this.updateUrl.emit({ chartSeries });
             }
           });
           removeFromComparisonChartItem.addEventListener('click', () => {
-            analyzerService.removeFromComparisonChart(seriesId, this.selectedDateRange.startDate);
-            // this.updateUrl.emit(chartOptionSeries);
+            const { analyzerSeries } = 
+              analyzerService.removeFromComparisonChart(seriesId, this.selectedDateRange.startDate);
+            const chartSeries = analyzerSeries
+              .filter((s) => s.visible)
+              .map((s) => s.id)
+              .join("-") || null;
+            this.updateUrl.emit({ chartSeries });
           });
           removeFromAnalyzerItem.addEventListener('click', (e) => {
             e.stopPropagation();
-            analyzerService.removeFromAnalyzer(seriesId, this.selectedDateRange.startDate);
+            const { analyzerSeries } =
+              analyzerService.removeFromAnalyzer(seriesId, this.selectedDateRange.startDate);
+            const seriesIds = analyzerSeries.map((s) => s.id).join("-");
+            const chartSeries = analyzerSeries
+            .filter((s) => s.visible)
+            .map((s) => s.id)
+            .join("-") || null;
+            console.log('analyzerSeries', analyzerSeries)
+            this.updateUrl.emit({ analyzerSeries: seriesIds, chartSeries });
           });
         }
       });
@@ -554,10 +572,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       chartTypeMenuItem.appendChild(chartTypeSelect);
       chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
       chartTypeSelect.addEventListener('change', e => {
-        this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value);
-        
-        // TODO:
-        //this.updateUrl.emit();
+        const { column, area } = 
+          this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value);
+        const columnParam = column.length ? column.join('-') : null;
+        const areaParam = area.length ? area.join('-') : null;
+        this.updateUrl.emit({ column: columnParam, area: areaParam });
       });  
     }
   }
@@ -572,10 +591,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
       yAxisSelect.addEventListener('change', (e) => {
         const side = (e.target as HTMLSelectElement).value;
-        this.analyzerService.updateCompareSeriesAxis(seriesId, side);
-        
-        // TODO:
-        //this.updateUrl.emit();
+        const { yLeftSeries, yRightSeries } =
+          this.analyzerService.updateCompareSeriesAxis(seriesId, side);
+        this.updateUrl.emit({ yleft: yLeftSeries, yright: yRightSeries});
       });
     }
   }
@@ -616,8 +634,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     const param = {};
     param[`${axisSide}Min`] = +e.target.value ?? null;
     this.updateUrl.emit(param);
-    //TODO:
-    //this.updateUrl.emit();
   }
 
   changeYAxisMax(e, axis) {
@@ -629,9 +645,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     const param = {};
     param[`${axisSide}Max`] = +e.target.value ?? null;
     this.updateUrl.emit(param);
-
-    //TODO:
-    //this.updateUrl.emit();
   }
 
   calculateMinRange = (freq: string) => {
@@ -647,6 +660,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
 
   chartTransformationToggles = (chartSeries) => {
     const updateTransformation = (seriesId, transformation) =>  this.analyzerService.updateCompareChartTransformation(seriesId, transformation);
+    const updateUrlTransformation = (transformation: string) => this.updateUrlTransformation(transformation);
     const series = chartSeries.filter(s => s.className !== 'navigator');
     const transformations = series.reduce((prev, curr) => {
         prev.push(...curr.chartValues);
@@ -661,7 +675,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
         onclick: function(e) {
           series.forEach((series) => {
             if (series.className !== 'navigator') {
+              console.log('T', t)
               updateTransformation(series.id, t);
+              updateUrlTransformation(t);
             };
           });
         }
@@ -669,6 +685,29 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     });
     return buttons;
   };
+
+  updateUrlTransformation = (transformation: string) => {
+    const param = { chartYoy: null, chartYtd: null, chartMom: null, chartC5ma: null};
+    console.log(transformation)
+    if (transformation === 'YOY') {
+      this.analyzerService.analyzerData.chartYoy = true;
+      param.chartYoy = true;
+    }
+    if (transformation === 'YTD') {
+      this.analyzerService.analyzerData.chartYtd = true;
+      param.chartYtd = true;
+    }
+    if (transformation === 'MOM') {
+      this.analyzerService.analyzerData.chartMom = true;
+      param.chartMom = true;
+    }
+    if (transformation === 'C5MA') {
+      this.analyzerService.analyzerData.chartC5ma = true;
+      param.chartC5ma = true;
+    }
+    console.log(this.analyzerData)
+    this.updateUrl.emit(param);
+  }
 
   formatChartButtons(buttons: Array<any>) {
     const chartButtons = buttons.reduce((allButtons, button) => {
