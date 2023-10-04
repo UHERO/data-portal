@@ -1,7 +1,8 @@
 import { Component, OnInit, Inject, PLATFORM_ID, ViewChild, AfterViewInit } from '@angular/core';
 import { isPlatformBrowser, NgIf } from '@angular/common';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
-import { ToolsModule } from 'tools';
+import { HeaderComponent } from 'projects/shared/components/header/header.component';
+import { PrimengMenuNavComponent } from 'projects/shared/components/primeng-menu-nav/primeng-menu-nav.component';
 
 declare var gtag: (str: string, gaId: string, path: object) => void;
 
@@ -10,7 +11,7 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     standalone: true,
-    imports: [NgIf, ToolsModule, RouterOutlet]
+    imports: [NgIf, RouterOutlet, HeaderComponent, PrimengMenuNavComponent]
 })
 export class AppComponent implements AfterViewInit, OnInit {
   private isBrowser;

@@ -18,20 +18,20 @@ bootstrapApplication(AppComponent, {
     provideAnimations(),
     provideNoopAnimations(),
     provideHttpClient(
-        withInterceptorsFromDi()
+      withInterceptorsFromDi()
     ),
     { provide: RequestCache, useClass: RequestCache },
     {
-        provide: HTTP_INTERCEPTORS,
-        useClass: CacheInterceptor,
-        multi: true
+      provide: HTTP_INTERCEPTORS,
+      useClass: CacheInterceptor,
+      multi: true
     },
     provideRouter(uheroRoutes,
-        withComponentInputBinding(),
-        withHashLocation(),
-        withRouterConfig({
-            onSameUrlNavigation: 'reload'
-        })
+      withComponentInputBinding(),
+      withHashLocation(),
+      withRouterConfig({
+        onSameUrlNavigation: 'reload'
+      })
     ),
     importProvidersFrom(
       BrowserModule,
