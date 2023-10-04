@@ -109,7 +109,6 @@ export class AnalyzerComponent
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe(
       (series) => {
-        console.log('compare', this.compare)
         this.seriesInAnalyzer = series;
         this.updateAnalyzer(series);
       }
@@ -131,7 +130,6 @@ export class AnalyzerComponent
     this.analyzerService.analyzerData.rightMax = null;
     this.routeStart = this.start;
     this.routeEnd = this.end;
-    console.log('on changes compare', this.compare)
     if (this.analyzerSeries) {
       this.storeUrlSeries(this.analyzerSeries);
     }
@@ -309,8 +307,6 @@ export class AnalyzerComponent
 
   toggleAnalyzerDisplay() {
     this.displayCompare = !this.displayCompare;
-    console.log('toggle display', this.displayCompare)
-
     this.updateUrlLocation({ compare: `${this.displayCompare}`|| null });
   }
 
@@ -326,54 +322,20 @@ export class AnalyzerComponent
   updateUrlLocation(param) {
     const paramIncludesAnalyzerSeries = Object.keys(param).includes('analyzerSeries');
     const paramIncludesChartSeries = Object.keys(param).includes('chartSeries');
+    const analyzerData = this.analyzerService.analyzerData;
+    const { analyzerSeries } = analyzerData;
     if (!paramIncludesAnalyzerSeries) {
-      const analyzerData = this.analyzerService.analyzerData;
-      const { analyzerSeries } = analyzerData;
       const analyzerSeriesParam = analyzerSeries.map((s) => s.id).join("-");
       this.queryParams = { ...this.queryParams, analyzerSeries: analyzerSeriesParam };
     }
     if (!paramIncludesChartSeries) {
-      const analyzerData = this.analyzerService.analyzerData;
-      const { analyzerSeries } = analyzerData;
       const chartSeriesParam = analyzerSeries
         .filter((s) => s.visible)
         .map((s) => s.id)
         .join("-") || null;
       this.queryParams = { ...this.queryParams, chartSeries: chartSeriesParam };
     }
-    /* const analyzerData = this.analyzerService.analyzerData;
-    const {
-      analyzerSeries,
-      yLeftSeries,
-      yRightSeries,
-      leftMin,
-      leftMax,
-      rightMin,
-      rightMax,
-      column,
-      area
-    } = analyzerData;
-    console.log('this.start', this.start)
-    this.queryParams.start = this.start;
-    this.queryParams.end = this.end;
-    this.queryParams.analyzerSeries = this.queryParams.analyzerSeries = analyzerSeries.map((s) => s.id).join("-");
-    this.queryParams.chartSeries =
-      analyzerSeries
-        .filter((s) => s.visible)
-        .map((s) => s.id)
-        .join("-") || null;
-    this.queryParams.yright = yRightSeries.length
-      ? yRightSeries.join("-")
-      : null;
-    this.queryParams.yleft = yLeftSeries.length ? yLeftSeries.join("-") : null;
-    this.queryParams.column = column.length ? column.join('-') : null;
-    this.queryParams.area = area.length ? area.join('-') : null;
-    this.queryParams.leftMin = leftMin ? leftMin : null;
-    this.queryParams.leftMax = leftMax ? leftMax : null;
-    this.queryParams.rightMin = rightMin ? rightMin : null;
-    this.queryParams.rightMax = rightMax ? rightMax : null; */
     this.queryParams = { ...this.queryParams, ...param };
-    console.log(this.route)
     const url = this.router
       .createUrlTree([], {
         relativeTo: this.route,

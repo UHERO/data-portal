@@ -7,7 +7,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy,
   ViewEncapsulation,
   SimpleChanges
 } from '@angular/core';
@@ -31,7 +30,6 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {frequencyShort: strin
     selector: 'lib-analyzer-highstock',
     templateUrl: './analyzer-highstock.component.html',
     styleUrls: ['./analyzer-highstock.component.scss'],
-    //changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
     standalone: true,
     imports: [HighchartsChartModule, NgFor, NgIf]
@@ -324,7 +322,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
             .filter((s) => s.visible)
             .map((s) => s.id)
             .join("-") || null;
-            console.log('analyzerSeries', analyzerSeries)
             this.updateUrl.emit({ analyzerSeries: seriesIds, chartSeries });
           });
         }
@@ -629,7 +626,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       .find(a => a.id === axis.userOptions.id).min = +e.target.value ?? null;
     this.analyzerService.analyzerData[`${axis.userOptions.id}Min`] = +e.target.value ?? null;
     this.updateChart = true;
-    console.log('axis', axis);
     const axisSide = axis.userOptions.id;
     const param = {};
     param[`${axisSide}Min`] = +e.target.value ?? null;
@@ -675,7 +671,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
         onclick: function(e) {
           series.forEach((series) => {
             if (series.className !== 'navigator') {
-              console.log('T', t)
               updateTransformation(series.id, t);
               updateUrlTransformation(t);
             };
@@ -688,7 +683,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
 
   updateUrlTransformation = (transformation: string) => {
     const param = { chartYoy: null, chartYtd: null, chartMom: null, chartC5ma: null};
-    console.log(transformation)
     if (transformation === 'YOY') {
       this.analyzerService.analyzerData.chartYoy = true;
       param.chartYoy = true;
@@ -705,21 +699,20 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       this.analyzerService.analyzerData.chartC5ma = true;
       param.chartC5ma = true;
     }
-    console.log(this.analyzerData)
     this.updateUrl.emit(param);
   }
 
   formatChartButtons(buttons: Array<any>) {
     const chartButtons = buttons.reduce((allButtons, button) => {
-        allButtons.push(button !== 'all' ? {
-          type: 'year',
-          count: button,
-          text: `${button}Y`
-        } :
-        {
-          type: 'all',
-          text: 'All'
-        });
+      allButtons.push(button !== 'all' ? {
+        type: 'year',
+        count: button,
+        text: `${button}Y`
+      } :
+      {
+        type: 'all',
+        text: 'All'
+      });
       return allButtons;
     }, []);
     return chartButtons;

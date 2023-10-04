@@ -77,12 +77,8 @@ export class AnalyzerService {
       this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, startDate);
     }
     const chartValues = series.observations.map(obs => obs.displayName);
-    console.log('chartValues', chartValues)
     const selectedChartTransformation = chartValues.find(name => name === this.assignChartTransformation()) || chartValues[0];
-    
-    console.log('selectedChartTransformation', selectedChartTransformation)
     const selectedTransformation = series.observations.find(t => t.displayName === selectedChartTransformation).values;
-    console.log('selectedTransformation', selectedTransformation)
     const selectedChartType = this.assignChartType(series);
     series.yAxisText = this.setYAxisLabel(indexed, baseYear, series, selectedChartTransformation);
     series.className = series.id;
@@ -224,9 +220,7 @@ export class AnalyzerService {
     const { analyzerSeries } = this.analyzerData;
     const selectedCompareSeries = this.findSelectedCompareSeries(seriesId);
     if (selectedCompareSeries) {
-      console.log('TRANSFORMATION', transformation)
       selectedCompareSeries.selectedChartTransformation = selectedCompareSeries.chartValues.find(t => t === transformation);
-      console.log('selectedCompareSeries', selectedCompareSeries)
       this.updateCompareSeriesDataAndAxes(analyzerSeries);
     }
   }
@@ -467,10 +461,6 @@ export class AnalyzerService {
       chartMom,
       chartC5ma
     } = this.analyzerData;
-    console.log('chartYOY', chartYoy);
-    console.log('chartYtd', chartYtd)
-    console.log('chartMom', chartMom)
-    console.log('chartC5ma', chartC5ma)
     if (chartYoy) {
       return 'YOY';
     }

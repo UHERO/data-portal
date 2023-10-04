@@ -59,13 +59,15 @@
         <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
           [index]="index" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="selectedDateRange.startDate"
           [endDate]="selectedDateRange.endDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries"
-          [leftMin]="data.leftMin" [leftMax]="data.leftMax" [rightMin]="data.rightMin" [column]="data.column" [area]="data.area" [rightMax]="data.rightMax"
-          [displayCompare]="displayCompare">
+          [leftMin]="data.leftMin" [leftMax]="data.leftMax" [rightMin]="data.rightMin" [column]="data.column"
+          [area]="data.area" [rightMax]="data.rightMax" [chartYoy]="data.chartYoy" [chartYtd]="data.chartYtd"
+          [chartMom]="data.chartMom" [chartC5ma]="data.chartC5ma" [displayCompare]="displayCompare">
         </lib-share-link>
       </div>
       <div id="analyzer-customizations">
         <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
-          (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerFrequency.freq, data.analyzerSeries)" class="selector">
+          (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerFrequency.freq, data.analyzerSeries)"
+          class="selector">
         </lib-freq-selector>
         <label *ngIf="data.requestComplete && data.displayFreqSelector" class="mx-2 form-check-inline">
           <input type="checkbox" (change)="indexActive($event)"
@@ -88,8 +90,9 @@
             [analyzerView]="true" [indexChecked]="index" [indexBaseYear]="data.baseYear">
           </lib-category-charts>
           <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-            [series]="data.analyzerSeries" [dates]="data.sliderDates" [indexChecked]="index" (tableExtremes)="changeRange($event)"
-            (xAxisExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation($event)">
+            [series]="data.analyzerSeries" [dates]="data.sliderDates" [indexChecked]="index"
+            (tableExtremes)="changeRange($event)" (xAxisExtremes)="changeRange($event)"
+            (updateUrl)="updateUrlLocation($event)">
           </lib-analyzer-highstock>
           <lib-analyzer-table *ngIf="data.analyzerSeries.length" [dates]="data.sliderDates" [yoyChecked]="tableYoy"
             [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom" [indexChecked]="index"

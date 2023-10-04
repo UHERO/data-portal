@@ -20,6 +20,10 @@ export class ShareLinkComponent implements OnChanges {
   @Input() index: boolean;
   @Input() column: Array<any>;
   @Input() area: Array<any>;
+  @Input() chartYoy: string;
+  @Input() chartYtd: string;
+  @Input() chartMom: string;
+  @Input() chartC5ma: string;
   @Input() yRightSeries: Array<any>;
   @Input() yLeftSeries: Array<any>;
   @Input() leftMin: number;
@@ -99,6 +103,10 @@ export class ShareLinkComponent implements OnChanges {
     seriesUrl += this.rightMax ? `&rightMax=${this.rightMax}` : '';
     seriesUrl += this.column && this.column.length ? `&column=${this.column.join('-')}` : '';
     seriesUrl += this.area && this.area.length ? `&area=${this.area.join('-')}` : '';
+    seriesUrl += this.chartYoy ? `&chartYoy=${this.chartYoy}` : '';
+    seriesUrl += this.chartYtd ? `&chartYtd=${this.chartYtd}` : '';
+    seriesUrl += this.chartMom ? `&chartMom=${this.chartMom}` : '';
+    seriesUrl += this.chartC5ma ? `&chartC5ma=${this.chartC5ma}` : '';
     seriesUrl += this.displayCompare && this.view === 'analyzer' ? `&compare=${this.displayCompare}` : '';
     return seriesUrl;
   }
