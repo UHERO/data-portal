@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes } from '@angular/router';
 import { LandingPageComponent } from 'projects/shared/components/landing-page/landing-page.component';
 import { SingleSeriesComponent } from 'projects/shared/components/single-series/single-series.component';
 import { AnalyzerComponent } from 'projects/shared/components/analyzer/analyzer.component';
