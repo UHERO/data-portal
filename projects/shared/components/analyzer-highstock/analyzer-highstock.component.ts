@@ -682,6 +682,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
   };
 
   updateUrlTransformation = (transformation: string) => {
+    this.resetAnalyzerDataTransformationChecks();
     const param = { chartYoy: null, chartYtd: null, chartMom: null, chartC5ma: null};
     if (transformation === 'YOY') {
       this.analyzerService.analyzerData.chartYoy = true;
@@ -700,6 +701,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       param.chartC5ma = true;
     }
     this.updateUrl.emit(param);
+  }
+
+  resetAnalyzerDataTransformationChecks = () => {
+    this.analyzerService.analyzerData.chartYoy = false;
+    this.analyzerService.analyzerData.chartYtd = false;
+    this.analyzerService.analyzerData.chartMom = false;
+    this.analyzerService.analyzerData.chartC5ma = false;
   }
 
   formatChartButtons(buttons: Array<any>) {
