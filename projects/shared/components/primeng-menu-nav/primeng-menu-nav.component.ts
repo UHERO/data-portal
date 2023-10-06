@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy, AfterContentChecked } from '@angular/core';
+import { Component, Inject, OnInit, AfterContentChecked } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd, RouterLink } from '@angular/router';
 import { AnalyzerService } from 'projects/shared/services/analyzer.service';
 import { ApiService } from 'projects/shared/services/api.service';
@@ -21,7 +21,7 @@ import { NgIf, NgFor } from '@angular/common';
         NgFor,
     ],
 })
-export class PrimengMenuNavComponent implements OnInit, OnDestroy {
+export class PrimengMenuNavComponent implements OnInit {
   public categories;
   public reveal = false;
   public overlay = false;
@@ -36,7 +36,6 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   private defaultCategory;
   private packageCatData;
   private expand = true;
-  analyzerSeriesCount;
   portalSettings;
   navMenuItems: MenuItem[];
   uheroLogo: boolean;
@@ -50,9 +49,6 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) {
-    this.analyzerSeriesCount = this.analyzerService.analyzerSeriesCount$.subscribe((data: any) => {
-      this.analyzerSeries = data;
-    });
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
@@ -93,10 +89,6 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     });
     this.headerLogo = this.logo;
     this.uheroLogo = this.logo.altText.includes('UHERO');
-  }
-
-  ngOnDestroy() {
-    this.analyzerSeriesCount.unsubscribe();
   }
 
   setQueryParams = (categoryId, subcategoryId) => {

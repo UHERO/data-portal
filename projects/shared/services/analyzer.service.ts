@@ -1,5 +1,5 @@
 import { of as observableOf, forkJoin as observableForkJoin, BehaviorSubject } from 'rxjs';
-import { Inject, Injectable, EventEmitter, Output } from '@angular/core';
+import { Inject, Injectable, EventEmitter, Output, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { DataPortalSettingsService } from './data-portal-settings.service';
@@ -24,6 +24,10 @@ class AnalyzerData implements AnalyzerDataInterface {
   chartYtd = false;
   chartMom = false;
   chartC5ma = false;
+  seriesYoy = [];
+  seriesYtd = [];
+  seriesMom = [];
+  seriesC5ma = [];
   leftMin = null;
   leftMax = null;
   rightMin = null;
@@ -39,10 +43,11 @@ class AnalyzerData implements AnalyzerDataInterface {
 })
 export class AnalyzerService {
   // Keep track of series in the analyzer
-  analyzerSeriesTrackerSource: BehaviorSubject<any> = new BehaviorSubject([]);
-  analyzerSeriesTracker = this.analyzerSeriesTrackerSource.asObservable();
-  analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesTrackerSource.value.length);
-  analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
+  analyzerSeriesStore = signal<number[]>([]);
+  //analyzerSeriesTrackerSource: BehaviorSubject<any> = new BehaviorSubject([]);
+  //analyzerSeriesTracker = this.analyzerSeriesTrackerSource.asObservable();
+  //analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesTrackerSource.value.length);
+  //analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
 
   public analyzerData = new AnalyzerData();
   public embedData = {
@@ -60,11 +65,15 @@ export class AnalyzerService {
     private dataPortalSettingsServ: DataPortalSettingsService,
   ) { }
 
-  checkAnalyzer = (seriesInfo: any) => this.analyzerSeriesTrackerSource.value.some(series => series.id === seriesInfo.id);
+  // checkAnalyzer = (seriesInfo: any) => this.analyzerSeriesTrackerSource.value.some(series => series.id === seriesInfo.id);
+    checkAnalyzer = (seriesInfo: any) => this.analyzerSeriesStore().some(id => id === seriesInfo.id);
 
-  updateAnalyzerSeries(data) {
+  /*updateAnalyzerSeries(data) {
     this.analyzerSeriesTrackerSource.next(data);
     this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
+  }*/
+  updateAnalyzerSeries(data: number[]) {
+    this.analyzerSeriesStore.update(() => [...data])
   }
 
   getVisibleCompareSeries = (series) => series.filter(s => s.visible);
@@ -217,11 +226,40 @@ export class AnalyzerService {
   }
 
   updateCompareChartTransformation(seriesId: number, transformation: string) {
-    const { analyzerSeries } = this.analyzerData;
+    const { analyzerSeries, seriesYoy, seriesYtd, seriesMom, seriesC5ma } = this.analyzerData;
     const selectedCompareSeries = this.findSelectedCompareSeries(seriesId);
     if (selectedCompareSeries) {
+      console.log('transformation', transformation)
       selectedCompareSeries.selectedChartTransformation = selectedCompareSeries.chartValues.find(t => t === transformation);
+      this.updateTransformationTrackers(this.analyzerData, transformation, seriesId)
       this.updateCompareSeriesDataAndAxes(analyzerSeries);
+      
+    }
+  }
+
+  updateTransformationTrackers(analyzerData: AnalyzerData, transformation: string, seriesId: number) {
+    const { seriesYoy, seriesYtd, seriesMom, seriesC5ma } = analyzerData;
+    if (transformation === 'YOY') {
+      this.filterTransformationTrackers(seriesYtd, seriesId);
+      seriesYoy.push(seriesId);
+    }
+    if (transformation === 'YTD') {
+      seriesYtd.push(seriesId);
+    }
+    if (transformation === 'MOM') {
+      seriesMom.push(seriesId);
+    }
+    if (transformation === 'Annual Change') {
+      seriesC5ma.push(seriesId);
+    }
+    console.log('seriesYoy', seriesYoy);
+    console.log('seriesYtd', seriesYtd);
+  }
+
+  filterTransformationTrackers(transformationArr, seriesId) {
+    const matchIndex = transformationArr.findIndex(id => id === seriesId);
+    if (matchIndex > -1) {
+      transformationArr.splice(matchIndex, 1);
     }
   }
 
@@ -274,22 +312,26 @@ export class AnalyzerService {
   }
 
   addToAnalyzer(seriesID: number) {
-    let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
+    /*let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
     currentAnalyzerTracker = [...currentAnalyzerTracker, { id: seriesID }];
     this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker);
-    this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
+    this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);*/
+    this.analyzerSeriesStore.update(() => [...this.analyzerSeriesStore(), seriesID]);
   }
 
   removeFromAnalyzer(seriesID: number, startDate: string) {
-    let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
+    // let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
     const { analyzerSeries } = this.analyzerData;
-    const current = currentAnalyzerTracker.filter(s => s.id !== seriesID)
+    /*const current = currentAnalyzerTracker.filter(s => s.id !== seriesID)
     this.analyzerData.analyzerSeries = analyzerSeries.filter(s => s.id !== seriesID);
     this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker.filter(s => s.id !== seriesID));
-    this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
+    this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);*/
+    this.analyzerSeriesStore.update(() => {
+      return this.analyzerSeriesStore().filter(id => id !== seriesID);
+    })
     this.updateBaseYear(startDate);
     this.analyzerData.analyzerSeries = [].concat(this.analyzerData.analyzerSeries);
-    return { analyzerSeries: current };
+    return { analyzerSeries: analyzerSeries };
   }
 
   getAnalyzerData(aSeriesTracker: Array<any>, startDate: string, noCache: boolean) {
@@ -297,7 +339,7 @@ export class AnalyzerService {
     this.analyzerData.analyzerMeasurements = {}
     this.analyzerData.requestComplete = false;
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-    const ids = aSeriesTracker.map(s => s.id).join();
+    const ids = aSeriesTracker.map(id => id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       const analyzerDateWrapper = { } as DateWrapper;
@@ -397,7 +439,8 @@ export class AnalyzerService {
   }
 
   removeAll() {
-    this.updateAnalyzerSeries([]);
+    //this.updateAnalyzerSeries([]);
+    this.analyzerSeriesStore.update(() => []);
     this.analyzerData = this.resetAnalyzerData();
   }
 

@@ -6,12 +6,12 @@
     </button>
     <ng-template [ngIf]="uheroLogo">
       <div>
-      <a class="navbar-brand" id="uhero-link" href="https://uhero.hawaii.edu">
-        <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
-      </a>
-      <a class="navbar-brand" id="data-portal-link" routerLink="/">
-        <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
-      </a>
+        <a class="navbar-brand" id="uhero-link" href="https://uhero.hawaii.edu">
+          <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+        </a>
+        <a class="navbar-brand" id="data-portal-link" routerLink="/">
+          <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+        </a>
       </div>
     </ng-template>
     <ng-template [ngIf]="!uheroLogo">
@@ -25,10 +25,11 @@
     <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
     <lib-search-bar (search)="onSearch($event)"></lib-search-bar>
     <p-panelMenu [model]="navMenuItems" [multiple]="true"></p-panelMenu>
-    <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer">&nbsp; Analyzer ({{analyzerSeries}})</a>
+    <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer">&nbsp;
+      Analyzer ({{analyzerService.analyzerSeriesStore().length}})</a>
     <hr *ngIf="portalSettings.otherDashboardLinks && portalSettings.otherDashboardLinks.length" />
     <ng-template ngFor let-dashboard [ngForOf]="portalSettings.otherDashboardLinks">
-      <a *ngIf="dashboard.name" class="list-item" [attr.href]="dashboard.url">{{dashboard.name}}</a>  
+      <a *ngIf="dashboard.name" class="list-item" [attr.href]="dashboard.url">{{dashboard.name}}</a>
     </ng-template>
     <span *ngIf="headerLogo.analyticsLogoSrc">
       <p id="built-by">Built By</p>

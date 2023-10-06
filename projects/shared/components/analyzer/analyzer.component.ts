@@ -69,6 +69,10 @@ export class AnalyzerComponent
   @Input() chartYtd: string;
   @Input() chartMom: string;
   @Input() chartC5ma: string;
+  @Input() seriesYoy: string;
+  @Input() seriesYtd: string;
+  @Input() seriesMom: string;
+  @Input() seriesC5ma: string;
   @Input() nocache: string;
 
   portalSettings;
@@ -107,12 +111,12 @@ export class AnalyzerComponent
     private location: Location,
     private helperService: HelperService
   ) {
-    this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe(
+    /*this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe(
       (series) => {
         this.seriesInAnalyzer = series;
         this.updateAnalyzer(series);
       }
-    );
+    );*/
 
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
       (dateRange) => {
@@ -130,6 +134,9 @@ export class AnalyzerComponent
     this.analyzerService.analyzerData.rightMax = null;
     this.routeStart = this.start;
     this.routeEnd = this.end;
+
+    this.seriesInAnalyzer = this.analyzerService.analyzerSeriesStore();
+    console.log(this.analyzerService.analyzerSeriesStore())
     if (this.analyzerSeries) {
       this.storeUrlSeries(this.analyzerSeries);
     }
@@ -177,6 +184,18 @@ export class AnalyzerComponent
     if (this.chartC5ma) {
       this.analyzerService.analyzerData.chartC5ma = this.evalParamAsTrue(this.chartC5ma);
     }
+    if (this.seriesYoy) {
+      this.analyzerService.analyzerData.seriesYoy = this.seriesYoy.split('-').map(id => +id);
+    }
+    if (this.seriesYtd) {
+      this.analyzerService.analyzerData.seriesYtd = this.seriesYtd.split('-').map(id => +id);
+    }
+    if (this.seriesMom) {
+      this.analyzerService.analyzerData.seriesMom = this.seriesMom.split('-').map(id => +id);
+    }
+    if (this.seriesC5ma) {
+      this.analyzerService.analyzerData.seriesC5ma = this.seriesC5ma.split('-').map(id => +id);
+    }
     if (this.leftMin) {
       this.analyzerService.analyzerData.leftMin = this.leftMin;
     }
@@ -213,12 +232,13 @@ export class AnalyzerComponent
   }
 
   ngOnDestroy() {
-    this.analyzerSeriesSub.unsubscribe();
+    //this.analyzerSeriesSub.unsubscribe();
     this.dateRangeSubscription.unsubscribe();
   }
 
   storeUrlSeries(urlSeries: string) {
-    const urlASeries = urlSeries.split("-").map((id) => ({ id: +id }));
+    // const urlASeries = urlSeries.split("-").map((id) => ({ id: +id }));
+    const urlASeries = urlSeries.split('-').map(id => +id);
     this.analyzerService.updateAnalyzerSeries(urlASeries);
   }
 
