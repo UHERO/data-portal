@@ -15,8 +15,8 @@ import { NgFor, NgIf, AsyncPipe } from '@angular/common';
     standalone: true,
     imports: [NgFor, NgIf, DateSliderComponent, HighstockComponent, AnalyzerHighstockComponent, AsyncPipe]
 })
-export class EmbedGraphComponent implements OnInit, OnDestroy {
-  private seriesId: number;
+export class EmbedGraphComponent /* implements OnInit, OnDestroy */{
+  /* private seriesId: number;
   private analyzerIds: Array<any>;
   startDate: string;
   endDate: string;
@@ -95,5 +95,5 @@ export class EmbedGraphComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.analyzerService.analyzerData = this.analyzerService.resetAnalyzerData();
-  }
+  } */
 }

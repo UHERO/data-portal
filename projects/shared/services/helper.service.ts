@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Frequency } from '../models/Frequency';
 import { Geography } from '../models/Geography';
@@ -19,6 +19,10 @@ export class HelperService {
   currentDateRangeChange: BehaviorSubject<any> = new BehaviorSubject(<DateRange>{});
   currentDateRange = this.currentDateRangeChange.asObservable();
 
+  startDate = signal<string>(null);
+  endDate = signal<string>(null);
+  endOfSample = signal<boolean>(null);
+  useDefaultRange = signal<boolean>(null);
 
   constructor() { }
 
@@ -30,6 +34,22 @@ export class HelperService {
       }
     });
     return id;
+  }
+
+  setStartDate(date: string) {
+    this.startDate.set(date);
+  }
+
+  setEndDate(date: string) {
+    this.endDate.set(date);
+  }
+
+  setEndOfSample(isEndOfSample) {
+      this.endOfSample.set(isEndOfSample);
+  }
+
+  setUseDefaultRange(useDefault: boolean) {
+    this.useDefaultRange.set(useDefault);
   }
 
   updateCurrentFrequency = (newFreq: Frequency) => {
@@ -59,6 +79,10 @@ export class HelperService {
       useDefaultRange: useDefault,
       endOfSample: end === dates[dates.length - 1].date
     });
+    /*this.setStartDate(start);
+    this.setEndDate(end);
+    this.setUseDefaultRange(useDefault);
+    this.setEndOfSample(end === dates[dates.length - 1].date);*/
   }
 
   getIdParam = (id: any) => {

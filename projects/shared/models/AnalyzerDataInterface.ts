@@ -9,14 +9,14 @@ export interface AnalyzerDataInterface {
   displayFreqSelector: boolean;
   siblingFreqs: Array<any>;
   analyzerFrequency: null;
-  yRightSeries: Array<any>;
-  yLeftSeries: Array<any>;
-  leftMin: number;
-  leftMax: number;
-  rightMin: number;
-  rightMax: number;
-  urlChartSeries: Array<any>;
+  //yRightSeries: Array<any>;
+  //yLeftSeries: Array<any>;
+  //leftMin: number;
+  //leftMax: number;
+  //rightMin: number;
+  //rightMax: number;
+  //urlChartSeries: Array<any>;
   requestComplete: boolean;
-  indexed: boolean;
-  baseYear: string;
+  //indexed: boolean;
+  //baseYear: string;
 }

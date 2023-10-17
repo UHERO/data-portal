@@ -34,7 +34,7 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {frequencyShort: strin
     standalone: true,
     imports: [HighchartsChartModule, NgFor, NgIf]
 })
-export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy {
+export class AnalyzerHighstockComponent /*implements OnInit, OnChanges, OnDestroy*/ {
   @Input() series;
   @Input() portalSettings;
   @Input() dates;
@@ -264,7 +264,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
           settingIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
           settingIcon.setAttribute('viewBox', '0 0 16 16');
           const dropdownElements = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-          const dropdownList = dropdownElements.map(function (dropdownToggleEl) {
+          dropdownElements.map(function (dropdownToggleEl) {
             return new Dropdown(dropdownToggleEl, {
               boundary: document.querySelector('.analyzer-view'),
               popperConfig: {
@@ -305,13 +305,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
             }
           });
           removeFromComparisonChartItem.addEventListener('click', () => {
-            const { analyzerSeries } = 
+            /*const { analyzerSeries } = 
               analyzerService.removeFromComparisonChart(seriesId, this.selectedDateRange.startDate);
             const chartSeries = analyzerSeries
               .filter((s) => s.visible)
               .map((s) => s.id)
               .join("-") || null;
-            this.updateUrl.emit({ chartSeries });
+            this.updateUrl.emit({ chartSeries });*/
           });
           removeFromAnalyzerItem.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -342,7 +342,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
       this.selectedDateRange = dateRange;
       const { startDate, endDate } = dateRange;
@@ -350,10 +350,20 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     });
   }
 
+  /* ngOnInit(): void {
+    this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
+      this.selectedDateRange = dateRange;
+      const { startDate, endDate } = dateRange;
+      this.drawChart(startDate, endDate);
+    });
+  } */
+
   ngOnChanges(changes: SimpleChanges) {
     const indexCheckChange = changes['indexChecked'];
     const seriesChange = changes['series']; 
     const datesChange = changes['dates'];
+    console.log(changes)
+    console.log('indexCheckChange', indexCheckChange)
     if (
       (indexCheckChange && !indexCheckChange.firstChange) ||
       (seriesChange && !seriesChange.firstChange) ||
@@ -364,9 +374,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     }
   }
 
-  ngOnDestroy(): void {
+  /* ngOnDestroy(): void {
     this.dateRangeSubscription.unsubscribe();
-  }
+  } */
 
   drawChart(startDate: string, endDate: string) {
     this.updateChartOptions(this.series, startDate, endDate);
@@ -402,9 +412,45 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     const dates = this.dates;
     const rangeSelectorSetExtremes = (eventMin, eventMax, freq, dates, xAxisExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, dates, xAxisExtremes);
     this.chartOptions.accessibility.description = `${portal}\n${portalLink}`;
+    console.log("SERIES", series)
     this.chartOptions.series = series.map((s, index) => {
+      /*const indexed = this.analyzerService.indexed();
+      const baseYear = this.analyzerService.baseYear();
+      console.log('INDEXED', indexed);
+      console.log('baseYear', baseYear)
+      const transformation = s.selectedChartTransformation || 'Level';
+      console.log('s', s.selectedChartTransformation)
+      const transformationValues = [...s.observations.find(s => s.displayName === transformation).values]
+      console.log('data', transformationValues)
+      const data = this.analyzerService.indexed() ?
+        this.analyzerService.getChartIndexedValues(transformationValues, this.analyzerService.baseYear()) :
+        transformationValues;
+      s.yAxisText = this.analyzerService.setYAxisLabel(indexed, baseYear, s, transformation);
+      s.name = s.displayName;
+      s.className = s.id;
+      s.yAxis = this.analyzerService.assignYAxisSide(s);
+      s.includeInDataExport = true;
+      s.showInLegend = true;
+      s.showInNavigator = false;
+      s.events = {
+        legendItemClick() {
+          return false;
+        }
+      };
+      s.seasonallyAdjusted = series.seasonalAdjustment === 'seasonally_adjusted';
+      s.chartType = [
+        'line',
+        'column',
+        'area'
+      ];
+      s.yAxisSides = [
+        'left',
+        'right'
+      ];
+      s.chartValues = s.observations.map(obs => obs.displayName);*/
       return {
         ...s,
+        //data,
         colorIndex: index,
       };
     });
@@ -417,50 +463,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       }
     };
 
-    const leftAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'left');
-    const rightAxisLabel = this.createYAxisLabel(this.chartOptions.series, 'right');
-    this.chartOptions.yAxis = this.chartOptions.series.reduce((axes, s) => {
-      if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
-        const { leftMin, leftMax, rightMin, rightMax } = this.analyzerService.analyzerData;
-        let currentMin: number;
-        let currentMax: number;
-        if (s.yAxis === 'left') {
-          currentMin = +leftMin ?? 0;
-          currentMax = +leftMax || null;
-        }
-        if (s.yAxis === 'right') {
-          currentMin = +rightMin ?? 0;
-          currentMax = +rightMax || null;
-        }
-        axes.push({
-          labels: {
-            formatter() {
-              return Highcharts.numberFormat(this.value, 2, '.', ',');
-            },
-            align: s.yAxis === 'right' ? 'left' : 'right' 
-          },
-          id: `${s.yAxis}`,
-          title: {
-            text: s.yAxis === 'right' ? rightAxisLabel : leftAxisLabel
-          },
-          opposite: s.yAxis === 'left' ? false : true,
-          gridLineColor: 'none',
-          minPadding: 0,
-          maxPadding: 0,
-          minTickInterval: 0.01,
-          endOnTick: false,
-          startOnTick: false,
-          showEmpty: false,
-          styleOrder: s.yAxis === 'left' ? 1 : 2,
-          showLastLabel: true,
-          showFirstLabel: true,
-          min: currentMin,
-          max: currentMax,
-          visible: this.chartOptions.series.filter(series => series.yAxis === s.yAxis && series.className !== 'navigator').some(series => series.visible)
-        });
-      }
-      return axes;
-    }, []);
+    this.chartOptions.yAxis = this.createYAxes(this.chartOptions.series);
 
     this.chartOptions.exporting = {
       allowHTML: true,
@@ -565,15 +568,18 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       const chartTypeSelect = document.createElement('select');
       chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);
       chartTypeSelect.classList.add('form-select'); 
-      this.addSelectorOptions(chartTypeSelect, series.chartType, series.selectedChartType)
+      this.addSelectorOptions(chartTypeSelect, series.chartType, series.type)
       chartTypeMenuItem.appendChild(chartTypeSelect);
       chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
       chartTypeSelect.addEventListener('change', e => {
-        const { column, area } = 
-          this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value);
-        const columnParam = column.length ? column.join('-') : null;
+        //  { column, area } = 
+          // this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value);
+        /*const columnParam = column.length ? column.join('-') : null;
         const areaParam = area.length ? area.join('-') : null;
-        this.updateUrl.emit({ column: columnParam, area: areaParam });
+        this.updateUrl.emit({ column: columnParam, area: areaParam });*/
+        const selected = this.chartOptions.series.findIndex(s => +s.id === seriesId)
+        this.chartOptions.series[selected].type = (e.target as HTMLSelectElement).value as any;
+        this.updateChart = true
       });  
     }
   }
@@ -588,11 +594,65 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
       yAxisSelect.addEventListener('change', (e) => {
         const side = (e.target as HTMLSelectElement).value;
-        const { yLeftSeries, yRightSeries } =
-          this.analyzerService.updateCompareSeriesAxis(seriesId, side);
-        this.updateUrl.emit({ yleft: yLeftSeries, yright: yRightSeries});
+        this.analyzerService.updateCompareSeriesAxis(seriesId, side);
+        const selected = this.chartOptions.series.findIndex(s => +s.id === seriesId);
+        this.chartOptions.series[selected].yAxis = side;
+        this.chartOptions.yAxis = this.createYAxes(this.chartOptions.series);
+        this.updateChart = true;
+        /* const { yLeftSeries, yRightSeries } =
+          this.analyzerService.updateCompareSeriesAxis(seriesId, side); */
+        // this.updateUrl.emit({ yleft: yLeftSeries, yright: yRightSeries});
       });
     }
+  }
+
+  createYAxes = (chartSeries): any => {
+    const leftAxisLabel = this.createYAxisLabel(chartSeries, 'left');
+    const rightAxisLabel = this.createYAxisLabel(chartSeries, 'right');
+
+    const yAxes = chartSeries.reduce((axes, s) => {
+      if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
+        // const { leftMin, leftMax, rightMin, rightMax } = this.analyzerService.analyzerData;
+        let currentMin: number;
+        let currentMax: number;
+        if (s.yAxis === 'left') {
+          // currentMin = +leftMin ?? 0;
+          // currentMax = +leftMax || null;
+        }
+        if (s.yAxis === 'right') {
+          //currentMin = +rightMin ?? 0;
+          //currentMax = +rightMax || null;
+        }
+        axes.push({
+          labels: {
+            formatter() {
+              return Highcharts.numberFormat(this.value, 2, '.', ',');
+            },
+            align: s.yAxis === 'right' ? 'left' : 'right' 
+          },
+          id: `${s.yAxis}`,
+          title: {
+            text: s.yAxis === 'right' ? rightAxisLabel : leftAxisLabel
+          },
+          opposite: s.yAxis === 'left' ? false : true,
+          gridLineColor: 'none',
+          minPadding: 0,
+          maxPadding: 0,
+          minTickInterval: 0.01,
+          endOnTick: false,
+          startOnTick: false,
+          showEmpty: false,
+          styleOrder: s.yAxis === 'left' ? 1 : 2,
+          showLastLabel: true,
+          showFirstLabel: true,
+          min: currentMin,
+          max: currentMax,
+          visible: this.chartOptions.series.filter(series => series.yAxis === s.yAxis && series.className !== 'navigator').some(series => series.visible)
+        });
+      }
+      return axes;
+    }, []);
+    return yAxes;
   }
 
   createChartSeriesValueSelector(seriesId: number, series: any, chartValueItem: HTMLElement) {
@@ -603,7 +663,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       this.addSelectorOptions(valueSelect, series.chartValues, series.selectedChartTransformation);
       chartValueItem.appendChild(valueSelect);
       chartValueItem.addEventListener('mousedown', e => e.stopPropagation());
-      chartValueItem.addEventListener('change', e => this.analyzerService.updateCompareChartTransformation(seriesId, (e.target as HTMLSelectElement).value));
+      chartValueItem.addEventListener('change', e => {
+        const selectedTransformation = (e.target as HTMLSelectElement).value;
+        this.analyzerService.updateCompareChartTransformation(seriesId, selectedTransformation);
+      });
     }
   }
 
@@ -685,29 +748,29 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     this.resetAnalyzerDataTransformationChecks();
     const param = { chartYoy: null, chartYtd: null, chartMom: null, chartC5ma: null};
     if (transformation === 'YOY') {
-      this.analyzerService.analyzerData.chartYoy = true;
+      // this.analyzerService.analyzerData.chartYoy = true;
       param.chartYoy = true;
     }
     if (transformation === 'YTD') {
-      this.analyzerService.analyzerData.chartYtd = true;
+      // this.analyzerService.analyzerData.chartYtd = true;
       param.chartYtd = true;
     }
     if (transformation === 'MOM') {
-      this.analyzerService.analyzerData.chartMom = true;
+      // this.analyzerService.analyzerData.chartMom = true;
       param.chartMom = true;
     }
     if (transformation === 'Annual Change') {
-      this.analyzerService.analyzerData.chartC5ma = true;
+      // this.analyzerService.analyzerData.chartC5ma = true;
       param.chartC5ma = true;
     }
     this.updateUrl.emit(param);
   }
 
   resetAnalyzerDataTransformationChecks = () => {
-    this.analyzerService.analyzerData.chartYoy = false;
+    /*this.analyzerService.analyzerData.chartYoy = false;
     this.analyzerService.analyzerData.chartYtd = false;
     this.analyzerService.analyzerData.chartMom = false;
-    this.analyzerService.analyzerData.chartC5ma = false;
+    this.analyzerService.analyzerData.chartC5ma = false;*/
   }
 
   formatChartButtons(buttons: Array<any>) {
