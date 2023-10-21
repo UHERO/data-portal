@@ -73,6 +73,7 @@ export class HelperService {
   }
 
   setCurrentDateRange = (start: string, end: string, useDefault: boolean, dates: Array<any>) => {
+    console.log('date', dates)
     this.updateCurrentDateRange({
       startDate: start,
       endDate: end,

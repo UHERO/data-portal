@@ -4,8 +4,6 @@ import {
   Inject,
   Input,
   OnDestroy,
-  ChangeDetectorRef,
-  AfterContentChecked,
   SimpleChanges,
   computed,
 } from "@angular/core";
@@ -46,7 +44,7 @@ import { DialogModule } from "primeng/dialog";
   ],
 })
 export class AnalyzerComponent
-  implements OnChanges, OnDestroy, AfterContentChecked
+  implements OnChanges, OnDestroy
 {
   @Input() analyzerSeries: string;
   @Input() chartSeries: string;
@@ -70,10 +68,6 @@ export class AnalyzerComponent
   @Input() chartYtd: string;
   @Input() chartMom: string;
   @Input() chartC5ma: string;
-  @Input() seriesYoy: string;
-  @Input() seriesYtd: string;
-  @Input() seriesMom: string;
-  @Input() seriesC5ma: string;
   @Input() nocache: string;
 
   portalSettings;
@@ -82,11 +76,7 @@ export class AnalyzerComponent
   tableC5ma: boolean;
   tableMom: boolean;
   private noCache: boolean;
-  analyzerData;
-  yRightSeries: string;
-  yLeftSeries: string;
   analyzerShareLink: string;
-  analyzerSeriesSub: Subscription;
   seriesInAnalyzer;
   routeView: string;
   queryParams: any = {};
@@ -100,7 +90,6 @@ export class AnalyzerComponent
   selectedDateRange: DateRange;
   previousFreq: string = "";
   
-  // analyzerData2 = computed(() => this.analyzerService.analyzerData())
   constructor(
     @Inject("environment") private environment,
     @Inject("portal") private portal,
@@ -109,17 +98,9 @@ export class AnalyzerComponent
     private route: ActivatedRoute,
     private apiService: ApiService,
     private router: Router,
-    private cdRef: ChangeDetectorRef,
     private location: Location,
     private helperService: HelperService
   ) {
-    /*this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe(
-      (series) => {
-        this.seriesInAnalyzer = series;
-        this.updateAnalyzer(series);
-      }
-    );*/
-
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
       (dateRange) => {
         this.selectedDateRange = dateRange;
@@ -127,15 +108,9 @@ export class AnalyzerComponent
     );
   }
 
-  analyzerData2 = computed(() => this.analyzerService.analyzerData());
+  analyzerData = computed(() => this.analyzerService.analyzerData());
   
   ngOnChanges(simpleChanges: SimpleChanges) {
-    /*this.analyzerService.analyzerData.yLeftSeries = [];
-    this.analyzerService.analyzerData.yRightSeries = [];
-    this.analyzerService.analyzerData.leftMin = null;
-    this.analyzerService.analyzerData.leftMax = null;
-    this.analyzerService.analyzerData.rightMin = null;
-    this.analyzerService.analyzerData.rightMax = null;*/
     this.routeStart = this.start;
     this.routeEnd = this.end;
 
@@ -161,69 +136,40 @@ export class AnalyzerComponent
       this.tableMom = this.evalParamAsTrue(this.mom);
     }
     if (this.yright) {
-      this.yRightSeries = this.yright;
-      //this.analyzerService.analyzerData.yRightSeries = this.yright.split('-').map(id => +id);
-      this.analyzerService.yRightSeries.mutate(() => this.yright.split('-').map(id => +id));
+      this.analyzerService.yRightSeries.update(right => right = this.yright.split('-').map(id => +id));
     }
     if (this.yleft) {
-      this.yLeftSeries = this.yleft;
-      //this.analyzerService.analyzerData.yLeftSeries = this.yleft.split('-').map(id => +id);
-      this.analyzerService.yLeftSeries.mutate(() => this.yleft.split('-').map(id => +id));
+      this.analyzerService.yLeftSeries.update(left => left = this.yleft.split('-').map(id => +id));
     }
     if (this.column) {
-      // this.analyzerService.analyzerData.column = this.column.split('-').map(id => +id);
-      this.analyzerService.column.mutate(() => this.column.split('-').map(id => +id));
+      this.analyzerService.column.update(col => col = this.column.split('-').map(id => +id));
     }
     if (this.area) {
-      // this.analyzerService.analyzerData.area = this.area.split('-').map(id => +id);
-      this.analyzerService.area.mutate(() => this.area.split('-').map(id => +id))
+      this.analyzerService.area.update(area => area = this.area.split('-').map(id => +id));
     }
+
     if (this.chartYoy) {
-      //this.analyzerService.analyzerData.chartYoy = this.evalParamAsTrue(this.chartYoy);
-      this.analyzerService.chartYoy.set(this.evalParamAsTrue(this.chartYoy));
+      this.analyzerService.chartYoy.update(yoy => yoy = this.chartYoy.split('-'));
     }
     if (this.chartYtd) {
-      //this.analyzerService.analyzerData.chartYtd = this.evalParamAsTrue(this.chartYtd);
-      this.analyzerService.chartYtd.set(this.evalParamAsTrue(this.chartYtd));
+      this.analyzerService.chartYtd.update(ytd => ytd = this.chartYtd.split('-'));
     }
     if (this.chartMom) {
-      //this.analyzerService.analyzerData.chartMom = this.evalParamAsTrue(this.chartMom);
-      this.analyzerService.chartMom.set(this.evalParamAsTrue(this.chartMom));
+      this.analyzerService.chartMom.update(mom => mom = this.chartMom.split('-'));
     }
     if (this.chartC5ma) {
-      // this.analyzerService.analyzerData.chartC5ma = this.evalParamAsTrue(this.chartC5ma);
-      this.analyzerService.chartC5ma.set(this.evalParamAsTrue(this.chartC5ma))
-    }
-    if (this.seriesYoy) {
-      // this.analyzerService.analyzerData.seriesYoy = this.seriesYoy.split('-').map(id => +id);
-      this.analyzerService.seriesYoy.mutate(() => this.seriesYoy.split('-').map(id => +id));
-    }
-    if (this.seriesYtd) {
-      //this.analyzerService.analyzerData.seriesYtd = this.seriesYtd.split('-').map(id => +id);
-      this.analyzerService.seriesYtd.mutate(() => this.seriesYtd.split('-').map(id => +id));
-    }
-    if (this.seriesMom) {
-      //this.analyzerService.analyzerData.seriesMom = this.seriesMom.split('-').map(id => +id);
-      this.analyzerService.seriesMom.mutate(() => this.seriesMom.split('-').map(id => +id));
-    }
-    if (this.seriesC5ma) {
-      // this.analyzerService.analyzerData.seriesC5ma = this.seriesC5ma.split('-').map(id => +id);
-      this.analyzerService.seriesMom.mutate(() => this.seriesMom.split('-').map(id => +id));
+      this.analyzerService.chartC5ma.update(c5ma => c5ma = this.chartC5ma.split('-'));
     }
     if (this.leftMin) {
-      //this.analyzerService.analyzerData.leftMin = this.leftMin;
       this.analyzerService.leftMin.set(+this.leftMin);
     }
     if (this.leftMax) {
-      //this.analyzerService.analyzerData.leftMax = this.leftMax;
       this.analyzerService.leftMax.set(+this.leftMax);
     }
     if (this.rightMin) {
-      //this.analyzerService.analyzerData.rightMin = this.rightMin;
       this.analyzerService.rightMin.set(+this.rightMin);
     }
     if (this.rightMax) {
-      //this.analyzerService.analyzerData.rightMax = this.rightMax;
       this.analyzerService.rightMax.set(+this.rightMax);
     }
     this.noCache = this.evalParamAsTrue(this.nocache);
@@ -234,32 +180,20 @@ export class AnalyzerComponent
       this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
-  ngAfterContentChecked() {
-    // this.cdRef.detectChanges();
-  }
-
   evalParamAsTrue = (param: string) => param === "true";
 
   updateAnalyzer(analyzerSeries: Array<any>) {
     if (analyzerSeries.length && this.selectedDateRange) {
-      /*  this.analyzerData = this.analyzerService.getAnalyzerData(
-        analyzerSeries,
-        this.selectedDateRange.startDate,
-        this.noCache
-      ); */
       this.analyzerService.getAnalyzerData(
         analyzerSeries,
         this.selectedDateRange.startDate,
         this.noCache
       );
-
-      //this.analyzerService.analyzerData.indexed = this.index === 'true';
       this.analyzerService.indexed.set(this.index === 'true');
     }
   }
 
   ngOnDestroy() {
-    //this.analyzerSeriesSub.unsubscribe();
     this.dateRangeSubscription.unsubscribe();
   }
 
@@ -270,18 +204,12 @@ export class AnalyzerComponent
   }
 
   indexActive(e) {
-    /* this.index = e.target.checked;
-    this.queryParams.index = e.target.checked || null;
-    this.analyzerService.toggleIndexValues(
-      e.target.checked,
-      this.selectedDateRange.startDate
-    );
-    this.updateUrlLocation({ index: e.target.checked || null }); */
     this.analyzerService.toggleIndexValues(
       e.target.checked,
       this.selectedDateRange.startDate
     )
     this.analyzerService.indexed.set(e.target.checked);
+    this.updateUrlLocation({ index: this.analyzerService.indexed() || null });
     console.log(this.analyzerService.indexed())
   }
 
@@ -306,8 +234,7 @@ export class AnalyzerComponent
   changeAnalyzerFrequency(freq, previousFreq: string, analyzerSeries) {
     this.previousFreq = previousFreq === freq ? "" : previousFreq;
     const siblingIds = [];
-    // this.analyzerService.analyzerData.urlChartSeries = [];
-    this.analyzerService.urlChartSeries.mutate(() => []);
+    this.analyzerService.urlChartSeries.update(series => series = []);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(
         serie.id,
@@ -336,18 +263,9 @@ export class AnalyzerComponent
       if (siblingIds.length) {
         this.displaySelectionNA = false;
       }
-      const analyzerSeriesParam = siblingIds
-      .map((ids) => ids.id)
-      .join("-");
-      const chartSeriesParam = siblingIds
-      .filter((sib) => sib.visible)
-      .map((ids) => ids.id)
-      .join("-");
-      this.analyzerService.updateAnalyzerSeries(siblingIds);
-      this.updateUrlLocation({
-        analyzerSeries: analyzerSeriesParam,
-        chartSeries: chartSeriesParam
-      });
+      this.analyzerService.updateAnalyzerSeries(siblingIds.map(sib => +sib.id));
+      const queryParams = this.analyzerService.analyzerParams();
+      this.router.navigate([`/analyzer`], { queryParams: queryParams, queryParamsHandling: 'merge' })
     });
   }
 
@@ -357,6 +275,7 @@ export class AnalyzerComponent
 
   removeAllAnalyzerSeries() {
     this.analyzerService.removeAll();
+    this.updateUrlLocation({})
   }
 
   toggleAnalyzerDisplay() {
@@ -367,9 +286,6 @@ export class AnalyzerComponent
   changeRange(e) {
     this.routeStart = e.startDate;
     this.routeEnd = e.endDate;
-    /*if (this.analyzerService.analyzerData.indexed) {
-      this.analyzerService.updateBaseYear(e.startDate);
-    }*/
     if (this.analyzerService.indexed()) {
       this.analyzerService.updateBaseYear(e.startDate);
     }
@@ -379,9 +295,7 @@ export class AnalyzerComponent
   updateUrlLocation(param) {
     const paramIncludesAnalyzerSeries = Object.keys(param).includes('analyzerSeries');
     const paramIncludesChartSeries = Object.keys(param).includes('chartSeries');
-    const analyzerData = this.analyzerService.analyzerData;
-    //const { analyzerSeries } = analyzerData;
-    const { analyzerSeries } = analyzerData();
+    const { analyzerSeries } = this.analyzerService.analyzerData();
     if (!paramIncludesAnalyzerSeries) {
       const analyzerSeriesParam = analyzerSeries.map((s) => s.id).join("-");
       this.queryParams = { ...this.queryParams, analyzerSeries: analyzerSeriesParam };

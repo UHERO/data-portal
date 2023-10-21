@@ -1,5 +1,5 @@
-import { of as observableOf, forkJoin as observableForkJoin, BehaviorSubject } from 'rxjs';
-import { Inject, Injectable, EventEmitter, Output, signal } from '@angular/core';
+// import { of as observableOf, forkJoin as observableForkJoin, BehaviorSubject } from 'rxjs';
+import { Inject, Injectable, EventEmitter, Output, signal, computed } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { DataPortalSettingsService } from './data-portal-settings.service';
@@ -15,26 +15,7 @@ class AnalyzerData implements AnalyzerDataInterface {
   displayFreqSelector = false;
   siblingFreqs = [];
   analyzerFrequency = null;
-  //yRightSeries = [];
-  //yLeftSeries = [];
-  //column = [];
-  //area = [];
-  //chartYoy = false;
-  //chartYtd = false;
-  //chartMom = false;
-  //chartC5ma = false;
-  //seriesYoy = [];
-  //seriesYtd = [];
-  //seriesMom = [];
-  //seriesC5ma = [];
-  //leftMin = null;
-  //leftMax = null;
-  //rightMin = null;
-  //rightMax = null;
-  //urlChartSeries = [];
   requestComplete = false;
-  //indexed = false;
-  //baseYear = null;
 }
 
 @Injectable({
@@ -43,18 +24,16 @@ class AnalyzerData implements AnalyzerDataInterface {
 export class AnalyzerService {
   // Keep track of series in the analyzer
   analyzerSeriesStore = signal<number[]>([]);
-  yRightSeries = signal<string[]>([]);
-  yLeftSeries = signal<string[]>([]);
+  yRightSeries = signal<number[]>([]);
+  yLeftSeries = signal<number[]>([]);
   column = signal<number[]>([]);
   area = signal<number[]>([]);
-  chartYoy = signal<boolean>(false);
-  chartYtd = signal<boolean>(false);
-  chartMom = signal<boolean>(false);
-  chartC5ma = signal<boolean>(false);
-  seriesYoy = signal<string[]>([]);
-  seriesYtd = signal<string[]>([]);
-  seriesMom = signal<string[]>([]);
-  seriesC5ma = signal<string[]>([]);
+  
+  chartYoy = signal<string[]>([]);
+  chartYtd = signal<string[]>([]);
+  chartMom = signal<string[]>([]);
+  chartC5ma = signal<string[]>([]);
+
   leftMin = signal<number>(null);
   leftMax = signal<number>(null);
   rightMin = signal<number>(null);
@@ -84,14 +63,81 @@ export class AnalyzerService {
     private dataPortalSettingsServ: DataPortalSettingsService,
   ) { }
 
-  // checkAnalyzer = (seriesInfo: any) => this.analyzerSeriesTrackerSource.value.some(series => series.id === seriesInfo.id);
-    checkAnalyzer = (seriesInfo: any) => this.analyzerSeriesStore().some(id => id === seriesInfo.id);
+  analyzerParams = computed(() => {
+    /*let seriesUrl = '';
+    let aSeries = `?analyzerSeries=${this.analyzerSeriesStore().join('-')}`;
+    let cSeries = this.urlChartSeries().length ? 
+      `&chartSeries=${this.urlChartSeries().join('-')}` :
+      ``;
+    seriesUrl += aSeries + cSeries;
+    seriesUrl += this.indexed() ? `&index=${this.indexed()}` : '';
+    seriesUrl += this.yRightSeries()?.length ?
+      `&yright=${this.yRightSeries().join('-')}` :
+      '';
+    seriesUrl += this.yLeftSeries()?.length ?
+      `&yleft=${this.yLeftSeries().join('-')}` :
+      '';
+    seriesUrl += this.leftMin() ?
+      `&leftMin=${this.leftMin()}` :
+      '';
+    seriesUrl += this.leftMax() ?
+      `&leftMax=${this.leftMax()}` :
+      '';
+    seriesUrl += this.rightMin() ?
+      `&rightMin=${this.rightMin()}` :
+      '';
+    seriesUrl += this.rightMax() ?
+      `&rightMax=${this.rightMax()}` :
+      '';
+    seriesUrl += this.column()?.length ?
+      `&column=${this.column().join('-')}` :
+      '';
+    seriesUrl += this.area()?.length ?
+      `&area=${this.area().join('-')}` :
+      '';
+    seriesUrl += this.chartYoy()?.length ?
+      `&chartYoy=${this.chartYoy().join('-')}` :
+      '';
+    seriesUrl += this.chartYtd()?.length ?
+      `&chartYtd=${this.chartYtd().join('-')}` :
+      '';
+    seriesUrl += this.chartMom()?.length ?
+      `&chartMom=${this.chartMom().join('-')}` :
+      '';
+    seriesUrl += this.chartC5ma()?.length ?
+      `&chartC5ma=${this.chartC5ma().join('-')}` :
+      '';
+      const chartSeries = this.urlChartSeries().join('-');
+      const indexed = this.indexed() ? `&index=${this.indexed()}` : '';
+      const yright = this.yRightSeries()?.length ?
+      `&yright=${this.yRightSeries().join('-')}` :
+      '';*/
+    const analyzerSeries = this.analyzerSeriesStore().join('-');
+    console.log('URL', this.urlChartSeries().join('-'))
+    const params = {
+      analyzerSeries: analyzerSeries,
+      ...(this.urlChartSeries()?.length && {chartSeries: this.urlChartSeries().join('-')}),
+      ...(this.indexed() && {index: `${this.indexed()}`}),
+      ...(this.yRightSeries()?.length && { yright: `${this.yRightSeries().join('-')}`}),
+      ...(this.yLeftSeries()?.length && { yleft: `${this.yLeftSeries().join('-')}`}),
+      ...(this.leftMin() && { leftMin: `${this.leftMin()}`}),
+      ...(this.leftMax() && { leftMax: `${this.leftMax()}`}),
+      ...(this.rightMin() && { rightMin: `${this.rightMin()}`}),
+      ...(this.rightMax() && { rightMax: `${this.rightMax()}`}),
+      ...(this.column()?.length && {column: `${this.column().join('-')}`}),
+      ...(this.area()?.length && {area: `${this.area().join('-')}`}),
+      ...(this.chartYoy()?.length && {chartYoy: `${this.chartYoy().join('-')}`}),
+      ...(this.chartYtd()?.length && {chartYtd: `${this.chartYtd().join('-')}`}),
+      ...(this.chartMom()?.length && {chartMom: `${this.chartMom().join('-')}`}),
+      ...(this.chartC5ma()?.length && {chartC5ma: `${this.chartC5ma().join('-')}`}),
+    }
+    return params;
+  });
 
-  /*updateAnalyzerSeries(data) {
-    this.analyzerSeriesTrackerSource.next(data);
-    this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
-  }*/
+  checkAnalyzer = (seriesInfo: any) => this.analyzerSeriesStore().some(id => id === seriesInfo.id);
+
   updateAnalyzerSeries(data: number[]) {
+    console.log('data', data)
     this.analyzerSeriesStore.update(() => [...data])
   }
 
@@ -107,7 +153,7 @@ export class AnalyzerService {
     }
     const baseYear = this.baseYear();
     const chartValues = series.observations.map(obs => obs.displayName);
-    const selectedChartTransformation = chartValues.find(name => name === this.assignChartTransformation()) || chartValues[0];
+    const selectedChartTransformation = chartValues.find(name => name === this.assignChartTransformation(series.id)) || chartValues[0];
     const selectedTransformation = series.observations.find(t => t.displayName === selectedChartTransformation).values;
     const selectedChartType = this.assignChartType(series);
     console.log('LEVEL DATA', series)
@@ -140,56 +186,6 @@ export class AnalyzerService {
     ];
     series.chartValues = chartValues;
     series.selectedChartTransformation = selectedChartTransformation;
-    //const { indexed, baseYear, analyzerSeries } = this.analyzerData;
-    /* if (analyzerSeries.length && indexed) {
-      const visibleCompareSeries = this.getVisibleCompareSeries(analyzerSeries);
-      const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : analyzerSeries;
-      this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, startDate);
-    } */
-    /* const { analyzerSeries } = this.analyzerData();
-    if (this.analyzerData().analyzerSeries && this.indexed()) {
-      const visibleCompareSeries = this.getVisibleCompareSeries(analyzerSeries);
-      const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : analyzerSeries;
-      this.baseYear.set(this.getIndexBaseYear(seriesToCalcBaseYear, startDate));
-    }
-
-    const indexed = this.indexed();
-    const baseYear = this.baseYear();
-
-    const chartValues = series.observations.map(obs => obs.displayName);
-    const selectedChartTransformation = chartValues.find(name => name === this.assignChartTransformation()) || chartValues[0];
-    const selectedTransformation = series.observations.find(t => t.displayName === selectedChartTransformation).values;
-    const selectedChartType = this.assignChartType(series);
-    console.log('LEVEL DATA', series)
-    series.yAxisText = this.setYAxisLabel(indexed, baseYear, series, selectedChartTransformation);
-    series.className = series.id;
-    series.name = this.formatDisplayName(series, indexed, selectedChartTransformation);
-    series.data = indexed ? this.getChartIndexedValues(selectedTransformation, baseYear) : [...selectedTransformation];
-    series.levelData = [...selectedTransformation];
-    series.yAxis = this.assignYAxisSide(series);
-    //series.type = selectedChartType;
-    series.currentFreq = { freq: series.frequencyShort, label: series.frequency };
-    series.includeInDataExport = true;
-    series.showInLegend = true;
-    series.showInNavigator = false;
-    series.events = {
-      legendItemClick() {
-        return false;
-      }
-    };
-    series.seasonallyAdjusted = series.seasonalAdjustment === 'seasonally_adjusted';
-    series.chartType = [
-      'line',
-      'column',
-      'area'
-    ];
-    //series.selectedChartType = selectedChartType;
-    series.yAxisSides = [
-      'left',
-      'right'
-    ];
-    series.chartValues = chartValues;
-    series.selectedChartTransformation = selectedChartTransformation; */
   }
 
   setYAxisLabel = (indexed: boolean, baseYear, series, transformation: string) => {
@@ -217,38 +213,25 @@ export class AnalyzerService {
   }
 
   makeCompareSeriesVisible(series: any, startDate: string) {
-    // const { analyzerSeries, indexed } = this.analyzerData;
     const { analyzerSeries } = this.analyzerData();
     const indexed = this.indexed();
-
     analyzerSeries.find(s => s.id === series?.id).visible = true;
     const visibleCompareSeries = analyzerSeries.filter(s => s.visible);
     const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : analyzerSeries;
-    //this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, startDate);
     this.baseYear.set(this.getIndexBaseYear(seriesToCalcBaseYear, startDate));
     if (visibleCompareSeries.length && indexed) {
       this.updateBaseYear(startDate);
     }
-    // this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
-    this.analyzerData.mutate(data => data.analyzerSeries = [...analyzerSeries] );
-    this.urlChartSeries.mutate(chartSeries => chartSeries.push(series.id));
-
-    return { analyzerSeries };
+    this.analyzerData.update(data => data = {...data, analyzerSeries: [...analyzerSeries]});
+    this.urlChartSeries.update(chartSeries => chartSeries = [...chartSeries, series.id]);
   }
 
   updateCompareSeriesAxis(seriesId: any, axis: string) {
-    //const { yRightSeries, yLeftSeries, analyzerSeries } = this.analyzerData;
     const { analyzerSeries } = this.analyzerData();
-
     const visibleCompareSeries = analyzerSeries.filter(s => s.visible);
     const selectedCompareSeries = visibleCompareSeries.find(s => s.className === seriesId);
-    //const rightSeriesMatch = yRightSeries.find(id => id === seriesId);
-    //const leftSeriesMatch = yLeftSeries.find(id => id === seriesId);
-    
     const rightSeriesMatch = this.yRightSeries().find(id => id === seriesId);
     const leftSeriesMatch = this.yLeftSeries().find(id => id === seriesId);
-
-    //const { indexed, baseYear } = this.analyzerData;
     const indexed = this.indexed();
     const baseYear = this.baseYear();
     if (axis === 'right' && !rightSeriesMatch) {
@@ -265,68 +248,25 @@ export class AnalyzerService {
     if (axis === 'left' && !leftSeriesMatch) {
       this.yLeftSeries.mutate(series => series.push(seriesId));
     }
-    /*if (axis === 'right' && !rightSeriesMatch) {
-      yRightSeries.push(seriesId);
-    }
-    if (axis === 'left' && rightSeriesMatch) {
-      const matchIndex = yRightSeries.findIndex(id => id === seriesId);
-      yRightSeries.splice(matchIndex, 1);
-    }
-    if (axis === 'right' && leftSeriesMatch) {
-      const matchIndex = yLeftSeries.findIndex(id => id === seriesId);
-      yLeftSeries.splice(matchIndex, 1);
-    }
-    if (axis === 'left' && !leftSeriesMatch) {
-      yLeftSeries.push(seriesId);
-    }*/
     selectedCompareSeries.yAxis = axis;
     selectedCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, selectedCompareSeries, selectedCompareSeries.selectedChartTransformation);
-    //this.analyzerData.analyzerSeries = [].concat(this.analyzerData.analyzerSeries);
-    this.analyzerData.mutate(data => data.analyzerSeries = [...analyzerSeries]);
-    // return { yLeftSeries, yRightSeries };
+    this.analyzerData.update((data) => {
+      return {...data, analyzerSeries: [...data.analyzerSeries]}
+    });
   }
 
   findSelectedCompareSeries = (seriesId) => {
-    // const { analyzerSeries } = this.analyzerData;
     const { analyzerSeries } = this.analyzerData();
     const compareSeries = analyzerSeries.filter(s => s.visible);
     return compareSeries.find(s => s.className === seriesId);
   }
 
   updateCompareChartType(seriesId: number, chartType: string) {
-    // const { analyzerSeries, column, area } = this.analyzerData;
-
     const column = this.column();
     const area = this.area();
-
     const matchInArea = area.find(id => id === seriesId);
     const matchInColumn = column.find(id => id === seriesId);
     const selectedCompareSeries = this.findSelectedCompareSeries(seriesId);
-    /*if (chartType === 'column' && !matchInArea) {
-      column.push(seriesId);
-    }
-    if (chartType === 'column' && matchInArea) {
-      const matchIndex = area.findIndex(id => id === seriesId);
-      column.push(seriesId);
-      area.splice(matchIndex, 1);
-    }
-    if (chartType === 'area' && !matchInColumn) {
-      area.push(seriesId);
-    }
-    if (chartType === 'area' && matchInColumn) {
-      const matchIndex = column.findIndex(id => id === seriesId);
-      column.splice(matchIndex, 1);
-      area.push(seriesId);
-    }
-    if (chartType === 'line' && matchInColumn) {
-      const matchIndex = column.findIndex(id => id === seriesId);
-      column.splice(matchIndex, 1);
-    }
-    if (chartType === 'line' && matchInArea) {
-      const matchIndex = area.findIndex(id => id === seriesId);
-      area.splice(matchIndex, 1);
-    }*/
-
     if (chartType === 'column' && !matchInArea) {
       this.column.mutate(series => series.push(seriesId));
     }
@@ -353,43 +293,21 @@ export class AnalyzerService {
     }
     selectedCompareSeries.type = chartType;
     selectedCompareSeries.selectedChartType = chartType;
-    // this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
+    console.log('selectedCompareSeries', selectedCompareSeries)
     this.analyzerData.update((data) => {
       const selected = data.analyzerSeries.findIndex(series => series.id === seriesId);
       data.analyzerSeries[selected].selectedChartType = chartType;
-      return data;
+      return {...data, analyzerSeries: [...data.analyzerSeries]}
     });
-    //return { column, area };
   }
 
   updateCompareChartTransformation(seriesId: number, transformation: string) {
-    //const { analyzerSeries, seriesYoy, seriesYtd, seriesMom, seriesC5ma } = this.analyzerData;
     const { analyzerSeries } = this.analyzerData();
-    const selectedCompareSeries = this.findSelectedCompareSeries(seriesId);
+    const selectedCompareSeries = analyzerSeries.find(s => s.className === seriesId)
     if (selectedCompareSeries) {
       selectedCompareSeries.selectedChartTransformation = selectedCompareSeries.chartValues.find(t => t === transformation);
-      // this.updateTransformationTrackers(this.analyzerData, transformation, seriesId)
       this.updateCompareSeriesDataAndAxes(analyzerSeries);
     }
-  }
-
-  updateTransformationTrackers(analyzerData: AnalyzerData, transformation: string, seriesId: number) {
-    /*const { seriesYoy, seriesYtd, seriesMom, seriesC5ma } = analyzerData;
-    if (transformation === 'YOY') {
-      this.filterTransformationTrackers(seriesYtd, seriesId);
-      seriesYoy.push(seriesId);
-    }
-    if (transformation === 'YTD') {
-      seriesYtd.push(seriesId);
-    }
-    if (transformation === 'MOM') {
-      seriesMom.push(seriesId);
-    }
-    if (transformation === 'Annual Change') {
-      seriesC5ma.push(seriesId);
-    }
-    console.log('seriesYoy', seriesYoy);
-    console.log('seriesYtd', seriesYtd);*/
   }
 
   filterTransformationTrackers(transformationArr, seriesId) {
@@ -400,10 +318,8 @@ export class AnalyzerService {
   }
 
   updateCompareSeriesDataAndAxes(series: Array<any>) {
-    //const { indexed, baseYear } = this.analyzerData;
     const indexed = this.indexed();
     const baseYear = this.baseYear();
-
     series.forEach((s) => {
       s.name = this.formatDisplayName(s, indexed, s.selectedChartTransformation);
       s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : [...s.observations.find(t => t.displayName === s.selectedChartTransformation).values];
@@ -411,40 +327,27 @@ export class AnalyzerService {
       s.yAxisText = this.setYAxisLabel(indexed, baseYear, s, s.selectedChartTransformation);
       s.yAxis = this.assignYAxisSide(s);
     });
-    // this.analyzerData.analyzerSeries = [].concat(this.analyzerData.analyzerSeries);
     this.analyzerData.update(data => data = { ...data, analyzerSeries: [...series]});
   }
 
   removeFromComparisonChart(id: number, startDate: string) {
-    // const { analyzerSeries } = this.analyzerData;
     const { analyzerSeries } = this.analyzerData();
-
     analyzerSeries.find(s => s.id === id).visible = false;
-    // this.analyzerData.urlChartSeries = this.analyzerData.urlChartSeries.filter(ids => ids !== id);
     this.urlChartSeries.update(series => series.filter(sId => sId !== id));
-
     this.updateBaseYear(startDate);
-    //this.analyzerData.analyzerSeries = [].concat(analyzerSeries);
-    this.analyzerData.mutate(data => data.analyzerSeries = [...analyzerSeries]);
-    // return { analyzerSeries };
+    this.analyzerData.update(data => data = {...data, analyzerSeries: [...analyzerSeries]});
   }
 
   toggleIndexValues(index: boolean, minYear: string) {
-    // this.analyzerData.indexed = index;
     this.indexed.set(index);
-    //const { analyzerSeries }  = this.analyzerData;
     const { analyzerSeries }  = this.analyzerData();
     const visibleCompareSeries = analyzerSeries.filter(s => s.visible);
     const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : analyzerSeries;
     const baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minYear);
-    //this.analyzerData.baseYear = baseYear;
     this.baseYear.set(baseYear);
     if (analyzerSeries) {
       this.updateCompareSeriesDataAndAxes(analyzerSeries);
     }
-    /*this.analyzerData.analyzerSeries.forEach((s) => {
-      s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'ytd');
-    });*/
     analyzerSeries.forEach((s) => {
       s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'ytd');
     })
@@ -452,12 +355,10 @@ export class AnalyzerService {
   }
 
   updateBaseYear(startDate: string) {
-    //const { analyzerSeries } = this.analyzerData;
     const { analyzerSeries } = this.analyzerData();
     const visibleCompareSeries = analyzerSeries.filter(s => s.visible);
     const seriesToCalcBaseYear = visibleCompareSeries.length ? visibleCompareSeries : analyzerSeries;
     if (seriesToCalcBaseYear.length) {
-      //this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, startDate);
       this.baseYear.set(this.getIndexBaseYear(seriesToCalcBaseYear, startDate))
     }
     if (analyzerSeries) {
@@ -466,27 +367,18 @@ export class AnalyzerService {
   }
 
   addToAnalyzer(seriesID: number) {
-    /*let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
-    currentAnalyzerTracker = [...currentAnalyzerTracker, { id: seriesID }];
-    this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker);
-    this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);*/
     this.analyzerSeriesStore.update(() => [...this.analyzerSeriesStore(), seriesID]);
   }
 
   removeFromAnalyzer(seriesID: number, startDate: string) {
-    // let currentAnalyzerTracker = this.analyzerSeriesTrackerSource.value;
-    //const { analyzerSeries } = this.analyzerData;
     const { analyzerSeries } = this.analyzerData();
-    /*const current = currentAnalyzerTracker.filter(s => s.id !== seriesID)
-    this.analyzerData.analyzerSeries = analyzerSeries.filter(s => s.id !== seriesID);
-    this.analyzerSeriesTrackerSource.next(currentAnalyzerTracker.filter(s => s.id !== seriesID));
-    this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);*/
     this.analyzerSeriesStore.update(() => {
       return this.analyzerSeriesStore().filter(id => id !== seriesID);
-    })
+    });
+    this.analyzerData.update((data) => {
+      return {...data, analyzerSeries: analyzerSeries.filter(s => s.id !== seriesID)};
+    });
     this.updateBaseYear(startDate);
-    // this.analyzerData.analyzerSeries = [].concat(this.analyzerData.analyzerSeries);
-    return { analyzerSeries: analyzerSeries };
   }
 
   getAnalyzerData(aSeriesTracker: Array<any>, startDate: string, noCache: boolean) {
@@ -494,6 +386,7 @@ export class AnalyzerService {
     this.analyzerData.mutate(data => data.analyzerMeasurements = {});
     this.analyzerData.mutate(data => data.requestComplete = false);
     const ids = aSeriesTracker.map(id => id).join();
+    console.log('IDS', ids)
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const { series } = results;
@@ -501,13 +394,6 @@ export class AnalyzerService {
       analyzerDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
       analyzerDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
       const { series1Name } = this.portalSettings.highcharts;
-      /* const { analyzerSeries, analyzerMeasurements } = series.forEach((s) => {
-        s.observations = this.helperService.formatSeriesForCharts(s);
-        s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', series1Name); 
-        //this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries, this.analyzerData.analyzerMeasurements, startDate);
-        const { analyzerSeries, analyzerMeasurements } = this.addSeriesToAnalyzerData(s, startDate);
-        return { analyzerSeries, analyzerMeasurements }
-      }); */
       const analyzerSeries = [];
       const analyzerMeasurements = {};
       series.forEach((s) => {
@@ -527,9 +413,6 @@ export class AnalyzerService {
             analyzerMeasurements[seriesData.measurementName] = [seriesData];
           }
         }
-        //this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries, this.analyzerData.analyzerMeasurements, startDate);
-        // const { analyzerSeries, analyzerMeasurements } = this.addSeriesToAnalyzerData(s, startDate);
-        //return { analyzerSeries, analyzerMeasurements }
       });
       /* this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ?
         this.getCurrentAnalyzerFrequency(series, this.analyzerData.siblingFreqs) :
@@ -642,7 +525,10 @@ export class AnalyzerService {
   isVisible = (series: any, analyzerSeries: Array<any>) => {
     // const { urlChartSeries } = this.analyzerData;
     const urlChartSeries = this.urlChartSeries();
+    console.log('isVisible', urlChartSeries)
+    console.log('series id', series.id)
     const inCompare = urlChartSeries.includes(series.id);
+    console.log('inCompare', inCompare)
     // On load, analyzer should add 1 (or 2 if available) series to comparison chart
     // if user has not already added/removed series for comparison
     if ((!urlChartSeries.length || urlChartSeries.length < 2) && !inCompare) {
@@ -655,7 +541,6 @@ export class AnalyzerService {
 
   addToCompareChart(compareSeries: Array<any>, seriesData: any, startDate: string) {
     const seriesExistsInCompare = compareSeries.find(s => s.className === seriesData.id);
-    // const { urlChartSeries } = this.analyzerData;
     const urlChartSeries = this.urlChartSeries();
 
     if (!seriesExistsInCompare || urlChartSeries.find(chartSeries => chartSeries === seriesData.id)) {
@@ -665,16 +550,16 @@ export class AnalyzerService {
 
   storeUrlChartSeries(urlChartSeries: string) {
     const urlCSeries = urlChartSeries.split('-').map(Number);
-    urlCSeries.forEach((cSeries) => {
-      //this.analyzerData.urlChartSeries.push(cSeries);
-      this.urlChartSeries.mutate(series => series.push(cSeries));
-    });
+    // urlCSeries.forEach((cSeries) => {
+      //this.urlChartSeries.mutate(series => series.push(cSeries));
+      //this.urlChartSeries.update(series => series = [...series,])
+    //});
+  this.urlChartSeries.update(series => series = [...series, ...urlCSeries])
+    console.log(this.urlChartSeries())
   }
 
   removeAll() {
-    //this.updateAnalyzerSeries([]);
     this.analyzerSeriesStore.update(() => []);
-    // this.analyzerData = this.resetAnalyzerData();
     this.analyzerData.set(new AnalyzerData());
   }
 
@@ -685,12 +570,8 @@ export class AnalyzerService {
   formatSeriesForAnalyzer = (series) => {
     const { frequency, seasonalAdjustment, frequencyShort } = series;
     const indexed = this.indexed();
-
-    // series.displayName = this.formatDisplayName(series, this.analyzerData.indexed);
-    // series.indexDisplayName = this.formatDisplayName(series, this.analyzerData.indexed);
     series.displayName = this.formatDisplayName(series, indexed);
     series.indexDisplayName = this.formatDisplayName(series, indexed);    
-
     series.saParam = seasonalAdjustment !== 'not_seasonally_adjusted';
     series.currentGeo = series.geography;
     series.currentFreq = { freq: frequencyShort, label: frequency };
@@ -711,7 +592,6 @@ export class AnalyzerService {
   }
 
   assignYAxisSide(series: any) {
-    // const { yLeftSeries, yRightSeries } = this.analyzerData;
     const yLeftSeries = this.yLeftSeries();
     const yRightSeries = this.yRightSeries();
     if (yLeftSeries.length && yLeftSeries.some(id => id === series.id)) {
@@ -720,20 +600,17 @@ export class AnalyzerService {
     if (yRightSeries.length && yRightSeries.some(id => id === series.id)) {
       return 'right';
     }
-   // const { analyzerSeries } = this.analyzerData;
    const { analyzerSeries } = this.analyzerData();
     const units = analyzerSeries.map(s => s.yAxisText);
     const indexed = this.indexed();
-    //return !units.length || units[0] === series.yAxisText || this.analyzerData.indexed ? 'left' : 'right';
-    console.log(units)
     return !units.length || units[0] === series.yAxisText || indexed ? 'left' : 'right';
   }
 
   assignChartType(series: any) {
-    // const { column, area } = this.analyzerData;
     const column = this.column();
     const area = this.area();
-
+    console.log('chart type column', column);
+    console.log('chart type area', area)
     if (column.length && column.some(id => id === series.id)) {
       return 'column';
     }
@@ -743,25 +620,17 @@ export class AnalyzerService {
     return 'line';
   }
 
-  assignChartTransformation = () => {
-    // only one transformation should be active/true
-    // default to level
-    /*const {
-      chartYoy,
-      chartYtd,
-      chartMom,
-      chartC5ma
-    } = this.analyzerData;*/
-    if (this.chartYoy()) {
+  assignChartTransformation = (id: string) => {
+    if (this.chartYoy().includes(id)) {
       return 'YOY';
     }
-    if (this.chartYtd()) {
+    if (this.chartYtd().includes(id)) {
       return 'YTD';
     }
-    if (this.chartMom()) {
+    if (this.chartMom().includes(id)) {
       return 'MOM';
     }
-    if (this.chartC5ma()) {
+    if (this.chartC5ma().includes(id)) {
       return 'Annual Change';
     }
     return 'Level';
@@ -807,8 +676,6 @@ export class AnalyzerService {
     });
     const tableDates = this.createAnalyzerTableDates(analyzerSeries);
     const sliderDates = this.createSliderDates(tableDates);
-    //this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
-    //this.analyzerData.sliderDates = this.createSliderDates(this.analyzerData.analyzerTableDates);
     return { tableDates, sliderDates };
   }
 
@@ -873,8 +740,6 @@ export class AnalyzerService {
       const currentObsStart = current.seriesObservations.observationStart;
       return prevObsStart > currentObsStart ? prev : current;
     }).seriesObservations.observationStart;
-    //this.analyzerData.baseYear = (maxObsStartDate > start || !start) ? maxObsStartDate : start;
-    //return this.analyzerData.baseYear;
     this.baseYear.set((maxObsStartDate > start || !start) ? maxObsStartDate : start);
     return this.baseYear();
   }
