@@ -19,8 +19,11 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   @Input() ytd: boolean;
   @Input() c5ma: boolean;
   @Input() displayCompare: boolean;
+  @Input() seriesId: number;
+  @Input() seasonallyAdjusted: boolean;
   shareLink: string;
   embedCode: string;
+
   /* 
   
 
@@ -66,11 +69,21 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   formatShareLink = (start: string, end: string) => {
+    console.log(this.view)
     const params = {
-      analyzer: `/analyzer${this.addAnalyzerParams(start, end)}`,
-      // series: `/series${this.addQueryParams(start, end)}`
+      analyzer: this.view === 'anzlyzer' ? `/analyzer${this.addAnalyzerParams(start, end)}` : '',
+      series: `/series${this.addQueryParams(start, end)}`
     };
     return `${this.environment['portalUrl']}${params[this.view]}`;
+  }
+
+  addQueryParams(start, end) {
+    let seriesUrl = '';
+    seriesUrl += this.seriesId ? `?id=${this.seriesId}` : '';
+    seriesUrl += this.seasonallyAdjusted ? `&sa=${this.seasonallyAdjusted}` : '';
+    seriesUrl += start ? `&start=${start}` : '';
+    seriesUrl += end ? `&end=${end}` : '';
+    return seriesUrl;
   }
 
   addAnalyzerParams(start, end) {
@@ -96,10 +109,17 @@ export class ShareLinkComponent implements OnInit, OnChanges {
 
   formatEmbedSnippet = (start: string, end: string) => {
     const params = {
-      analyzer: this.addAnalyzerParams(start, end),
-      //series: this.addSingleSeriesParams(start, end)
+      analyzer: this.view === 'anzlyzer' ? this.addAnalyzerParams(start, end) : '',
+      series: this.addSingleSeriesParams(start, end)
     };
     return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}/graph${params[this.view]}" scrolling="no"></iframe></div>`;
+  }
+
+  addSingleSeriesParams = (start: string, end: string) => {
+    let params = `?id=${this.seriesId}`;
+    params += start ? `&start=${start}` : '';
+    params += end ? `&end=${end}` : '';
+    return params;
   }
 
   copyLink(inputValue, shareText) {

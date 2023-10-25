@@ -11,7 +11,7 @@
     [freq]="analyzerData().analyzerFrequency.freq"></lib-date-slider>
   <div class="analyzer-view">
     <lib-analyzer-highstock *ngIf="analyzerData().analyzerSeries.length" [portalSettings]="portalSettings"
-      [series]="analyzerData().analyzerSeries" [indexChecked]="analyzerService.indexed()">
+      [series]="analyzerData().analyzerSeries" [dates]="analyzerData().sliderDates" [indexChecked]="analyzerService.indexed()">
     </lib-analyzer-highstock>
   </div>
 <!-- </ng-template> -->

@@ -50,9 +50,9 @@
         <lib-forecast-selector *ngIf="displayFcSelector" [forecasts]="data.forecastList"
           (selectedFcChange)="updateSelectedForecast(data.siblings, selectedGeo.handle, seasonallyAdjusted, data.forecasts, $event)"
           class="selector"></lib-forecast-selector>
-        <!-- <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted"
+        <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted"
           [startDate]="selectedDateRange.startDate" [endDate]="selectedDateRange.endDate"
-          [seriesId]="data.seriesDetail.id"></lib-share-link> -->
+          [seriesId]="data.seriesDetail.id"></lib-share-link>
         <div class="form-check" *ngIf="data.saPairAvail">
           <label class="form-check-inline">
             <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
