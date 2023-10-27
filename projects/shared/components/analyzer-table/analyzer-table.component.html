@@ -1,0 +1,35 @@
+<div class="transform-checks">
+  <label *ngIf="portalSettings.transformations.yoy" class="form-check-inline">
+    <input type="checkbox" (change)="yoyActive($event)" [checked]="yoyChecked">Year/Year
+  </label>
+  <label *ngIf="portalSettings.transformations.ytd" class="form-check-inline">
+    <input type="checkbox" (change)="ytdActive($event)" [checked]="ytdChecked">Year-to-Date
+  </label>
+  <label *ngIf="portalSettings.transformations.mom && displayMomCheck" class="form-check-inline">
+    <input type="checkbox" (change)="momActive($event, series)" [checked]="momChecked">Month/Month
+  </label>
+  <label *ngIf="portalSettings.transformations.c5ma" class="form-check-inline">
+    <input type="checkbox" (change)="c5maActive($event)" [checked]="c5maChecked">Annual Change
+  </label>
+</div>
+<ng-template ngIf [ngIf]="series && series.length">
+  <button class="csv-export-button" type="button" (click)="onExport()">Download CSV
+    <i class="bi bi-file-earmark-excel"></i>
+  </button>
+  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" domLayout="autoHeight"
+    [components]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true" [suppressDragLeaveHidesColumns]="true"
+    (gridReady)="onGridReady($event, 'data')" [singleClickEdit]="true">
+  </ag-grid-angular>
+  <p class="stat-note">*Scroll to the right for additional statistics</p>
+  <ag-grid-angular style="width: 100%;" class="ag-theme-balham summary-table" [rowData]="summaryRows" [columnDefs]="summaryColumns" domLayout="autoHeight"
+    [gridOptions]="statGridOptions" [components]="frameworkComponents" [singleClickEdit]="true" (gridReady)="onGridReady($event, 'summary')">
+  </ag-grid-angular>
+</ng-template>
+<p *ngIf="missingSummaryStat" class="stat-warning">
+  <i class="bi bi-exclamation-circle"></i> The following series contain N/As due to missing values included in the selected range:
+  <ng-template ngFor let-serie [ngForOf]="summaryRows">
+    <ul>
+      <li *ngIf="serie.missing">{{serie.series}}</li>
+    </ul>
+  </ng-template>
+</p>

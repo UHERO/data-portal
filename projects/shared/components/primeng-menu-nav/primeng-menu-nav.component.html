@@ -1,0 +1,41 @@
+<nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light">
+  <div>
+    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse"
+      aria-controls="navbar-side" aria-expanded="false" aria-label="Toggle Category Menu">
+      &#9776;
+    </button>
+    <ng-template [ngIf]="uheroLogo">
+      <div>
+        <a class="navbar-brand" id="uhero-link" href="https://uhero.hawaii.edu">
+          <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+        </a>
+        <a class="navbar-brand" id="data-portal-link" routerLink="/">
+          <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+        </a>
+      </div>
+    </ng-template>
+    <ng-template [ngIf]="!uheroLogo">
+      <a class="navbar-brand" id="uhero-header" routerLink="/">
+        <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+        <p *ngIf="!headerLogo.mobileLogo">{{headerLogo.headerText}}</p>
+      </a>
+    </ng-template>
+  </div>
+  <div id="navbar-side" class="navbar-side" [class.reveal]="reveal">
+    <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
+    <lib-search-bar (search)="onSearch($event)"></lib-search-bar>
+    <p-panelMenu [model]="navMenuItems" [multiple]="true"></p-panelMenu>
+    <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer">&nbsp;
+      Analyzer ({{analyzerService.analyzerSeriesStore().length}})</a>
+    <hr *ngIf="portalSettings.otherDashboardLinks && portalSettings.otherDashboardLinks.length" />
+    <ng-template ngFor let-dashboard [ngForOf]="portalSettings.otherDashboardLinks">
+      <a *ngIf="dashboard.name" class="list-item" [attr.href]="dashboard.url">{{dashboard.name}}</a>
+    </ng-template>
+    <span *ngIf="headerLogo.analyticsLogoSrc">
+      <p id="built-by">Built By</p>
+      <a href="https://uhero.hawaii.edu/uhero-analytics/"><img class="analytics-logo"
+          [src]="headerLogo.analyticsLogoSrc" [alt]="headerLogo.altText"></a>
+    </span>
+  </div>
+  <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
+</nav>

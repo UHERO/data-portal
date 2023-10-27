@@ -1,0 +1,165 @@
+<div class="analyzer-view col-xs-12 col-xl-11" [class.d-flex]="seriesInAnalyzer.length"
+  [class.flex-wrap]="seriesInAnalyzer.length">
+  <div>
+    <h2 id="analyzer-header">Analyzer</h2><i (click)="showHelp()" class="bi bi-question-circle display-help-icon"></i>
+  </div>
+  <p-dialog header="Analyzer View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
+    [dismissableMask]="true">
+    <p-tabView>
+      <p-tabPanel header="Analyzer">
+        <p>The Data Portal's Analyzer consists of 2 views: Gallery and Compare. Click on the Compare/Gallery button at
+          the top to toggle between them. See the Gallery View and Compare View tabs for more details on each.
+        </p>
+        <img src="assets/analyzer_tables.png" alt="Analyzer tables">
+        <p>The lower half of both Analyzer views contains two tables. The first table lists each indicator that was
+          selected with all the data for the current selected date range. Similar to the category table view, there are
+          controls above this table to toggle the display of growth rates and a link to download the data in CSV format.
+          The second table contains the following summary statistics for each indicator: selected date range, minimum
+          value, maximum value, percent change, change, total, average, and compound annual growth rate.</p>
+      </p-tabPanel>
+      <p-tabPanel header="Gallery View">
+        <img src="assets/analyzer_gallery.png" alt="Analyzer gallery view">
+        <p>By default, the analyzer loads into the Gallery view. The upper half contains small charts of all the series
+          that have been selected for the analyzer. If all the indicators in the analyzer are of the same frequency,
+          there will be a dropdown selector above to change the frequency. Next to that is a checkbox to toggle indexing
+          (all indicators must be the same frequency to utilize this). This is followed by a date slider to control the
+          sample size and a 'Remove All Series' button to clear all indicators from the analyzer. At the bottom left
+          corner of all the charts is an <i class="bi bi-bar-chart-fill"></i> icon that toggles whether an indicator is
+          added to the 'Compare' view of the analyzer (more on that view below). By default, the first 2 indicators are
+          added to the comparison. If the index checkbox is selected, series will be indexed to the selected starting
+          date. If data is not available for all comparison indicators at the selected start date, indexing will be
+          based on the earliest common date of the indicators selected for comparison.</p>
+      </p-tabPanel>
+      <p-tabPanel header="Compare View">
+        <img src="assets/analyzer_compare.png" alt="Analyzer compare view">
+        <p>The compare view displays a single chart drawing all the series that were selected for 'Add to Comparison.'
+          There is a set of buttons at the top left-hand corner of the chart to set the range of data to 1 Year, 5
+          Years, or 10 Years from the selected starting date. The 'All' button will display all available data. In the
+          top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of the
+          selected data. Next to the Download is a set of buttons to update the chart to draw growth rates or the
+          default level data for the selected indicators.</p>
+        <p>The chart legend lists all indicators currently in the analyzer. To the left of each name is an <i
+            class="bi bi-gear-fill"></i> icon. Click on this icon to open a set of options available for the indicator.
+          These options include drawing the indicator on either a left or right y-axis, changing the chart type (line,
+          column, or area), changing the value drawn (level or growth rates), and removing an indicator from the compre
+          view or analyzer.</p>
+        <p>The share button at the top opens a dialog box containing a static URL which can be bookmarked, shared or
+          otherwise used to reproduce the analyzer set up as it appears on the screen, as well as, an embed code to
+          embed the chart from the 'Compare' view.</p>
+      </p-tabPanel>
+    </p-tabView>
+  </p-dialog>
+  <!-- <ng-container *ngIf="seriesInAnalyzer.length">
+    <ng-template ngFor let-data [ngForOf]="analyzerData | async">
+      <div id="view-toggle-share" class="ms-2">
+        <button type="button" class="btn btn-sm btn-outline-primary compare-btn" (click)="toggleAnalyzerDisplay()">
+          <span><i class="bi" [class.bi-grid-3x3-gap-fill]="displayCompare"
+              [class.bi-bar-chart-fill]="!displayCompare"></i>{{displayCompare ? ' Gallery View' : ' Compare'}}</span>
+        </button>
+        <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
+          [index]="index" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="selectedDateRange.startDate"
+          [endDate]="selectedDateRange.endDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries"
+          [leftMin]="data.leftMin" [leftMax]="data.leftMax" [rightMin]="data.rightMin" [column]="data.column"
+          [area]="data.area" [rightMax]="data.rightMax" [chartYoy]="data.chartYoy" [chartYtd]="data.chartYtd"
+          [chartMom]="data.chartMom" [chartC5ma]="data.chartC5ma" [displayCompare]="displayCompare">
+        </lib-share-link>
+      </div>
+      <div id="analyzer-customizations">
+        <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
+          (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerFrequency.freq, data.analyzerSeries)"
+          class="selector">
+        </lib-freq-selector>
+        <label *ngIf="data.requestComplete && data.displayFreqSelector" class="mx-2 form-check-inline">
+          <input type="checkbox" (change)="indexActive($event)"
+            [attr.title]="!data.displayFreqSelector ? 'Unavailable for mixed frequencies' : ''" [checked]="index"
+            [disabled]="!data.displayFreqSelector">Index
+        </label>
+        <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+          [dates]="data.sliderDates" [previousFreq]="previousFreq" [routeStart]="routeStart" [routeEnd]="routeEnd"
+          [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
+        <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
+          (click)="removeAllAnalyzerSeries()">
+          Remove All Series
+        </button>
+      </div>
+      <div class="w-100">
+        <ng-template ngIf [ngIf]="data.requestComplete">
+          <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
+            [displayedMeasurements]="data.analyzerMeasurements" [dates]="data.sliderDates"
+            [freq]="data.analyzerFrequency.freq" [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal"
+            [analyzerView]="true" [indexChecked]="index" [indexBaseYear]="data.baseYear">
+          </lib-category-charts>
+          <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
+            [series]="data.analyzerSeries" [dates]="data.sliderDates" [indexChecked]="index"
+            (tableExtremes)="changeRange($event)" (xAxisExtremes)="changeRange($event)"
+            (updateUrl)="updateUrlLocation($event)">
+          </lib-analyzer-highstock>
+          <lib-analyzer-table *ngIf="data.analyzerSeries.length" [dates]="data.sliderDates" [yoyChecked]="tableYoy"
+            [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom" [indexChecked]="index"
+            [series]="data.analyzerSeries" [freq]="data.analyzerFrequency.freq" [indexBaseYear]="data.baseYear"
+            (tableTransform)="checkTransforms($event)">
+          </lib-analyzer-table>
+        </ng-template>
+      </div>
+      <div *ngIf="!data.requestComplete" class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </ng-template>
+  </ng-container> -->
+  <ng-container *ngIf="seriesInAnalyzer.length && analyzerData().requestComplete">
+    <div id="view-toggle-share" class="ms-2">
+      <button type="button" class="btn btn-sm btn-outline-primary compare-btn" (click)="toggleAnalyzerDisplay()">
+        <span><i class="bi" [class.bi-grid-3x3-gap-fill]="displayCompare"
+            [class.bi-bar-chart-fill]="!displayCompare"></i>{{displayCompare ? ' Gallery View' : ' Compare'}}</span>
+      </button>
+      <lib-share-link [view]="'analyzer'" [routeStart]="routeStart" [routeEnd]="routeEnd" [yoy]="tableYoy"
+        [ytd]="tableYtd" [c5ma]="tableC5ma" [displayCompare]="displayCompare"
+        [analyzerParams]="analyzerService.analyzerParams()"></lib-share-link>
+    </div>
+    <div id="analyzer-customizations">
+      <lib-freq-selector [freqs]="analyzerData().siblingFreqs" [analyzerView]="true"
+        (selectedFreqChange)="changeAnalyzerFrequency($event.freq, analyzerData().analyzerFrequency.freq, analyzerData().analyzerSeries)"
+        class="selector">
+      </lib-freq-selector>
+      <label *ngIf="analyzerData().displayFreqSelector" class="mx-2 form-check-inline">
+        <input type="checkbox" (change)="indexActive($event)"
+          [attr.title]="!analyzerData().displayFreqSelector ? 'Unavailable for mixed frequencies' : ''"
+          [checked]="analyzerService.indexed()" [disabled]="!analyzerData().displayFreqSelector">Index
+      </label>
+      <lib-date-slider class="sliders" [portalSettings]="portalSettings" [dates]="analyzerData().sliderDates"
+        [previousFreq]="previousFreq" [routeStart]="routeStart" [routeEnd]="routeEnd"
+        [freq]="analyzerData()?.analyzerFrequency?.freq" (updateRange)="changeRange($event)"></lib-date-slider>
+      <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
+        (click)="removeAllAnalyzerSeries()">
+        Remove All Series
+      </button>
+    </div>
+    <div class="w-100">
+      <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
+        [displayedMeasurements]="analyzerData()?.analyzerMeasurements" [dates]="analyzerData()?.sliderDates"
+        [freq]="analyzerData()?.analyzerFrequency?.freq" [analyzerView]="true"
+        [indexChecked]="analyzerService.indexed()" [indexBaseYear]="analyzerService.baseYear()">
+      </lib-category-charts>
+      <lib-analyzer-highstock *ngIf="displayCompare && analyzerData().analyzerSeries.length"
+        [portalSettings]="portalSettings" [series]="analyzerData().analyzerSeries" [dates]="analyzerData().sliderDates"
+        [indexChecked]="analyzerService.indexed()" (tableExtremes)="changeRange($event)"
+        (xAxisExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation($event)">
+      </lib-analyzer-highstock>
+      <lib-analyzer-table *ngIf="analyzerData()?.analyzerSeries?.length" [dates]="analyzerData()?.sliderDates"
+        [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom"
+        [indexChecked]="analyzerService.indexed()" [series]="analyzerData()?.analyzerSeries"
+        [freq]="analyzerData()?.analyzerFrequency?.freq" [indexBaseYear]="analyzerService.baseYear()"
+        (tableTransform)="checkTransforms($event)">
+      </lib-analyzer-table>
+    </div>
+  </ng-container>
+  <div *ngIf="analyzerService.analyzerSeriesStore().length && !analyzerData().requestComplete"
+    class="d-flex justify-content-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <p *ngIf="displaySelectionNA" id="no-data-msg">Selection not available.</p>
+</div>

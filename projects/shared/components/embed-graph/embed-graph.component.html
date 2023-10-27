@@ -1,0 +1,17 @@
+<ng-template ngFor let-data [ngForOf]="seriesData | async">
+  <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+    [dates]="data.sliderDates" [freq]="data.seriesDetail.frequencyShort" [routeStart]="startDate"
+    [routeEnd]="endDate"></lib-date-slider>
+  <lib-highstock *ngIf="!data.noData && data.requestComplete" [portalSettings]="portalSettings"
+    [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" [showTitle]="true"></lib-highstock>
+</ng-template>
+<!-- <ng-template ngFor let-data [ngForOf]="analyzerData | async"> -->
+  <lib-date-slider *ngIf="analyzerData().requestComplete" class="sliders" [portalSettings]="portalSettings"
+    [dates]="analyzerData().sliderDates" [routeStart]="startDate" [routeEnd]="endDate"
+    [freq]="analyzerData().analyzerFrequency.freq"></lib-date-slider>
+  <div class="analyzer-view">
+    <lib-analyzer-highstock *ngIf="analyzerData().analyzerSeries.length" [portalSettings]="portalSettings"
+      [series]="analyzerData().analyzerSeries" [dates]="analyzerData().sliderDates" [indexChecked]="analyzerService.indexed()">
+    </lib-analyzer-highstock>
+  </div>
+<!-- </ng-template> -->

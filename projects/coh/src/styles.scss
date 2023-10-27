@@ -1,6 +1,6 @@
 @import './assets/app_colors';
-@import '~ag-grid-community/dist/styles/ag-grid.css';
-@import '~ag-grid-community/dist/styles/ag-theme-balham.css';
+@import '~ag-grid-community/styles/ag-grid.css';
+@import '~ag-grid-community/styles/ag-theme-balham.css';
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 /* You can add global styles to this file, and also import other style files */
 body {
@@ -93,20 +93,29 @@ body {
     }
 
     .p-panelmenu {
-      .p-panelmenu-header.p-highlight {
-        a {
-          color: $primary;
+      .p-panelmenu-header {
+        .p-panelmenu-header-content {
+          background-color: transparent;
+          border: 0;
 
-          &:hover {
-            color: $primary;
-  
-            .p-panelmenu-icon {
+          .p-panelmenu-header-action {
+            color: #333;
+            padding: 0.75em;
+            font-size: 0.9em;
+            font-weight: 400;
+
+            &:hover {
               color: $primary;
-            }
-          }
   
-          .p-panelmenu-icon {
-            color: $primary;
+              .p-panelmenu-icon {
+                color: $primary;
+              }
+            }
+  
+            .p-submenu-icon {
+              color: #333;
+              margin-right: 0;
+            }
           }
         }
       }
@@ -315,6 +324,12 @@ body {
   }
 
   .analyzer-chart, .single-series-chart {
+    .highcharts-series-1 {
+      .highcharts-graph {
+        stroke: unset;
+      }
+    }
+    
     .highcharts-background {
       fill: $chart-background;
     }

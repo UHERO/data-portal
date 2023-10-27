@@ -1,0 +1,40 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-sm btn-outline-secondary share-button" data-bs-toggle="modal"
+  data-bs-target="#shareModal">
+  <i class="bi bi-share-fill"></i> Share
+</button>
+<!-- Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="shareModalLabel">Share or Embed</span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="share">
+          <span>Share</span>
+          <div class="input-group">
+            <span class="input-group-addon" id="share-link">
+              <i class="bi bi-link share-link" (click)="copyLink(shareLinkInput, shareLink)" title="Copy Link"></i>
+            </span>
+            <input type="text" class="form-control" [value]="shareLink" aria-describedby="share-link" #shareLinkInput>
+          </div>
+        </div>
+        <div class="share">
+          <span>Embed</span>
+          <div class="input-group">
+            <span class="input-group-addon" id="embed-code">
+              <i class="bi bi-code share-link" (click)="copyLink(embedCodeInput, embedCode)" title="Copy Embed"></i>
+            </span>
+            <input type="text" class="form-control" [value]="embedCode" aria-describedby="embed-code" #embedCodeInput>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
