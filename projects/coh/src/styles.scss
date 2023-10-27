@@ -324,6 +324,12 @@ body {
   }
 
   .analyzer-chart, .single-series-chart {
+    .highcharts-series-1 {
+      .highcharts-graph {
+        stroke: unset;
+      }
+    }
+    
     .highcharts-background {
       fill: $chart-background;
     }
