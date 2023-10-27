@@ -55,7 +55,6 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
       this.selectedDateRange = dateRange;
-      console.log('date range', dateRange)
       const { startDate, endDate } = dateRange;
       if (this.seriesData === 'No data available') {
         this.noDataChart(this.seriesData, `<b>${this.seriesData.displayTitle}</b><br />No Data Available`, '');

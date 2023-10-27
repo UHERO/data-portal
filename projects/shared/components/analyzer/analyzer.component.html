@@ -118,7 +118,6 @@
         [ytd]="tableYtd" [c5ma]="tableC5ma" [displayCompare]="displayCompare"
         [analyzerParams]="analyzerService.analyzerParams()"></lib-share-link>
     </div>
-
     <div id="analyzer-customizations">
       <lib-freq-selector [freqs]="analyzerData().siblingFreqs" [analyzerView]="true"
         (selectedFreqChange)="changeAnalyzerFrequency($event.freq, analyzerData().analyzerFrequency.freq, analyzerData().analyzerSeries)"
@@ -137,7 +136,6 @@
         Remove All Series
       </button>
     </div>
-
     <div class="w-100">
       <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
         [displayedMeasurements]="analyzerData()?.analyzerMeasurements" [dates]="analyzerData()?.sliderDates"
@@ -155,9 +153,13 @@
         [freq]="analyzerData()?.analyzerFrequency?.freq" [indexBaseYear]="analyzerService.baseYear()"
         (tableTransform)="checkTransforms($event)">
       </lib-analyzer-table>
-
     </div>
-
   </ng-container>
+  <div *ngIf="analyzerService.analyzerSeriesStore().length && !analyzerData().requestComplete"
+    class="d-flex justify-content-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
   <p *ngIf="displaySelectionNA" id="no-data-msg">Selection not available.</p>
 </div>

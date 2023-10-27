@@ -136,29 +136,29 @@ export class AnalyzerComponent
       this.tableMom = this.evalParamAsTrue(this.mom);
     }
     if (this.yright) {
-      this.analyzerService.yRightSeries.update(right => right = this.yright.split('-').map(id => +id));
+      this.analyzerService.yRightSeries.update(right => right = this.mapIds(this.yright));
     }
     if (this.yleft) {
-      this.analyzerService.yLeftSeries.update(left => left = this.yleft.split('-').map(id => +id));
+      this.analyzerService.yLeftSeries.update(left => left = this.mapIds(this.yleft));
     }
     if (this.column) {
-      this.analyzerService.column.update(col => col = this.column.split('-').map(id => +id));
+      this.analyzerService.column.update(col => col = this.mapIds(this.column));
     }
     if (this.area) {
-      this.analyzerService.area.update(area => area = this.area.split('-').map(id => +id));
+      this.analyzerService.area.update(area => area = this.mapIds(this.area));
     }
 
     if (this.chartYoy) {
-      this.analyzerService.chartYoy.update(yoy => yoy = this.chartYoy.split('-'));
+      this.analyzerService.chartYoy.update(yoy => yoy = this.mapIds(this.chartYoy));
     }
     if (this.chartYtd) {
-      this.analyzerService.chartYtd.update(ytd => ytd = this.chartYtd.split('-'));
+      this.analyzerService.chartYtd.update(ytd => ytd = this.mapIds(this.chartYtd));
     }
     if (this.chartMom) {
-      this.analyzerService.chartMom.update(mom => mom = this.chartMom.split('-'));
+      this.analyzerService.chartMom.update(mom => mom = this.mapIds(this.chartMom));
     }
     if (this.chartC5ma) {
-      this.analyzerService.chartC5ma.update(c5ma => c5ma = this.chartC5ma.split('-'));
+      this.analyzerService.chartC5ma.update(c5ma => c5ma = this.mapIds(this.chartC5ma));
     }
     if (this.leftMin) {
       this.analyzerService.leftMin.set(+this.leftMin);
@@ -179,6 +179,8 @@ export class AnalyzerComponent
     this.portalSettings =
       this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
+
+  mapIds = (paramString: string) => paramString.split('-').map(Number);
 
   evalParamAsTrue = (param: string) => param === "true";
 
@@ -210,7 +212,6 @@ export class AnalyzerComponent
     )
     this.analyzerService.indexed.set(e.target.checked);
     this.updateUrlLocation({ index: this.analyzerService.indexed() || null });
-    console.log(this.analyzerService.indexed())
   }
 
   checkTransforms(e) {
@@ -275,7 +276,10 @@ export class AnalyzerComponent
 
   removeAllAnalyzerSeries() {
     this.analyzerService.removeAll();
-    this.updateUrlLocation({})
+    Object.keys(this.queryParams).forEach((param) => {
+      delete this.queryParams[param]
+    });
+    this.router.navigate(['/analyzer']);
   }
 
   toggleAnalyzerDisplay() {
@@ -307,7 +311,27 @@ export class AnalyzerComponent
         .join("-") || null;
       this.queryParams = { ...this.queryParams, chartSeries: chartSeriesParam };
     }
-    this.queryParams = { ...this.queryParams, ...param };
+    const optionalParams = [
+      'indexed',
+      'yright',
+      'yleft',
+      'leftMin',
+      'leftMax',
+      'rightMin',
+      'rightMax',
+      'column',
+      'area',
+      'chartYoy',
+      'chartYtd',
+      'chartMom',
+      'chartC5ma'
+    ];
+    optionalParams.forEach((p) => {
+      if (!Object.keys(this.analyzerService.analyzerParams()).includes(p)) {
+        delete this.queryParams[p];
+      }
+    });
+    this.queryParams = { ...this.queryParams, ...param, ...this.analyzerService.analyzerParams() };
     const url = this.router
       .createUrlTree([], {
         relativeTo: this.route,

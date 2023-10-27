@@ -336,8 +336,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     const indexCheckChange = changes['indexChecked'];
     const seriesChange = changes['series']; 
     const datesChange = changes['dates'];
-    console.log(changes)
-    console.log('seriesChange', seriesChange)
     if (
       (indexCheckChange && !indexCheckChange.firstChange) ||
       (seriesChange && !seriesChange.firstChange) ||
@@ -386,10 +384,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     const dates = this.dates;
     const rangeSelectorSetExtremes = (eventMin, eventMax, freq, dates, xAxisExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, dates, xAxisExtremes);
     this.chartOptions.accessibility.description = `${portal}\n${portalLink}`;
-    console.log("SERIES", series)
+    const units = series.map(s => s.yAxisText);
     this.chartOptions.series = series.map((s, index) => {
       return {
         ...s,
+        yAxis: this.analyzerService.assignYAxisSide(s, units),
         colorIndex: index,
       };
     });
@@ -512,6 +511,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
       chartTypeSelect.addEventListener('change', e => {
         this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value);
+        this.updateUrl.emit({});
       });  
     }
   }
@@ -525,8 +525,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       yAxisSideMenuItem.appendChild(yAxisSelect);
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
       yAxisSelect.addEventListener('change', (e) => {
-        const side = (e.target as HTMLSelectElement).value; 
+        const side = (e.target as HTMLSelectElement).value;
         this.analyzerService.updateCompareSeriesAxis(seriesId, side);
+        this.updateUrl.emit({});
       });
     }
   }
@@ -595,42 +596,39 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
         const selectedTransformation = (e.target as HTMLSelectElement).value;
         this.removeFromTransformationTrackers(seriesId);
         this.analyzerService.updateCompareChartTransformation(seriesId, selectedTransformation);
-        this.addToTransformationTracker(selectedTransformation, seriesId)
+        this.addToTransformationTracker(selectedTransformation, seriesId);
+        this.updateUrl.emit({});
       });
     }
   }
 
   removeFromTransformationTrackers(id: number) {
-    if (this.analyzerService.chartYoy().includes(`${id}`)) {
-      //const index = this.analyzerService.chartYoy().findIndex(yoyId => yoyId === `${id}`);
-      this.analyzerService.chartYoy.update(yoy => yoy.filter(yoyId => yoyId !== `${id}`));
+    if (this.analyzerService.chartYoy().includes(id)) {
+      this.analyzerService.chartYoy.update(yoy => yoy.filter(yoyId => yoyId !== id));
     }
-    if (this.analyzerService.chartYtd().includes(`${id}`)) {
-      // const index = this.analyzerService.chartYtd().findIndex(ytdId => ytdId === `${id}`);
-      this.analyzerService.chartYtd.update(ytd => ytd.filter(ytdId => ytdId !== `${id}`));
+    if (this.analyzerService.chartYtd().includes(id)) {
+      this.analyzerService.chartYtd.update(ytd => ytd.filter(ytdId => ytdId !== id));
     }
-    if (this.analyzerService.chartMom().includes(`${id}`)) {
-      // const index = this.analyzerService.chartMom().findIndex(momId => momId === `${id}`);
-      this.analyzerService.chartMom.update(mom => mom.filter(momId => momId !== `${id}`));
+    if (this.analyzerService.chartMom().includes(id)) {
+      this.analyzerService.chartMom.update(mom => mom.filter(momId => momId !== id));
     }
-    if (this.analyzerService.chartC5ma().includes(`${id}`)) {
-      // const index = this.analyzerService.chartC5ma().findIndex(c5maId => c5maId === `${id}`);
-      this.analyzerService.chartC5ma.update(c5ma => c5ma.filter(c5maId => c5maId !== `${id}`));
+    if (this.analyzerService.chartC5ma().includes(id)) {
+      this.analyzerService.chartC5ma.update(c5ma => c5ma.filter(c5maId => c5maId !== id));
     }
   }
 
   addToTransformationTracker(transformation: string, id: number) {
     if (transformation === 'YOY') {
-      this.analyzerService.chartYoy.update((yoy) => [...yoy, `${id}`])
+      this.analyzerService.chartYoy.update((yoy) => [...yoy, id])
     }
     if (transformation === 'YTD') {
-      this.analyzerService.chartYtd.update((ytd) => [...ytd, `${id}`])
+      this.analyzerService.chartYtd.update((ytd) => [...ytd, id])
     }
     if (transformation === 'MOM') {
-      this.analyzerService.chartMom.update((mom) => [...mom, `${id}`])
+      this.analyzerService.chartMom.update((mom) => [...mom, id])
     }
     if (transformation === 'Annual Change') {
-      this.analyzerService.chartC5ma.update((c5ma) => [...c5ma, `${id}`])
+      this.analyzerService.chartC5ma.update((c5ma) => [...c5ma, id])
     }
   }
 
@@ -654,10 +652,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     this.analyzerService.analyzerData[`${axis.userOptions.id}Min`] = +e.target.value ?? null;
     this.analyzerService[`${axis.userOptions.id}Min`].set(+e.target.value ?? null);
     this.updateChart = true;
-    const axisSide = axis.userOptions.id;
-    //const param = {};
-    //param[`${axisSide}Min`] = +e.target.value ?? null;
-    // this.updateUrl.emit(param);
+    this.updateUrl.emit({});
   }
 
   changeYAxisMax(e, axis) {
@@ -667,10 +662,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     this.analyzerService[`${axis.userOptions.id}Max`].set(+e.target.value ?? null);
 
     this.updateChart = true;
-    const axisSide = axis.userOptions.id;
-    /*const param = {};
-    param[`${axisSide}Max`] = +e.target.value ?? null;
-    this.updateUrl.emit(param);*/
+    this.updateUrl.emit({});
   }
 
   calculateMinRange = (freq: string) => {
@@ -687,7 +679,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
   chartTransformationToggles = (chartSeries) => {
     const resetAnalyzerDataTransformationChecks = () => this.resetAnalyzerDataTransformationChecks();
     const updateTransformation = (seriesId, transformation) =>  this.analyzerService.updateCompareChartTransformation(seriesId, transformation);
-    const updateUrlTransformation = (transformation: string, id: string) => this.updateUrlTransformation(transformation, id);
+    const updateUrlTransformation = (transformation: string, id: number) => this.updateUrlTransformation(transformation, id);
     const series = chartSeries.filter(s => s.className !== 'navigator');
     const transformations = series.reduce((prev, curr) => {
         prev.push(...curr.chartValues);
@@ -703,9 +695,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
           resetAnalyzerDataTransformationChecks();
           series.forEach((series) => {
             if (series.className !== 'navigator') {
-              console.log('series', series)
               updateTransformation(series.id, t);
-              updateUrlTransformation(t, series.id);
+              updateUrlTransformation(t, +series.id);
             };
           });
         }
@@ -714,7 +705,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     return buttons;
   };
 
-  updateUrlTransformation = (transformation: string, id: string) => {
+  updateUrlTransformation = (transformation: string, id: number) => {
     if (transformation === 'YOY') {
       this.analyzerService.chartYoy.update(yoy => [...yoy, id]);
     }
@@ -729,13 +720,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     if (transformation === 'Annual Change') {
       this.analyzerService.chartC5ma.update(c5ma => [...c5ma, id]);
     }
+    this.updateUrl.emit({});
   }
 
   resetAnalyzerDataTransformationChecks = () => {
-    this.analyzerService.chartYoy.update(yoy => []);
-    this.analyzerService.chartYtd.update(ytd => []);
-    this.analyzerService.chartMom.update(mom => []);
-    this.analyzerService.chartC5ma.update(c5ma => []);
+    this.analyzerService.chartYoy.update(yoy => yoy = []);
+    this.analyzerService.chartYtd.update(ytd => ytd = []);
+    this.analyzerService.chartMom.update(mom => mom = []);
+    this.analyzerService.chartC5ma.update(c5ma => c5ma = []);
   }
 
   formatChartButtons(buttons: Array<any>) {
