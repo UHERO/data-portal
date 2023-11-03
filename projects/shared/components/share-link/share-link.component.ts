@@ -77,7 +77,7 @@ export class ShareLinkComponent implements OnChanges {
 
   formatEmbedSnippet = (start: string, end: string) => {
     const params = {
-      analyzer: this.view === 'anzlyzer' ? this.addAnalyzerParams(start, end) : '',
+      analyzer: this.view === 'analyzer' ? this.addAnalyzerParams(start, end) : '',
       series: this.addSingleSeriesParams(start, end)
     };
     return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}/graph${params[this.view]}" scrolling="no"></iframe></div>`;
