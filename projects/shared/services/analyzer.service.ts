@@ -265,13 +265,11 @@ export class AnalyzerService {
     const indexed = this.indexed();
     const baseYear = this.baseYear();
     const { analyzerSeries } = this.analyzerData();
-    const units = analyzerSeries.map(s => s.yAxisText);
     series.forEach((s) => {
       s.name = this.formatDisplayName(s, indexed, s.selectedChartTransformation);
       s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : [...s.observations.find(t => t.displayName === s.selectedChartTransformation).values];
       s.levelData =  [...s.observations.find(t => t.displayName === s.selectedChartTransformation).values];
       s.yAxisText = this.setYAxisLabel(indexed, baseYear, s, s.selectedChartTransformation);
-      //s.yAxis = this.assignYAxisSide(s, units);
     });
     this.analyzerData.update(data => data = { ...data, analyzerSeries: [...series]});
   }
@@ -365,6 +363,17 @@ export class AnalyzerService {
       const analyzerFrequency = displayFreqSelector ? this.getCurrentAnalyzerFrequency(series, siblingFreqs) :
         this.getHighestFrequency(analyzerSeries);
       if (this.allowMoMTransformation(analyzerFrequency.freq)) {
+        this.analyzerData.set({
+          analyzerTableDates: [],
+          sliderDates: [],
+          displayFreqSelector,
+          siblingFreqs,
+          analyzerFrequency,
+          analyzerSeries,
+          analyzerMeasurements,
+          analyzerDateWrapper,
+          requestComplete: false
+        });
         this.addMoMTransformation(ids, noCache);
       } else {
         const { tableDates, sliderDates } = this.createAnalyzerTable(analyzerSeries);
@@ -407,31 +416,9 @@ export class AnalyzerService {
           series.seriesObservations.transformationResults.push(seriesMatch.seriesObservations.transformationResults[0])
         }
       });
-
-      //TODO
-      //this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      //this.analyzerData.requestComplete = true;
+      const { tableDates, sliderDates } = this.createAnalyzerTable(analyzerSeries);
+      this.analyzerData.update(data => data = {...data, analyzerTableDates: tableDates, sliderDates, requestComplete: true});
     });
-  }
-
-  addSeriesToAnalyzerData(series: any, /*analyzerSeries: Array<any>, analyzerMeasurements,*/ startDate: string) {
-    const analyzerSeries = [];
-    const analyzerMeasurements = {};
-    const seriesExists = analyzerSeries.find(s => series.id === s.id);
-    if (!seriesExists) {
-      const seriesData = this.formatSeriesForAnalyzer(series);
-      seriesData.visible = this.isVisible(series, analyzerSeries);
-      analyzerSeries.push(seriesData);
-      this.setCompareChartSeriesObject(seriesData, startDate);
-
-      if (analyzerMeasurements[seriesData.measurementName]) {
-        analyzerMeasurements[seriesData.measurementName].push(seriesData);
-      }
-      if (!analyzerMeasurements[seriesData.measurementName]) {
-        analyzerMeasurements[seriesData.measurementName] = [seriesData];
-      }
-    }
-    return { analyzerSeries, analyzerMeasurements };
   }
 
   isVisible = (series: any, analyzerSeries: Array<any>) => {
