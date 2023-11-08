@@ -67,6 +67,20 @@
   }
 }
 
+.highcharts-range-selector-buttons .highcharts-label {
+  text {
+    fill: #333;
+  }
+}
+
+.highcharts-button {
+  fill: none;
+
+  text {
+    fill: #333;
+  }
+}
+
 .highcharts-button, .highcharts-button-hover {
   stroke: none;
 }
