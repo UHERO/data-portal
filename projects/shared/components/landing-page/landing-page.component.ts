@@ -94,6 +94,7 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
   ngOnChanges(simpleChanges: SimpleChanges): void  {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     const idOrSearchParam = this.helperService.getIdParam(this.id);
+    this.isSearch = typeof this.id === 'string' ? true : false;
     const dataListIdParam = this.helperService.getIdParam(this.data_list_id);
     const noCacheParam = this.nocache === 'true';
     if (this.sa === undefined) {

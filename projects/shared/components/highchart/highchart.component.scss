@@ -5,6 +5,12 @@
       height: 200px;
       display: block;
     }
+
+    .highcharts-container {
+      font-family: Lucida Grande,Lucida Sans Unicode,Arial,Helvetica,sans-serif;
+      font-size: 12px;
+    }
+
     .highcharts-tooltip {
       filter: none !important;
     }
