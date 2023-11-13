@@ -280,13 +280,24 @@ body {
       }
     }
 
+    .highcharts-column-series path.highcharts-point,
+    .highcharts-bar-series path.highcharts-point {
+      stroke: none;
+    }
+
     .highcharts-series-0 {
+      fill: $highcharts-series0;
+      stroke: $highcharts-series0;
+
       .highcharts-graph {
         stroke: $highcharts-series0;
       }
     }
 
-    .highcharts-series-1 {
+    .highcharts-series-1, .highcharts-color-1 {
+      fill: $highcharts-series1;
+      stroke: $highcharts-series1;
+      
       .highcharts-graph {
         stroke: $highcharts-series1;
       }
