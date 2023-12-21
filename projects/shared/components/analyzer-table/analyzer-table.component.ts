@@ -76,13 +76,17 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     this.dateRangeSub = this.helperService.currentDateRange.subscribe((dateRange) => {
       this.selectedDateRange = dateRange;
       const { startDate, endDate } = dateRange;
+      console.log('TABLE INIT')
       this.drawTable(startDate, endDate);
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     let indexCheckChange = changes['indexChecked'];
-    if (indexCheckChange && !indexCheckChange.firstChange) {
+    let baseYearChange = changes['indexBaseYear'];
+    console.log('CHANGES', changes)
+    if ((indexCheckChange && !indexCheckChange.firstChange) ||
+      (baseYearChange && !baseYearChange.firstChange)) {
      this.drawTable(this.selectedDateRange.startDate, this.selectedDateRange.endDate);
     }
   }
@@ -192,7 +196,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   formatLvlData = (series, level, startDate) => {
     const { dates, values } = level;
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
-    const baseYear = this.indexBaseYear
+    //const baseYear = this.indexBaseYear
+    const baseYear = this.analyzerService.baseYear()
+    console.log('table baseYear', baseYear)
     const indexedValues = this.analyzerService.getIndexedValues(values, dates, baseYear);
     const seriesData = {
       series: this.analyzerService.formatDisplayName(series, this.indexChecked),

@@ -104,6 +104,9 @@ export class AnalyzerComponent
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
       (dateRange) => {
         this.selectedDateRange = dateRange;
+        console.log(dateRange)
+        console.log('analyzer series', this.analyzerService.analyzerSeriesStore())
+        
       }
     );
   }
@@ -111,6 +114,7 @@ export class AnalyzerComponent
   analyzerData = computed(() => this.analyzerService.analyzerData());
   
   ngOnChanges(simpleChanges: SimpleChanges) {
+    /*console.log('TEST')
     this.routeStart = this.start;
     this.routeEnd = this.end;
 
@@ -119,6 +123,9 @@ export class AnalyzerComponent
     }
     if (this.chartSeries) {
       this.analyzerService.storeUrlChartSeries(this.chartSeries);
+    }
+    if (this.index) {
+      this.displayCompare = this.evalParamAsTrue(this.index);
     }
     if (this.compare) {
       this.displayCompare = this.evalParamAsTrue(this.compare);
@@ -175,9 +182,12 @@ export class AnalyzerComponent
     this.noCache = this.evalParamAsTrue(this.nocache);
     this.seriesInAnalyzer = this.analyzerService.analyzerSeriesStore();
 
-    this.updateAnalyzer(this.seriesInAnalyzer);
+    
+    */
     this.portalSettings =
-      this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+    this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+      this.seriesInAnalyzer = this.analyzerService.analyzerSeriesStore();
+      this.updateAnalyzer(this.seriesInAnalyzer);
   }
 
   mapIds = (paramString: string) => paramString.split('-').map(Number);
@@ -185,10 +195,15 @@ export class AnalyzerComponent
   evalParamAsTrue = (param: string) => param === "true";
 
   updateAnalyzer(analyzerSeries: Array<any>) {
-    if (analyzerSeries.length && this.selectedDateRange) {
+    if (analyzerSeries.length /*&& this.selectedDateRange*/) {
+      console.log('1', this.selectedDateRange)
+      console.log('2', this.start)
+      const date = this.selectedDateRange.startDate || this.routeStart;
       this.analyzerService.getAnalyzerData(
         analyzerSeries,
-        this.selectedDateRange.startDate,
+        //this.selectedDateRange.startDate,
+        //this.routeStart,
+        date,
         this.noCache
       );
       this.analyzerService.indexed.set(this.index === 'true');
@@ -236,6 +251,9 @@ export class AnalyzerComponent
     this.previousFreq = previousFreq === freq ? "" : previousFreq;
     const siblingIds = [];
     this.analyzerService.urlChartSeries.update(series => series = []);
+    this.analyzerService.updateAnalyzerSeries([]);
+    console.log(this.analyzerService.urlChartSeries())
+    console.log('series ? ',this.analyzerService.analyzerSeriesStore())
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(
         serie.id,
@@ -288,10 +306,12 @@ export class AnalyzerComponent
   }
 
   changeRange(e) {
+    console.log('e change range', e)
     this.routeStart = e.startDate;
     this.routeEnd = e.endDate;
     if (this.analyzerService.indexed()) {
       this.analyzerService.updateBaseYear(e.startDate);
+      console.log('NEW BASE YEAR', this.analyzerService.baseYear())
     }
     this.updateUrlLocation({start: e.startDate, end: e.endDate});
   }
@@ -305,6 +325,7 @@ export class AnalyzerComponent
       this.queryParams = { ...this.queryParams, analyzerSeries: analyzerSeriesParam };
     }
     if (!paramIncludesChartSeries) {
+      console.log('analyzerSeries', analyzerSeries)
       const chartSeriesParam = analyzerSeries
         .filter((s) => s.visible)
         .map((s) => s.id)

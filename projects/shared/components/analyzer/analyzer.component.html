@@ -49,65 +49,6 @@
       </p-tabPanel>
     </p-tabView>
   </p-dialog>
-  <!-- <ng-container *ngIf="seriesInAnalyzer.length">
-    <ng-template ngFor let-data [ngForOf]="analyzerData | async">
-      <div id="view-toggle-share" class="ms-2">
-        <button type="button" class="btn btn-sm btn-outline-primary compare-btn" (click)="toggleAnalyzerDisplay()">
-          <span><i class="bi" [class.bi-grid-3x3-gap-fill]="displayCompare"
-              [class.bi-bar-chart-fill]="!displayCompare"></i>{{displayCompare ? ' Gallery View' : ' Compare'}}</span>
-        </button>
-        <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
-          [index]="index" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="selectedDateRange.startDate"
-          [endDate]="selectedDateRange.endDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries"
-          [leftMin]="data.leftMin" [leftMax]="data.leftMax" [rightMin]="data.rightMin" [column]="data.column"
-          [area]="data.area" [rightMax]="data.rightMax" [chartYoy]="data.chartYoy" [chartYtd]="data.chartYtd"
-          [chartMom]="data.chartMom" [chartC5ma]="data.chartC5ma" [displayCompare]="displayCompare">
-        </lib-share-link>
-      </div>
-      <div id="analyzer-customizations">
-        <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
-          (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerFrequency.freq, data.analyzerSeries)"
-          class="selector">
-        </lib-freq-selector>
-        <label *ngIf="data.requestComplete && data.displayFreqSelector" class="mx-2 form-check-inline">
-          <input type="checkbox" (change)="indexActive($event)"
-            [attr.title]="!data.displayFreqSelector ? 'Unavailable for mixed frequencies' : ''" [checked]="index"
-            [disabled]="!data.displayFreqSelector">Index
-        </label>
-        <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
-          [dates]="data.sliderDates" [previousFreq]="previousFreq" [routeStart]="routeStart" [routeEnd]="routeEnd"
-          [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
-        <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
-          (click)="removeAllAnalyzerSeries()">
-          Remove All Series
-        </button>
-      </div>
-      <div class="w-100">
-        <ng-template ngIf [ngIf]="data.requestComplete">
-          <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
-            [displayedMeasurements]="data.analyzerMeasurements" [dates]="data.sliderDates"
-            [freq]="data.analyzerFrequency.freq" [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal"
-            [analyzerView]="true" [indexChecked]="index" [indexBaseYear]="data.baseYear">
-          </lib-category-charts>
-          <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-            [series]="data.analyzerSeries" [dates]="data.sliderDates" [indexChecked]="index"
-            (tableExtremes)="changeRange($event)" (xAxisExtremes)="changeRange($event)"
-            (updateUrl)="updateUrlLocation($event)">
-          </lib-analyzer-highstock>
-          <lib-analyzer-table *ngIf="data.analyzerSeries.length" [dates]="data.sliderDates" [yoyChecked]="tableYoy"
-            [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom" [indexChecked]="index"
-            [series]="data.analyzerSeries" [freq]="data.analyzerFrequency.freq" [indexBaseYear]="data.baseYear"
-            (tableTransform)="checkTransforms($event)">
-          </lib-analyzer-table>
-        </ng-template>
-      </div>
-      <div *ngIf="!data.requestComplete" class="d-flex justify-content-center">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    </ng-template>
-  </ng-container> -->
   <ng-container *ngIf="seriesInAnalyzer.length && analyzerData().requestComplete">
     <div id="view-toggle-share" class="ms-2">
       <button type="button" class="btn btn-sm btn-outline-primary compare-btn" (click)="toggleAnalyzerDisplay()">
@@ -137,24 +78,29 @@
       </button>
     </div>
     <div class="w-100">
-      <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
+      <!-- <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
         [displayedMeasurements]="analyzerData()?.analyzerMeasurements" [dates]="analyzerData()?.sliderDates"
         [freq]="analyzerData()?.analyzerFrequency?.freq" [analyzerView]="true"
         [indexChecked]="analyzerService.indexed()" [indexBaseYear]="analyzerService.baseYear()">
+      </lib-category-charts> -->
+
+      <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings"
+        [displayedMeasurements]="analyzerData()?.analyzerMeasurements" [dates]="analyzerData()?.sliderDates"
+        [freq]="analyzerData()?.analyzerFrequency?.freq" [analyzerView]="true">
       </lib-category-charts>
-      <lib-analyzer-highstock *ngIf="displayCompare && analyzerData().analyzerSeries.length"
+      <!-- <lib-analyzer-highstock *ngIf="displayCompare && analyzerData().analyzerSeries.length"
         [portalSettings]="portalSettings" [series]="analyzerData().analyzerSeries" [dates]="analyzerData().sliderDates"
-        [indexChecked]="analyzerService.indexed()" (tableExtremes)="changeRange($event)"
-        (xAxisExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation($event)">
+        [indexChecked]="analyzerService.indexed()" [indexBaseYear]="analyzerService.baseYear()" (tableExtremes)="changeRange($event)"
+        (xAxisExtremes)="changeRange($event)" (updateUrl)="updateUrlLocation($event)"> 
       </lib-analyzer-highstock>
       <lib-analyzer-table *ngIf="analyzerData()?.analyzerSeries?.length" [dates]="analyzerData()?.sliderDates"
         [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [momChecked]="tableMom"
         [indexChecked]="analyzerService.indexed()" [series]="analyzerData()?.analyzerSeries"
         [freq]="analyzerData()?.analyzerFrequency?.freq" [indexBaseYear]="analyzerService.baseYear()"
         (tableTransform)="checkTransforms($event)">
-      </lib-analyzer-table>
+      </lib-analyzer-table> -->
     </div>
-  </ng-container>
+  </ng-container> 
   <div *ngIf="analyzerService.analyzerSeriesStore().length && !analyzerData().requestComplete"
     class="d-flex justify-content-center">
     <div class="spinner-border" role="status">

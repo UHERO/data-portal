@@ -39,6 +39,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
   @Input() portalSettings;
   @Input() dates;
   @Input() indexChecked;
+  @Input() indexBaseYear;
   @Output() xAxisExtremes = new EventEmitter(true);
   @Output() updateUrl = new EventEmitter<any>();
   Highcharts = Highcharts;
@@ -336,10 +337,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     const indexCheckChange = changes['indexChecked'];
     const seriesChange = changes['series']; 
     const datesChange = changes['dates'];
+    const indexBaseYearChange = changes['indexBaseYear'];
+    console.log('highstock changes', changes)
     if (
       (indexCheckChange && !indexCheckChange.firstChange) ||
       (seriesChange && !seriesChange.firstChange) ||
-      (datesChange && !datesChange.firstChange)
+      (datesChange && !datesChange.firstChange) ||
+      (indexBaseYearChange && !indexBaseYearChange.firstChange)
     ) {
       const { startDate, endDate } = this.selectedDateRange;
       this.drawChart(startDate, endDate)
@@ -489,7 +493,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
       },
       minRange: this.calculateMinRange(highestFreq),
       min: startDate ? Date.parse(startDate) : undefined,
-      max: endDate ? Date.parse(endDate) : undefined,
+      //max: endDate ? Date.parse(endDate) : undefined,
       ordinal: false,
       labels: {
         formatter() {

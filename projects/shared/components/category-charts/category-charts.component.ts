@@ -48,6 +48,7 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   ngOnChanges() {
+    console.log('MEASUREMENT UPDATED')
     if (this.displayedMeasurements) {
       Object.keys(this.displayedMeasurements).forEach((measurement) => {
         this.helperService.toggleSeriesDisplay(this.hasSeasonal, this.showSeasonal, this.displayedMeasurements[measurement], this.analyzerView);
