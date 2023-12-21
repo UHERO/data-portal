@@ -184,18 +184,24 @@ export class AnalyzerService {
     const indexed = this.indexed();
     const baseYear = this.baseYear();
     if (axis === 'right' && !rightSeriesMatch) {
-      this.yRightSeries.mutate(series => series.push(seriesId));
+      this.yRightSeries.update(series =>  series = [...series, seriesId]);
     }
     if (axis === 'left' && rightSeriesMatch) {
       const matchIndex = this.yRightSeries().findIndex(id => id === seriesId);
-      this.yRightSeries.mutate(series => series.splice(matchIndex, 1));
+      this.yRightSeries.update((series) => {
+        series.splice(matchIndex, 1);
+        return series;
+      });
     }
     if (axis === 'right' && leftSeriesMatch) {
       const matchIndex = this.yLeftSeries().findIndex(id => id === seriesId);
-      this.yLeftSeries.mutate(series => series.splice(matchIndex, 1));
+      this.yLeftSeries.update((series) => {
+        series.splice(matchIndex, 1);
+        return series;
+      });
     }
     if (axis === 'left' && !leftSeriesMatch) {
-      this.yLeftSeries.mutate(series => series.push(seriesId));
+      this.yLeftSeries.update(series => series = [...series, seriesId]);
     }
     selectedCompareSeries.yAxis = axis;
     selectedCompareSeries.yAxisText = this.setYAxisLabel(indexed, baseYear, selectedCompareSeries, selectedCompareSeries.selectedChartTransformation);
@@ -217,28 +223,40 @@ export class AnalyzerService {
     const matchInColumn = column.find(id => id === seriesId);
     const selectedCompareSeries = this.findSelectedCompareSeries(seriesId);
     if (chartType === 'column' && !matchInArea) {
-      this.column.mutate(series => series.push(seriesId));
+      this.column.update(series => series = [...series, seriesId]);
     }
     if (chartType === 'column' && matchInArea) {
       const matchIndex = area.findIndex(id => id === seriesId);
-      this.column.mutate(series => series.push(seriesId));
-      this.area.mutate(series => series.splice(matchIndex, 1));
+      this.column.update(series => series = [...series, seriesId]);
+      this.area.update((series) => {
+        series.splice(matchIndex, 1);
+        return series;
+      });
     }
     if (chartType === 'area' && !matchInColumn) {
-      this.area.mutate(series => series.push(seriesId));
+      this.area.update(series => series = [...series, seriesId]);
     }
     if (chartType === 'area' && matchInColumn) {
       const matchIndex = column.findIndex(id => id === seriesId);
-      this.column.mutate(series => series.splice(matchIndex, 1));
-      this.area.mutate(series => series.push(seriesId))
+      this.column.update((series) => {
+        series.splice(matchIndex, 1);
+        return series;
+      });
+      this.area.update(series => series = [...series, seriesId]);
     }
     if (chartType === 'line' && matchInColumn) {
       const matchIndex = column.findIndex(id => id === seriesId);
-      this.column.mutate(series => series.splice(matchIndex, 1));
+      this.column.update((series) => {
+        series.splice(matchIndex, 1);
+        return series;
+      });
     }
     if (chartType === 'line' && matchInArea) {
       const matchIndex = area.findIndex(id => id === seriesId);
-      this.area.mutate(series => series.splice(matchIndex, 1));
+      this.area.update((series) => {
+        series.splice(matchIndex, 1);
+        return series;
+      });
     }
     selectedCompareSeries.type = chartType;
     selectedCompareSeries.selectedChartType = chartType;
@@ -303,7 +321,7 @@ export class AnalyzerService {
     });
     const { analyzerMeasurements } = this.analyzerData()
     this.analyzerData.update(data => data = {...data, analyzerMeasurements, analyzerSeries: [...analyzerSeries]})
-    this.analyzerData.mutate(data => data.analyzerMeasurements = analyzerMeasurements)
+    this.analyzerData.update(data => data = {...data, analyzerMeasurements});
     console.log('updated analyzer data', this.analyzerData())
   }
 
@@ -336,9 +354,7 @@ export class AnalyzerService {
   }
 
   getAnalyzerData(aSeriesTracker: Array<any>, startDate: string, noCache: boolean) {
-    this.analyzerData.mutate(data => data.analyzerSeries = []);
-    this.analyzerData.mutate(data => data.analyzerMeasurements = {});
-    this.analyzerData.mutate(data => data.requestComplete = false);
+    this.analyzerData.update(data => data = {...data, analyzerSeries: [], analyzerMeasurements: {}, requestComplete: false });
     const ids = aSeriesTracker.map(id => id).join();
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
@@ -490,7 +506,7 @@ export class AnalyzerService {
     // On load, analyzer should add 1 (or 2 if available) series to comparison chart
     // if user has not already added/removed series for comparison
     if ((!urlChartSeries.length || urlChartSeries.length < 2) && !inCompare) {
-      this.urlChartSeries.mutate(chartSeries => chartSeries.push(series.id))
+      this.urlChartSeries.update(chartSeries => chartSeries = [...chartSeries, series.id]);
       return true;
     }
     console.log(this.urlChartSeries())
