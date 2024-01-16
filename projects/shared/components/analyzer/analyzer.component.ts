@@ -104,6 +104,9 @@ export class AnalyzerComponent
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
       (dateRange) => {
         this.selectedDateRange = dateRange;
+        if (this.analyzerService.indexed()) {
+          this.analyzerService.updateBaseYear(this.selectedDateRange.startDate);
+        }
       }
     );
   }
