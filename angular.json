@@ -121,24 +121,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "uhero:build"
+            "buildTarget": "uhero:build"
           },
           "configurations": {
             "staging": {
-              "browserTarget": "uhero:build:staging"
+              "buildTarget": "uhero:build:staging"
             },
             "production": {
-              "browserTarget": "uhero:build:production"
+              "buildTarget": "uhero:build:production"
             },
             "apiDev": {
-              "browserTarget": "uhero:build:apiDev"
+              "buildTarget": "uhero:build:apiDev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "uhero:build"
+            "buildTarget": "uhero:build"
           }
         },
         "test": {
@@ -300,24 +300,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "coh:build"
+            "buildTarget": "coh:build"
           },
           "configurations": {
             "staging": {
-              "browserTarget": "coh:build:staging"
+              "buildTarget": "coh:build:staging"
             },
             "production": {
-              "browserTarget": "coh:build:production"
+              "buildTarget": "coh:build:production"
             },
             "apiDev": {
-              "browserTarget": "coh:build:apiDev"
+              "buildTarget": "coh:build:apiDev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "coh:build"
+            "buildTarget": "coh:build"
           }
         },
         "test": {
@@ -476,24 +476,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "nta:build"
+            "buildTarget": "nta:build"
           },
           "configurations": {
             "staging": {
-              "browserTarget": "nta:build:staging"
+              "buildTarget": "nta:build:staging"
             },
             "production": {
-              "browserTarget": "nta:build:production"
+              "buildTarget": "nta:build:production"
             },
             "apiDev": {
-              "browserTarget": "nta:build:apiDev"
+              "buildTarget": "nta:build:apiDev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "nta:build"
+            "buildTarget": "nta:build"
           }
         },
         "test": {
@@ -647,24 +647,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ccom:build"
+            "buildTarget": "ccom:build"
           },
           "configurations": {
             "staging": {
-              "browserTarget": "ccom:build:staging"
+              "buildTarget": "ccom:build:staging"
             },
             "production": {
-              "browserTarget": "ccom:build:production"
+              "buildTarget": "ccom:build:production"
             },
             "apiDev": {
-              "browserTarget": "ccom:build:apiDev"
+              "buildTarget": "ccom:build:apiDev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ccom:build"
+            "buildTarget": "ccom:build"
           }
         },
         "test": {
@@ -816,24 +816,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "forecast:build"
+            "buildTarget": "forecast:build"
           },
           "configurations": {
             "staging": {
-              "browserTarget": "forecast:build:staging"
+              "buildTarget": "forecast:build:staging"
             },
             "production": {
-              "browserTarget": "forecast:build:production"
+              "buildTarget": "forecast:build:production"
             },
             "apiDev": {
-              "browserTarget": "forecast:build:apiDev"
+              "buildTarget": "forecast:build:apiDev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "forecast:build"
+            "buildTarget": "forecast:build"
           }
         },
         "test": {
