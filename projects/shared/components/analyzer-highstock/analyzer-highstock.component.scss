@@ -179,6 +179,7 @@ input.highcharts-range-selector {
 
 .highcharts-legend-item-hidden .series-name {
   opacity: 50%;
+  text-decoration: line-through;
 }
 
 .highcharts-legend-item .series-name,
@@ -190,6 +191,10 @@ input.highcharts-range-selector {
 
 .highcharts-legend-item .dropdown-menu {
   background-color: #FAFAFB;
+}
+
+.highcharts-legend-item-hidden * {
+  text-decoration: none;
 }
 
 #single-stock-chart {
