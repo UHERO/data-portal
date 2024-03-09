@@ -57,6 +57,7 @@ export class PrimengMenuNavComponent implements OnInit {
       this.categories = categories;
       this.navMenuItems = [];
       categories.forEach((category) => {
+        if (category.id === 21413) return; // temp fix, investigate and update.
         this.addMenuItem(this.navMenuItems, category);
       });
     },
