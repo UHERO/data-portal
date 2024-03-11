@@ -181,7 +181,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
       }
     }
     this.chartOptions.rangeSelector = {
-      selected: null,
+      selected: 0,
       buttons: chartButtons,
       buttonPosition: {
         x: 30,
@@ -195,6 +195,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
       buttons: {
         contextButton: { enabled: false },
         exportButton: {
+          enabled: true,
           menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
           text: 'Download',
         }
@@ -212,11 +213,10 @@ export class HighstockComponent implements OnInit, OnDestroy {
               }
             }
           },
-          styledMode: true,
-          spacingBottom: 40
+          spacingBottom: 40,
         },
         navigator: {
-          enabled: false
+          enabled: true
         },
         scrollbar: {
           enabled: false
@@ -300,7 +300,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
       minPadding: 0,
       maxPadding: 0,
       minTickInterval: 0.01,
-      showLastLabel: true
+      showLastLabel: false
     }];
     this.chartOptions.series = series as Highcharts.SeriesOptionsType[];
     this.chartOptions.title = {
