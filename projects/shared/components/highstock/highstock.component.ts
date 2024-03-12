@@ -181,7 +181,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
       }
     }
     this.chartOptions.rangeSelector = {
-      selected: 0,
+      selected: null,
       buttons: chartButtons,
       buttonPosition: {
         x: 30,
@@ -195,7 +195,6 @@ export class HighstockComponent implements OnInit, OnDestroy {
       buttons: {
         contextButton: { enabled: false },
         exportButton: {
-          enabled: true,
           menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
           text: 'Download',
         }
@@ -213,10 +212,11 @@ export class HighstockComponent implements OnInit, OnDestroy {
               }
             }
           },
+          styledMode: true,
           spacingBottom: 40,
         },
         navigator: {
-          enabled: true
+          enabled: false
         },
         scrollbar: {
           enabled: false
