@@ -213,7 +213,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
             }
           },
           styledMode: true,
-          spacingBottom: 40
+          spacingBottom: 40,
         },
         navigator: {
           enabled: false
@@ -300,7 +300,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
       minPadding: 0,
       maxPadding: 0,
       minTickInterval: 0.01,
-      showLastLabel: true
+      showLastLabel: false
     }];
     this.chartOptions.series = series as Highcharts.SeriesOptionsType[];
     this.chartOptions.title = {
