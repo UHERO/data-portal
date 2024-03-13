@@ -22,12 +22,12 @@ interface CustomChart extends Highcharts.Chart {
 }
 
 @Component({
-    selector: 'lib-highstock',
-    templateUrl: './highstock.component.html',
-    styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    standalone: true,
-    imports: [HighchartsChartModule]
+  selector: 'lib-highstock',
+  templateUrl: './highstock.component.html',
+  styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  standalone: true,
+  imports: [HighchartsChartModule]
 })
 export class HighstockComponent implements OnInit, OnDestroy {
   @Input() portalSettings;
@@ -64,7 +64,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
     credits: {
       enabled: false
     },
-    plotOptions:{
+    plotOptions: {
       series: {
         cropThreshold: 0,
         turboThreshold: 0
@@ -85,7 +85,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
     offlineExport(this.Highcharts);
     //Accessibility(this.Highcharts);
 
-    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
+    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function (proceed) {
       // Add metadata to top of CSV export
       const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
       const seriesMetaData = this.userOptions.accessibility.description;
@@ -118,6 +118,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
 
   drawChart = (chartData: HighchartChartData, seriesDetail: Series, portalSettings, startDate: string, endDate: string) => {
     let chartObject = this.chartObject
+    const isNTA = portalSettings?.catTable?.portalSource?.includes("National Transfer Accounts");
     const decimals = seriesDetail.decimals || 1;
     const geo: Geography = seriesDetail.geography;
     const freq: Frequency = { freq: seriesDetail.frequencyShort, label: seriesDetail.frequency };
@@ -136,20 +137,20 @@ export class HighstockComponent implements OnInit, OnDestroy {
     const xAxisExtremes = this.xAxisExtremes;
     const rangeSelectorSetExtremes = (eventMin, eventMax, freq, dates, xAxisExtremes) => this.highstockHelper.rangeSelectorSetExtremesEvent(eventMin, eventMax, freq, dates, xAxisExtremes)
     const formatTooltip = (
-        points: Array<Highcharts.TooltipFormatterContextObject>,
-        x: Highcharts.PointLabelObject['x'],
-        pseudoZ: Array<any>,
-        dec: number,
-        frequency: Frequency
-      ) => {
-        return this.formatTooltip(points, x, pseudoZ, dec, frequency);
-      };
+      points: Array<Highcharts.TooltipFormatterContextObject>,
+      x: Highcharts.PointLabelObject['x'],
+      pseudoZ: Array<any>,
+      dec: number,
+      frequency: Frequency
+    ) => {
+      return this.formatTooltip(points, x, pseudoZ, dec, frequency);
+    };
     const xAxisFormatter = (
-        chartAxis: Highcharts.AxisLabelsFormatterContextObject,
-        frequency: string
-      ) => {
-        return this.highstockHelper.xAxisLabelFormatter(chartAxis, frequency);
-      };
+      chartAxis: Highcharts.AxisLabelsFormatterContextObject,
+      frequency: string
+    ) => {
+      return this.highstockHelper.xAxisLabelFormatter(chartAxis, frequency);
+    };
     const logo = this.logo;
     const addToAnalyzer = (seriesId: number) => this.analyzerService.addToAnalyzer(seriesId);
     const rmvFromAnalyzer = (seriesId: number) => this.analyzerService.removeFromAnalyzer(seriesId, startDate);
@@ -165,13 +166,13 @@ export class HighstockComponent implements OnInit, OnDestroy {
         }
         const btnIcon = `<i class="analyzer-toggle bi ${!seriesDetail.analyze ? 'bi-star' : 'bi-star-fill'}"></i>`;
         chart.analyzerBtn = this.renderer.text(btnIcon, 10, this.chartHeight - 10, true)
-          .on('click', function() {
-          const btn = document.querySelector('.analyzer-toggle');
-          seriesDetail.analyze ? rmvFromAnalyzer(+seriesDetail.id) : addToAnalyzer(+seriesDetail.id);
-          seriesDetail.analyze = !seriesDetail.analyze;
-          btn.classList.toggle('bi-star');
-          btn.classList.toggle('bi-star-fill'); 
-        }).add();
+          .on('click', function () {
+            const btn = document.querySelector('.analyzer-toggle');
+            seriesDetail.analyze ? rmvFromAnalyzer(+seriesDetail.id) : addToAnalyzer(+seriesDetail.id);
+            seriesDetail.analyze = !seriesDetail.analyze;
+            btn.classList.toggle('bi-star');
+            btn.classList.toggle('bi-star-fill');
+          }).add();
       },
       load() {
         if (logo.analyticsLogoSrc) {
@@ -190,6 +191,14 @@ export class HighstockComponent implements OnInit, OnDestroy {
       labelStyle: { visibility: 'hidden' },
       inputEnabled: false,
     };
+    this.chartOptions.navigation = {
+      buttonOptions: {
+        y: isNTA ? -32 : 0,
+      },
+    }
+    this.chartOptions.chart = {
+      spacingTop: isNTA ?  42 : 10,
+    }
     this.chartOptions.exporting = {
       allowHTML: true,
       buttons: {
@@ -300,7 +309,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
       minPadding: 0,
       maxPadding: 0,
       minTickInterval: 0.01,
-      showLastLabel: false
+      showLastLabel: true
     }];
     this.chartOptions.series = series as Highcharts.SeriesOptionsType[];
     this.chartOptions.title = {
@@ -437,7 +446,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
     pseudoZones: Array<any>,
     decimals: number,
     freq: Frequency
-    ) => {
+  ) => {
     const getFreqLabel = (frequency, date) => HighstockHelperService.getTooltipFreqLabel(frequency, date);
     const pseudo = 'Pseudo History ';
     let s = `<b>${getFreqLabel(freq.freq, x)}</b>`;
@@ -447,7 +456,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
         const displayValue = Highcharts.numberFormat(point.y, decimal, '.', ',');
         const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
         const seriesColor = `<br><span class='series-${point.colorIndex}'>\u25CF</span>`;
-        const seriesNameValue =`${point.series.name}: ${formattedValue}`;
+        const seriesNameValue = `${point.series.name}: ${formattedValue}`;
         const label = seriesColor + seriesNameValue;
         if (pseudoZones.length) {
           pseudoZones.forEach((zone) => {
