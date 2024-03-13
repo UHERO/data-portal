@@ -10,7 +10,8 @@
     "build": "ng build --project=${PROJECT:-uhero} --configuration production",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "build-all": "ng build --project=uhero --configuration production && ng build --project=ccom --configuration production && ng build --project=nta --configuration production && ng build --project=coh --configuration production"
   },
   "private": true,
   "dependencies": {
