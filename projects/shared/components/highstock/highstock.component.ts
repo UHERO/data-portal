@@ -118,6 +118,7 @@ export class HighstockComponent implements OnInit, OnDestroy {
 
   drawChart = (chartData: HighchartChartData, seriesDetail: Series, portalSettings, startDate: string, endDate: string) => {
     let chartObject = this.chartObject
+    const isNTA = portalSettings?.catTable?.portalSource?.includes("National Transfer Accounts");
     const decimals = seriesDetail.decimals || 1;
     const geo: Geography = seriesDetail.geography;
     const freq: Frequency = { freq: seriesDetail.frequencyShort, label: seriesDetail.frequency };
@@ -192,12 +193,11 @@ export class HighstockComponent implements OnInit, OnDestroy {
     };
     this.chartOptions.navigation = {
       buttonOptions: {
-        enabled: true,
-        y: -32,
+        y: isNTA ? -32 : 0,
       },
     }
     this.chartOptions.chart = {
-      spacingTop: 42,
+      spacingTop: isNTA ?  42 : 10,
     }
     this.chartOptions.exporting = {
       allowHTML: true,
