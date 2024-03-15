@@ -186,8 +186,9 @@ export class CategoryHelperService {
     defaultGeo = defaultGeo || regions[0];
     const categoryFreq = useRouteGeoAndFreq ? routeFreq : defaultFreq.freq;
     const categoryGeo = useRouteGeoAndFreq ? routeGeo : defaultGeo.handle;
-    cachedCategoryData.currentFreq = frequencies.find(f => f.freq === categoryFreq);
-    cachedCategoryData.currentGeo = regions.find(r => r.handle === categoryGeo);
+    // Fall back if the default geo/freq set in Udaman is not available for the selected category
+    cachedCategoryData.currentFreq = frequencies.find(f => f.freq === categoryFreq || f.freq);
+    cachedCategoryData.currentGeo = regions.find(r => r.handle === categoryGeo || r.handle);
     this.helperService.updateCurrentFrequency(cachedCategoryData.currentFreq);
     this.helperService.updateCurrentGeography(cachedCategoryData.currentGeo);
   }
