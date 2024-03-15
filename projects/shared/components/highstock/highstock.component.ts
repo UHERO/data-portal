@@ -197,8 +197,9 @@ export class HighstockComponent implements OnInit, OnDestroy {
       },
     }
     this.chartOptions.chart = {
-      spacingTop: isNTA ?  42 : 10,
-    }
+      ...this.chartOptions.chart,
+      spacingTop: isNTA ? 42: 10
+    };
     this.chartOptions.exporting = {
       allowHTML: true,
       buttons: {
