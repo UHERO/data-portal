@@ -80,7 +80,7 @@ bootstrapApplication(AppComponent, {
     },
     {
       provide: "GoogleAnalyticsId",
-      useValue: "UA-18074519-3",
+      useValue: "G-RLVNRLYMP5",
     },
   ],
 }).catch((err) => console.error(err));
