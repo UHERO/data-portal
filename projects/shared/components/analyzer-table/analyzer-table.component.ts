@@ -12,15 +12,15 @@ import { AgGridModule } from 'ag-grid-angular';
 import { NgIf, NgFor } from '@angular/common';
 
 @Component({
-    selector: 'lib-analyzer-table',
-    templateUrl: './analyzer-table.component.html',
-    styleUrls: ['./analyzer-table.component.scss'],
-    standalone: true,
-    imports: [
-        NgIf,
-        AgGridModule,
-        NgFor,
-    ],
+  selector: 'lib-analyzer-table',
+  templateUrl: './analyzer-table.component.html',
+  styleUrls: ['./analyzer-table.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    AgGridModule,
+    NgFor,
+  ],
 })
 export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;
@@ -83,7 +83,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges) {
     let indexCheckChange = changes['indexChecked'];
     if (indexCheckChange && !indexCheckChange.firstChange) {
-     this.drawTable(this.selectedDateRange.startDate, this.selectedDateRange.endDate);
+      this.drawTable(this.selectedDateRange.startDate, this.selectedDateRange.endDate);
     }
   }
 
@@ -201,8 +201,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       seriesInfo: series,
       lvlData: true,
     };
+    const { universe } = series.seriesDetail;
     formattedDates.forEach((d, index) => {
-      seriesData[d] = this.indexChecked ? this.helperService.formatNum(indexedValues[index], series.decimals) : this.helperService.formatNum(+values[index], series.decimals);
+      seriesData[d] = this.indexChecked
+        ? this.helperService.formatNum(indexedValues[index], series.decimals, universe)
+        : this.helperService.formatNum(+values[index], series.decimals, universe);
     });
     return seriesData;
   }

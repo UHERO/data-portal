@@ -104,7 +104,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
           return displayValue === '-0.00' ? '0.00' : displayValue;
         };
         const formatSeriesLabel = (point, seriesValue: number, date: string, pointX) => {
-          let str = '';
+          let str = 'XX';
           const { colorIndex, userOptions } = point;
           const { geography, decimals, title, chartData, name } = userOptions;
           const decimal = (name.includes('YOY') || name.includes('YTD')) ? 1 : decimals;

@@ -1,4 +1,4 @@
-import { of as observableOf, forkJoin as observableForkJoin,  Observable } from 'rxjs';
+import { of as observableOf, forkJoin as observableForkJoin, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { AnalyzerService } from './analyzer.service';
 import { ApiService } from './api.service';
@@ -108,8 +108,9 @@ export class SeriesHelperService {
         }
       });
     }
-    const seriesTable = this.helperService.createSeriesTable(dates, transformations, decimals);
-    const chart = this.helperService.createSeriesChart(dates, transformations);
+    const universe = this.seriesData.seriesDetail.universe
+    const seriesTable = this.helperService.createSeriesTable(dates, transformations, decimals, universe);
+    const chart = this.helperService.createSeriesChart(dates, transformations, universe);
     const chartData = { level: chart.level, pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates };
     const results = { chartData, tableData: seriesTable, start, end };
     return results;
@@ -171,22 +172,23 @@ export class SeriesHelperService {
     const min = this.findMinAndIndex(valuesInRange.filter(val => val !== null));
     const max = this.findMaxAndIndex(valuesInRange.filter(val => val !== null));
     const sum = valuesInRange.reduce((a, b) => a + b, 0);
-    formattedStats.total = formatNum(sum, decimals);
-    formattedStats.avg = formatNum(sum / valuesInRange.length, decimals);
-    formattedStats.minValue = `${formatNum(min.value, decimals)} (${formatDate(datesInRange[min.index].date, freq)})`;
-    formattedStats.maxValue = `${formatNum(max.value, decimals)} (${formatDate(datesInRange[max.index].date, freq)})`;
+    const universe = seriesDetail.universe;
+    formattedStats.total = formatNum(sum, decimals, universe);
+    formattedStats.avg = formatNum(sum / valuesInRange.length, decimals, universe);
+    formattedStats.minValue = `${formatNum(min.value, decimals, universe)} (${formatDate(datesInRange[min.index].date, freq)})`;
+    formattedStats.maxValue = `${formatNum(max.value, decimals, universe)} (${formatDate(datesInRange[max.index].date, freq)})`;
     // if starting and ending values are missing, do not calculate change or % change
     if (valuesInRange[valuesInRange.length - 1] === null || valuesInRange[0] === null) {
       formattedStats.missing = true;
       return formattedStats;
     }
     const diff = valuesInRange[valuesInRange.length - 1] - valuesInRange[0];
-    const percChange = valuesInRange[0] !== null ? formatNum((diff / valuesInRange[0]) * 100, decimals) : 'N/A';
+    const percChange = valuesInRange[0] !== null ? formatNum((diff / valuesInRange[0]) * 100, decimals, universe) : 'N/A';
     const periods = valuesInRange.length - 1;
     const cagr = this.calculateCAGR(valuesInRange[0], valuesInRange[valuesInRange.length - 1], freq, periods);
     formattedStats.percChange = percent ? null : percChange;
-    formattedStats.levelChange = formatNum(diff, decimals);
-    formattedStats.cagr = formatNum(cagr, decimals);
+    formattedStats.levelChange = formatNum(diff, decimals, universe);
+    formattedStats.cagr = formatNum(cagr, decimals, universe);
     return formattedStats;
   }
 
@@ -194,7 +196,7 @@ export class SeriesHelperService {
     const value = Math.min(...values);
     return { value, index: values.indexOf(value) };
   }
-  
+
   findMaxAndIndex = (values: Array<any>) => {
     const value = Math.max(...values);
     return { value, index: values.indexOf(value) };

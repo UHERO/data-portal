@@ -45,7 +45,7 @@ export class HelperService {
   }
 
   setEndOfSample(isEndOfSample) {
-      this.endOfSample.set(isEndOfSample);
+    this.endOfSample.set(isEndOfSample);
   }
 
   setUseDefaultRange(useDefault: boolean) {
@@ -95,7 +95,7 @@ export class HelperService {
     }
   }
 
-  toggleSeriesDisplay = (hasSeasonal: boolean, showSeasonal: boolean, measurement: Array<any>, analyzerView: boolean) => { 
+  toggleSeriesDisplay = (hasSeasonal: boolean, showSeasonal: boolean, measurement: Array<any>, analyzerView: boolean) => {
     measurement.forEach((series) => {
       const display = this.shouldDisplay(series, showSeasonal, hasSeasonal, analyzerView);
       series.display = display;
@@ -163,7 +163,7 @@ export class HelperService {
   }
 
   findDateWrapperStart = series => series.reduce((start: string, s) => (s.seriesObservations.observationStart < start || start === '') ? s.seriesObservations.observationStart : start, '');
-  
+
   fineDateWrapperEnd = series => series.reduce((end: string, s) => (s.seriesObservations.observationEnd > end || end === '') ? s.seriesObservations.observationEnd : end, '');
 
   createDateArray = (dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) => {
@@ -208,7 +208,7 @@ export class HelperService {
       const q = this.getQuarter(monthStr);
       const dateStrFormat = this.parseISOString(`${yearStr}-${monthStr}-${dateStr}`).toISOString().substring(0, 10);
       const tableDate = this.getTableDate(start, currentFreq, q, dateStrFormat);
-      dateArray.push({ date: dateStrFormat , tableDate });
+      dateArray.push({ date: dateStrFormat, tableDate });
       if (currentFreq === 'A') {
         start.setUTCFullYear(start.getUTCFullYear() + 1);
         start.setUTCMonth(0);
@@ -324,7 +324,7 @@ export class HelperService {
     return { start, end };
   }
 
-  createSeriesChart(dateRange, transformations) {
+  createSeriesChart(dateRange, transformations, universe: string) {
     const { level, yoy, ytd, c5ma } = transformations;
     const levelValue = [];
     let yoyValue = [];
@@ -356,15 +356,19 @@ export class HelperService {
   createDateValuePairs = (transformationDates: Array<any>, date: string, values: Array<any>) => {
     if (transformationDates) {
       const transformationIndex = this.binarySearch(transformationDates, date);
-      return [ Date.parse(date), transformationIndex > -1 ? +values[transformationIndex] : null ];  
+      return [Date.parse(date), transformationIndex > -1 ? +values[transformationIndex] : null];
     }
   }
 
-  addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
+  addToTable(valueArray, date, tableObj, value, formattedValue, decimals, universe: string) {
     const tableEntry = this.binarySearch(valueArray.dates, date.date);
     if (tableEntry > -1) {
+      const thing = this.formattedValue(valueArray.values[tableEntry], decimals, universe)
+
+      // HERE //
+
       tableObj[value] = +valueArray.values[tableEntry];
-      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
+      tableObj[formattedValue] = thing;
     }
   }
 
@@ -382,9 +386,10 @@ export class HelperService {
     return transformationResults.map((t) => {
       const pseudoZones = this.getPseudoZones(t);
       const dateValuePairs = [];
+      const { universe } = series;
       // YTD and YOY transformations should be rounded to 1 decimal place
       if (t.transformation !== 'lvl' && t.transformation !== 'c5ma') {
-        t.values = t.values.map(val => this.formattedValue(val, 1).replace(/,/g, ''));
+        t.values = t.values.map(val => this.formattedValue(val, 1, universe).replace(/,/g, ''));
       }
       dateArray.forEach((date) => {
         dateValuePairs.push(this.createDateValuePairs(t.dates, date.date, t.values));
@@ -392,7 +397,7 @@ export class HelperService {
       return {
         name: t.transformation,
         displayName: observationNames[t.transformation],
-        values: dateValuePairs, 
+        values: dateValuePairs,
         pseudoZones,
         start: observationStart,
         end: observationEnd,
@@ -446,7 +451,7 @@ export class HelperService {
       return dates.map((curr, ind, arr) => {
         return indexDateExists > -1 ? [Date.parse(curr.date), +transformation[ind][1] / +transformation[indexDateExists][1] * 100] : [Date.parse(curr.date), null];
       });
-    } 
+    }
   }
 
   createSeriesChartData = (transformation, dates) => {
@@ -462,7 +467,8 @@ export class HelperService {
     }
   }
 
-  createSeriesTable(dateRange: Array<any>, transformations, decimals: number) {
+  createSeriesTable(dateRange: Array<any>, transformations, decimals: number, universe: string) {
+    // HERE //
     const level = transformations.level;
     const yoy = transformations.yoy;
     const ytd = transformations.ytd;
@@ -481,23 +487,25 @@ export class HelperService {
         formattedC5ma: ''
       };
       if (level) {
-        this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
+        this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals, universe);
       }
       if (yoy) {
-        this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', 1);
+        this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', 1, universe);
       }
       if (ytd) {
-        this.addToTable(ytd, date, tableObj, 'ytdValue', 'formattedYtd', 1);
+        this.addToTable(ytd, date, tableObj, 'ytdValue', 'formattedYtd', 1, universe);
       }
       if (c5ma) {
-        this.addToTable(c5ma, date, tableObj, 'c5maValue', 'formattedC5ma', decimals);
+        this.addToTable(c5ma, date, tableObj, 'c5maValue', 'formattedC5ma', decimals, universe);
       }
       return tableObj;
     });
     return table;
   }
 
-  formattedValue = (value, decimals) => (value === null || value === Infinity) ? '' : this.formatNum(+value, decimals);
+  formattedValue = (value, decimals, universe) => {
+    return (value === null || value === Infinity) ? '' : this.formatNum(+value, decimals, universe)
+  };
 
   formatDate(date: string, freq: string) {
     const year = date.substring(0, 4);
@@ -526,7 +534,11 @@ export class HelperService {
     return date.substring(0, 11);
   }
 
-  formatNum(num: number, decimal: number) {
+  formatNum(num: number, decimal: number, universe: string) {
+    if (universe === 'NTA' && num >= 1 && decimal === 2) {
+      // per Andy Mason: display 2 significant digits, unless the number is >1, then display 1 significant digit.
+      decimal = 1;
+    }
     return num === Infinity ? ' ' : num.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal });
   }
 
@@ -549,7 +561,7 @@ export class HelperService {
       const dateFromExists = this.checkDateExists(start, dates, freq, 'start');
       if (dateFromExists > -1) {
         startIndex = dateFromExists;
-      } 
+      }
       if (dateFromExists === -1) {
         startIndex = 0;
       }
@@ -558,7 +570,7 @@ export class HelperService {
       const dateToExists = this.checkDateExists(end, dates, freq, 'end');
       if (dateToExists > -1) {
         endIndex = dateToExists;
-      } 
+      }
       if (dateToExists === -1) {
         endIndex = dates.length - 1;
       }
@@ -588,7 +600,7 @@ export class HelperService {
       }
     }
     const dateArray = dates.map(d => d.date);
-    return boundary === 'start' ? 
+    return boundary === 'start' ?
       this.binarySearchStartDate(dateArray, dateToCheck) :
       this.binarySearchEndDate(dateArray, dateToCheck);
   }
