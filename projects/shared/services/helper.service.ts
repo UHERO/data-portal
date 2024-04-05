@@ -163,7 +163,6 @@ export class HelperService {
   }
 
   findDateWrapperStart = series => series.reduce((start: string, s) => (s.seriesObservations.observationStart < start || start === '') ? s.seriesObservations.observationStart : start, '');
-
   fineDateWrapperEnd = series => series.reduce((end: string, s) => (s.seriesObservations.observationEnd > end || end === '') ? s.seriesObservations.observationEnd : end, '');
 
   createDateArray = (dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) => {
@@ -363,12 +362,8 @@ export class HelperService {
   addToTable(valueArray, date, tableObj, value, formattedValue, decimals, universe: string) {
     const tableEntry = this.binarySearch(valueArray.dates, date.date);
     if (tableEntry > -1) {
-      const thing = this.formattedValue(valueArray.values[tableEntry], decimals, universe)
-
-      // HERE //
-
       tableObj[value] = +valueArray.values[tableEntry];
-      tableObj[formattedValue] = thing;
+      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals, universe);
     }
   }
 
@@ -468,7 +463,6 @@ export class HelperService {
   }
 
   createSeriesTable(dateRange: Array<any>, transformations, decimals: number, universe: string) {
-    // HERE //
     const level = transformations.level;
     const yoy = transformations.yoy;
     const ytd = transformations.ytd;

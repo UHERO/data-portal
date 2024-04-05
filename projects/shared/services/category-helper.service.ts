@@ -142,7 +142,6 @@ export class CategoryHelperService {
   }
 
   processSeriesData(seriesData: Array<any>, cachedCategoryData: any, transformation: string, findMinMax: boolean) {
-    // HERE //
     if (seriesData?.length) {
       this.setCategorySeriesAndDates(seriesData, cachedCategoryData, transformation, findMinMax);
     }
