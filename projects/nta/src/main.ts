@@ -78,7 +78,7 @@ bootstrapApplication(AppComponent, {
         },
         {
             provide: 'GoogleAnalyticsId',
-            useValue: 'UA-18074519-4'
+            useValue: 'G-7QVQLFEEDE'
         }
     ]
 })
