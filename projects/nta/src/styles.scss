@@ -269,7 +269,9 @@ body {
     }
 
     .highcharts-title, .highcharts-subtitle {
-      fill: $primary-text;        
+      fill: $primary-text;
+      font-size: 0.9em;   
+      top: -0px;  
     }
 
     .single-point {

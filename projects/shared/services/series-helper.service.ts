@@ -71,7 +71,8 @@ export class SeriesHelperService {
       const levelData = obs.transformationResults[0].dates;
       const obsStart = obs.observationStart;
       const obsEnd = obs.observationEnd;
-      if (levelData && levelData.length) {
+
+      if (levelData && levelData.length && obsStart !== '1-01-01') {
         // Use to format dates for table
         this.helperService.createDateArray(obsStart, obsEnd, currentFreq.freq, dateArray);
         const formattedData = this.dataTransform(obs, dateArray, decimals);
@@ -88,7 +89,7 @@ export class SeriesHelperService {
     },
       (error) => {
         error = this.errorMessage = error;
-        this.seriesData.eror = true;
+        this.seriesData.error = true;
         this.seriesData.requestComplete = true;
       });
     return observableForkJoin([observableOf(this.seriesData)]);
@@ -119,7 +120,7 @@ export class SeriesHelperService {
 
   // Find series siblings for a particular geo-frequency combination
   findGeoFreqSibling = (seriesSiblings, geo, freq, forecast = null) => {
-    const filteredByFreqAndGeo = seriesSiblings.filter((sib) => {
+    const filteredByFreqAndGeo = seriesSiblings?.filter((sib) => {
       const { geography, frequencyShort } = sib;
       return geography.handle === geo && frequencyShort === freq;
     });

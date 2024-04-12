@@ -112,7 +112,7 @@
 					<input type="checkbox" name="seasonal_toggle" [checked]="sa === 'true'"
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
-				<lib-date-slider *ngIf="data.displayedMeasurements" class="sliders" [portalSettings]="portalSettings"
+				<lib-date-slider *ngIf="data.displayedMeasurements && data.displayDateSlider" class="sliders" [portalSettings]="portalSettings"
 					[dates]="data.categoryDates" [previousFreq]="previousFreq" [freq]="selectedFreq?.freq || data.currentFreq.freq" [routeStart]="start"
 					[routeEnd]="end" (updateRange)="changeRange($event)"></lib-date-slider>
 			</div>

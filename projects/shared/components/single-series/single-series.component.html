@@ -41,10 +41,10 @@
           the selected data.</p>
       </p-dialog>
       <div class="filters">
-        <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
+        <lib-geo-selector *ngIf="data.regions?.length" [regions]="data.regions"
           (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
           class="geo-selector"></lib-geo-selector>
-        <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
+        <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies?.length" [freqs]="data.frequencies"
           (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
           class="freq-selector"></lib-freq-selector>
         <lib-forecast-selector *ngIf="displayFcSelector" [forecasts]="data.forecastList"
@@ -60,7 +60,7 @@
             Adjusted
           </label>
         </div>
-        <lib-date-slider *ngIf="data.requestComplete" class="sliders" [portalSettings]="portalSettings"
+        <lib-date-slider *ngIf="data.requestComplete && data.sliderDates?.length" class="sliders" [portalSettings]="portalSettings"
           [dates]="data.sliderDates" [previousFreq]="previousFreq" [freq]="data.seriesDetail.frequencyShort" [routeStart]="routeStart"
           [routeEnd]="routeEnd" (updateRange)="changeRange($event)"></lib-date-slider>
       </div>
@@ -74,7 +74,7 @@
           target="_blank">{{data.seriesDetail.sourceLink}}</a>
         <p innerHTML='{{data.seriesDetail.sourceDetails}}' class="source_detail"></p>
       </div>
-      <lib-summary-statistics *ngIf="data.requestComplete" [seriesData]="data"></lib-summary-statistics>
+      <lib-summary-statistics *ngIf="data.requestComplete && !data.noData" [seriesData]="data"></lib-summary-statistics>
       <lib-single-series-table *ngIf="!noSelection && !data.noData && data.requestComplete"
         [seriesData]="data"></lib-single-series-table>
     </div>

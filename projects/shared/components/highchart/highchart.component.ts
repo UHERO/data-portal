@@ -56,8 +56,8 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe((dateRange) => {
       this.selectedDateRange = dateRange;
       const { startDate, endDate } = dateRange;
-      if (this.seriesData === 'No data available') {
-        this.noDataChart(this.seriesData, `<b>${this.seriesData.displayTitle}</b><br />No Data Available`, '');
+      if (this.seriesData === 'No data available' || this.seriesData.seriesObservations.observationStart === '1-01-01') {
+        this.noDataChart(this.seriesData, `<b>${this.seriesData.displayTitle || this.seriesData.displayName}</b><br />No Data Available`, '');
         this.updateChart = true;
       } else {
         this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, startDate, endDate);
@@ -99,6 +99,7 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   noDataChart = (seriesData, chartTitle: string, subtitle: string) => {
+    this.chartOptions.chart = { styledMode: true };
     this.chartOptions.title = this.setChartTitle(chartTitle);
     this.chartOptions.subtitle = this.setSubtitle(subtitle);
     this.chartOptions.exporting = { enabled: false };
@@ -134,7 +135,7 @@ export class HighchartComponent implements OnInit, OnChanges, OnDestroy {
       align: 'left',
       widthAdjust: 0,
       x: 0,
-      y: -5,
+      y: 0,
       style: {
         margin: 75
       }
