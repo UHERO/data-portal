@@ -109,7 +109,7 @@ export class CategoryHelperService {
     updateCurrentFrequency(cachedCategoryData.currentFreq);
   }
 
-  setNoCategoryCata(cachedCategoryData: any) {
+  setNoCategoryData(cachedCategoryData: any) {
     cachedCategoryData.noData = true;
     cachedCategoryData.requestComplete = true;
   }
@@ -135,6 +135,7 @@ export class CategoryHelperService {
     cachedCategoryData.measurementOrder = measurementOrder;
     cachedCategoryData.displayedMeasurements = Object.keys(displayedMeasurements).length ? displayedMeasurements : null;
     cachedCategoryData.dateWrapper = dateWrapper;
+    cachedCategoryData.displayDateSlider = firstDate !== '1-01-01' && endDate !== '1-01-01';
     cachedCategoryData.categoryDates = categoryDates;
     cachedCategoryData.hasSeasonal = this.findSeasonalSeries(displaySeries);
     cachedCategoryData.findMinMax = findMinMax;
@@ -142,11 +143,16 @@ export class CategoryHelperService {
   }
 
   processSeriesData(seriesData: Array<any>, cachedCategoryData: any, transformation: string, findMinMax: boolean) {
-    if (seriesData?.length) {
+   /* const seriesHasNoValues = seriesData.every((series) => {
+      const { seriesObservations } = series;
+      const { observationEnd, observationStart } = seriesObservations;
+      return observationEnd === '1-01-01' || observationStart === '1-01-01';
+    }); */
+    if (seriesData?.length /*&& !seriesHasNoValues*/) {
       this.setCategorySeriesAndDates(seriesData, cachedCategoryData, transformation, findMinMax);
     }
-    if (!seriesData || !seriesData.length) {
-      this.setNoCategoryCata(cachedCategoryData);
+    if (!seriesData || !seriesData.length /*|| seriesHasNoValues*/) {
+      this.setNoCategoryData(cachedCategoryData);
     }
   }
 
