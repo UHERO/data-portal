@@ -80,7 +80,7 @@ bootstrapApplication(AppComponent, {
         },
         {
             provide: 'GoogleAnalyticsId',
-            useValue: 'UA-18074519-5'
+            useValue: 'G-3DL2CGLWQZ'
         }
     ]
 })
