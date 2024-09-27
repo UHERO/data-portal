@@ -166,7 +166,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       categoryId: parentId
     };
     if (!displaySeasonalMessage) {
-      const { universe } = series.seriesDetail
+      const { universe } = series
       dates.forEach((d: string, index: number) => {
         seriesData[d] = this.helperService.formatNum(+values[index], decimals, universe);
       });

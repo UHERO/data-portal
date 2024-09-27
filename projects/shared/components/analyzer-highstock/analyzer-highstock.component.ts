@@ -203,6 +203,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
     },
     legend: {
       enabled: true,
+      events: {
+        itemClick: (event) => {
+          event.preventDefault();
+        }
+      },
       useHTML: true,
       labelFormatter() {
         return `<div class="btn-group dropdown" id="series-${(<Highcharts.Series>this).userOptions.className}">

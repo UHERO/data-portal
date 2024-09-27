@@ -25,7 +25,7 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
 
   agInit(params: any): void {
     this.params = params;
-    const displayedColumns = params.columnApi.getAllDisplayedColumns();
+    const displayedColumns = params.api.getAllDisplayedColumns();
     this.startDate = displayedColumns[displayedColumns.length - 2].colDef.field;
   }
 
