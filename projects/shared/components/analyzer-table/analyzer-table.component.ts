@@ -90,15 +90,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.dateRangeSub.unsubscribe();
-    this.dataGridApi.destroy();
-    this.summaryStatGridApi.destroy();
+    if (!this.dataGridApi.isDestroyed()) {
+      this.dataGridApi.destroy();
+    }
+    if (!this.summaryStatGridApi.isDestroyed()) {
+      this.summaryStatGridApi.destroy();
+    }
   }
 
   drawTable = (startDate: string, endDate: string) => {
     this.displayMomCheck = this.freq === 'M' || this.freq === 'W' || this.freq === 'D';
     const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, startDate, endDate);
     this.columnDefs = this.setTableColumns(tableDateCols);
-    this.dataGridApi?.setColumnDefs(this.columnDefs)
+    this.dataGridApi?.setGridOption('columnDefs', this.columnDefs);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = [];
@@ -109,7 +113,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       const seriesData = this.formatLvlData(series, level, startDate);
       const summaryStats = this.calculateAnalyzerSummaryStats(series, startDate, endDate, this.indexChecked, startDate);
       this.summaryRows.push(summaryStats);
-      this.summaryStatGridApi?.setRowData(this.summaryRows);
+      this.summaryStatGridApi?.setGridOption('rowData', this.summaryRows);
       this.rows.push(seriesData);
       this.addTransformationToTableRows(this.yoyChecked, yoy, series);
       this.addTransformationToTableRows(this.ytdChecked, ytd, series);
@@ -201,7 +205,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       seriesInfo: series,
       lvlData: true,
     };
-    const { universe } = series.seriesDetail;
+    const { universe } = series;
     formattedDates.forEach((d, index) => {
       seriesData[d] = this.indexChecked
         ? this.helperService.formatNum(indexedValues[index], series.decimals, universe)
