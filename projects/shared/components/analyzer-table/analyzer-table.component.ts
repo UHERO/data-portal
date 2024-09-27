@@ -102,7 +102,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     this.displayMomCheck = this.freq === 'M' || this.freq === 'W' || this.freq === 'D';
     const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, startDate, endDate);
     this.columnDefs = this.setTableColumns(tableDateCols);
-    //this.dataGridApi?.setColumnDefs(this.columnDefs);
     this.dataGridApi?.setGridOption('columnDefs', this.columnDefs);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
@@ -115,7 +114,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       const summaryStats = this.calculateAnalyzerSummaryStats(series, startDate, endDate, this.indexChecked, startDate);
       this.summaryRows.push(summaryStats);
       this.summaryStatGridApi?.setGridOption('rowData', this.summaryRows);
-      //this.summaryStatGridApi?.setRowData(this.summaryRows);
       this.rows.push(seriesData);
       this.addTransformationToTableRows(this.yoyChecked, yoy, series);
       this.addTransformationToTableRows(this.ytdChecked, ytd, series);
