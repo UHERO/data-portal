@@ -1,0 +1,84 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build-all
+
+      - name: Prepare build folder
+        run: |
+          mkdir build
+          cp -r dist/uhero/* build/
+          cp -r dist/* build/
+          cp -r dist/ccom/assets/* build/assets
+          cp -r dist/coh/assets/* build/assets
+          cp -r dist/ccom/assets/* build/assets
+          rm -r build/uhero
+      
+      - name: Uploade build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build/
+
+  deploy:
+    needs: build
+    runs-on: Linux
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Copy build contents to server
+        env:
+          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          SERVER_USER: ${{ secrets.PROD_SSH_USER }}
+          SERVER_HOST: ${{ secrets.PROD_SSH_HOST }}
+        run: |
+          echo "$SSH_KEY" > ssh_key
+          chmod 700 ssh_key
+          scp -i ssh_key -o StrictHostKeyChecking=no -r * $SERVER_USER@$SERVER_HOST:data-portal-build
+          rm ssh_key
+      
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+  
+      - name: SSH into instance and copy build to data-portal-dist
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'EOF'
+            rm data-portal-build/ssh_key && \
+            sudo -u uhero rm ../uhero/data-portal-backup/data-portal-dist.zip && \
+            sudo -u uhero zip -r ../uhero/data-portal-backup/data-portal-dist.zip ../uhero/data-portal-dist && \
+            echo "Backup successful, moving onto deployment."
+            sudo -u uhero cp -r data-portal-build/* ../uhero/data-portal-dist/ && \
+            echo "Deployment complete"
+          EOF
