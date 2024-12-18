@@ -78,7 +78,7 @@ jobs:
             rm data-portal-build/ssh_key && \
             sudo -u uhero rm ../uhero/data-portal-backup/data-portal-dist.zip && \
             sudo -u uhero zip -r ../uhero/data-portal-backup/data-portal-dist.zip ../uhero/data-portal-dist && \
-            echo "Backup successful, moving onto deployment."
+            echo "Backup successful, moving onto deployment." && \
             sudo -u uhero cp -r data-portal-build/* ../uhero/data-portal-dist/ && \
             echo "Deployment complete"
           EOF
