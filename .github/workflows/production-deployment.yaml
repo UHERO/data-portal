@@ -40,7 +40,7 @@ jobs:
           name: build-artifact
           path: build/
 
-  deploy:
+  deploy-production:
     needs: build
     runs-on: Linux
 
