@@ -42,7 +42,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: Linux
+    runs-on: self-hosted
 
     steps:
       - name: Download build artifacts
