@@ -11,7 +11,9 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build-all": "ng build --project=uhero --configuration production && ng build --project=ccom --configuration production && ng build --project=nta --configuration production && ng build --project=coh --configuration production"
+    "build-all": "ng build --project=uhero --configuration production && ng build --project=ccom --configuration production && ng build --project=nta --configuration production && ng build --project=coh --configuration production",
+    "build-all-staging": "ng build --project=uhero --configuration staging && ng build --project=ccom --configuration staging && ng build --project=nta --configuration staging && ng build --project=coh --configuration staging"
+
   },
   "private": true,
   "dependencies": {
