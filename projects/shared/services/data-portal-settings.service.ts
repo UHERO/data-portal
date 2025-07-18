@@ -219,56 +219,5 @@ export class DataPortalSettingsService {
       otherDashboardLinks: [],
       selectors: []
     },
-    coh: {
-      catTable: {
-        portalSource: 'County of Hawaii: https://data.uhero.hawaii.edu/coh \n ',
-        portalLink: 'https://data.uhero.hawaii.edu/coh/#/category?id='
-      },
-      highcharts: {
-        seriesTotal: 2,
-        series0Name: 'level',
-        series0Type: 'line',
-        series0Data: true,
-        series1Name: 'ytd',
-        series1Type: 'column',
-        series1Data: true,
-        setYAxes: false
-      },
-      highstock: {
-        credits: 'data.uhero.hawaii.edu',
-        labels: {
-          seriesLink: 'https://data.uhero.hawaii.edu/coh/#/series?id=',
-          portal: 'County of Hawaii',
-          portalLink: 'County of Hawaii Data Portal: https://data.uhero.hawaii.edu/coh'
-        },
-        series0Name: 'level',
-        series0Type: 'line',
-        series1Name: 'yoy',
-        series1Type: 'column',
-        series2Name: 'ytd',
-        series2Type: 'column',
-        buttons: [1, 5, 10, 'all']
-      },
-      seriesTable: {
-        columns: 4,
-        series1: 'formattedValue',
-        series1Label: 'Level',
-        series2: 'formattedYoy',
-        series2Label: 'Year/Year % Chg',
-        series2PercLabel: 'Year/Year Chg',
-        series3: 'formattedYtd',
-        series3Label: 'Year-to-Date % Chg',
-        series3PercLabel: 'Year-to-Date Chg'
-      },
-      transformations: {
-        yoy: true,
-        ytd: true,
-        mom: true,
-        c5ma: false
-      },
-      sliderInteraction: true,
-      otherDashboardLinks: [],
-      selectors: []
-    }
   };
 }

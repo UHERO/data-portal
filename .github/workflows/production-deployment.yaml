@@ -30,7 +30,6 @@ jobs:
           cp -r dist/uhero/* build/
           cp -r dist/* build/
           cp -r dist/ccom/assets/* build/assets
-          cp -r dist/coh/assets/* build/assets
           cp -r dist/ccom/assets/* build/assets
           rm -r build/uhero
       

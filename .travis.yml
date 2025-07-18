@@ -25,4 +25,3 @@ before_script:
 script: 
 - ng test uhero --karma-config karma.conf.js --watch=false
 - ng test nta --karma-config karma.conf.js --watch=false
-- ng test coh --karma-config karma.conf.js --watch=false
