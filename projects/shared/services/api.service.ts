@@ -76,8 +76,8 @@ export class ApiService {
     return this.retrieveAPIData(`${this.baseUrl}/measurement/series?id=${id}&expand=true${caching}`);
   }
 
-  fetchSiblingSeriesByIdAndGeo(id: number, geo: string, seasonal: string, freq: string) {
-    const cacheId = seasonal ? `${id + geo + freq}SA` : id + geo + freq;
+  fetchSiblingSeriesByIdAndGeo(id: number, geo: string, seasonal: string, freq?: string) {
+    //const cacheId = seasonal ? `${id + geo + freq}SA` : id + geo + freq;
     return this.retrieveAPIData(`${this.baseUrl}/series/siblings?id=${id}&geo=${geo}&u=${this.portal.universe}`);
   }
 

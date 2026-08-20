@@ -20,6 +20,7 @@ import { AnalyzerHighstockComponent } from "../analyzer-highstock/analyzer-highs
 import { CategoryChartsComponent } from "../category-charts/category-charts.component";
 import { DateSliderComponent } from "../date-slider/date-slider.component";
 import { FreqSelectorComponent } from "../freq-selector/freq-selector.component";
+import { GeoSelectorComponent } from "../geo-selector/geo-selector.component";
 import { ShareLinkComponent } from "../share-link/share-link.component";
 import { TabViewModule } from "primeng/tabview";
 import { DialogModule } from "primeng/dialog";
@@ -36,6 +37,7 @@ import { DialogModule } from "primeng/dialog";
     NgFor,
     ShareLinkComponent,
     FreqSelectorComponent,
+    GeoSelectorComponent,
     DateSliderComponent,
     CategoryChartsComponent,
     AnalyzerHighstockComponent,
@@ -46,29 +48,29 @@ import { DialogModule } from "primeng/dialog";
 export class AnalyzerComponent
   implements OnChanges, OnDestroy
 {
-  @Input() analyzerSeries: string;
-  @Input() chartSeries: string;
-  @Input() start: string;
-  @Input() end: string;
-  @Input() index: string;
-  @Input() leftMin: string;
-  @Input() leftMax: string;
-  @Input() rightMin: string;
-  @Input() rightMax: string;
-  @Input() compare: string;
-  @Input() yoy: string;
-  @Input() ytd: string;
-  @Input() c5ma: string;
-  @Input() mom: string;
-  @Input() yright: string;
-  @Input() yleft: string;
-  @Input() column: string;
-  @Input() area: string;
-  @Input() chartYoy: string;
-  @Input() chartYtd: string;
-  @Input() chartMom: string;
-  @Input() chartC5ma: string;
-  @Input() nocache: string;
+  @Input() analyzerSeries!: string;
+  @Input() chartSeries!: string;
+  @Input() start?: string;
+  @Input() end?: string;
+  @Input() index?: string;
+  @Input() leftMin?: string;
+  @Input() leftMax?: string;
+  @Input() rightMin?: string;
+  @Input() rightMax?: string;
+  @Input() compare?: string;
+  @Input() yoy?: string;
+  @Input() ytd?: string;
+  @Input() c5ma?: string;
+  @Input() mom?: string;
+  @Input() yright?: string;
+  @Input() yleft?: string;
+  @Input() column?: string;
+  @Input() area?: string;
+  @Input() chartYoy?: string;
+  @Input() chartYtd?: string;
+  @Input() chartMom?: string;
+  @Input() chartC5ma?: string;
+  @Input() nocache?: string;
 
   portalSettings;
   tableYoy: boolean;
@@ -89,6 +91,7 @@ export class AnalyzerComponent
   dateRangeSubscription: Subscription;
   selectedDateRange: DateRange;
   previousFreq: string = "";
+  previousGeo: string = "";
   
   constructor(
     @Inject("environment") private environment,
@@ -235,9 +238,22 @@ export class AnalyzerComponent
     this.updateUrlLocation(param);
   }
 
+  changeAnalyzerGeography(geo, previousGeo: string, analyzerSeries, freq) {
+    this.previousGeo = previousGeo === geo ? "" : previousGeo;
+    const siblingIds = [];
+    this.analyzerService.urlChartSeries.update(series => series = []);
+    const siblingsList = analyzerSeries.map((serie) => {
+      return this.apiService.fetchSiblingSeriesByIdAndGeo(
+        serie.id,
+        geo.handle,
+        serie.seasonalAdjustment
+      );
+    });
+    this.switchToSiblingSeries(siblingsList, analyzerSeries, freq)
+  }
+
   changeAnalyzerFrequency(freq, previousFreq: string, analyzerSeries) {
     this.previousFreq = previousFreq === freq ? "" : previousFreq;
-    const siblingIds = [];
     this.analyzerService.urlChartSeries.update(series => series = []);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(
@@ -247,6 +263,11 @@ export class AnalyzerComponent
         freq
       );
     });
+    this.switchToSiblingSeries(siblingsList, analyzerSeries, freq);
+  }
+
+  switchToSiblingSeries(siblingsList, analyzerSeries, freq) {
+    const siblingIds = [];
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
         siblings.forEach((sib) => {
