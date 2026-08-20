@@ -547,14 +547,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
         const rightMin = this.analyzerService.rightMin();
         const rightMax = this.analyzerService.rightMax();
         let currentMin: number;
-        let currentMax: number;
+        let currentMax: number | null;
         if (s.yAxis === 'left') {
-          currentMin = +leftMin ?? 0;
-          currentMax = +leftMax || null;
+          currentMin = leftMin ?? 0;
+          currentMax = leftMax || null;
         }
         if (s.yAxis === 'right') {
-          currentMin = +rightMin ?? 0;
-          currentMax = +rightMax || null;
+          currentMin = rightMin ?? 0;
+          currentMax = rightMax || null;
         }
         axes.push({
           labels: {
@@ -651,19 +651,21 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   changeYAxisMin(e, axis) {
+    const minVal = e.target.value === '' ? null : +e.target.value;
     (<Highcharts.YAxisOptions[]>this.chartOptions.yAxis)
-      .find(a => a.id === axis.userOptions.id).min = +e.target.value ?? null;
-    this.analyzerService.analyzerData[`${axis.userOptions.id}Min`] = +e.target.value ?? null;
-    this.analyzerService[`${axis.userOptions.id}Min`].set(+e.target.value ?? null);
+      .find(a => a.id === axis.userOptions.id).min = minVal;
+    this.analyzerService.analyzerData[`${axis.userOptions.id}Min`] = minVal;
+    this.analyzerService[`${axis.userOptions.id}Min`].set(minVal);
     this.updateChart = true;
     this.updateUrl.emit({});
   }
 
   changeYAxisMax(e, axis) {
+    const maxVal = e.target.value === '' ? null : +e.target.value;
     (<Highcharts.YAxisOptions[]>this.chartOptions.yAxis)
-      .find(a => a.id === axis.userOptions.id).max = +e.target.value ?? null;
-    this.analyzerService.analyzerData[`${axis.userOptions.id}Max`] = +e.target.value ?? null;
-    this.analyzerService[`${axis.userOptions.id}Max`].set(+e.target.value ?? null);
+      .find(a => a.id === axis.userOptions.id).max = maxVal;
+    this.analyzerService.analyzerData[`${axis.userOptions.id}Max`] = maxVal;
+    this.analyzerService[`${axis.userOptions.id}Max`].set(maxVal);
 
     this.updateChart = true;
     this.updateUrl.emit({});
