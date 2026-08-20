@@ -11,7 +11,6 @@ import { TableModule } from 'primeng/table';
     selector: 'lib-single-series-table',
     templateUrl: './single-series-table.component.html',
     styleUrls: ['./single-series-table.component.scss'],
-    standalone: true,
     imports: [TableModule, SharedModule, NgFor, NgIf]
 })
 export class SingleSeriesTableComponent implements OnInit, OnDestroy {

@@ -12,7 +12,6 @@ import { NgFor, NgIf, AsyncPipe } from '@angular/common';
     selector: 'lib-embed-graph',
     templateUrl: './embed-graph.component.html',
     styleUrls: ['./embed-graph.component.scss'],
-    standalone: true,
     imports: [NgFor, NgIf, DateSliderComponent, HighstockComponent, AnalyzerHighstockComponent, AsyncPipe]
 })
 export class EmbedGraphComponent /* implements OnInit, OnDestroy */{

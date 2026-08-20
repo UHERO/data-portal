@@ -12,7 +12,6 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {endDate: string, _ind
     selector: 'lib-highchart',
     templateUrl: './highchart.component.html',
     styleUrls: ['./highchart.component.scss'],
-    standalone: true,
     imports: [HighchartsChartModule]
 })
 export class HighchartComponent implements OnInit, OnChanges, OnDestroy {

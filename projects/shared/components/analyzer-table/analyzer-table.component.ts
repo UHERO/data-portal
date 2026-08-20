@@ -12,15 +12,14 @@ import { AgGridModule } from 'ag-grid-angular';
 import { NgIf, NgFor } from '@angular/common';
 
 @Component({
-  selector: 'lib-analyzer-table',
-  templateUrl: './analyzer-table.component.html',
-  styleUrls: ['./analyzer-table.component.scss'],
-  standalone: true,
-  imports: [
-    NgIf,
-    AgGridModule,
-    NgFor,
-  ],
+    selector: 'lib-analyzer-table',
+    templateUrl: './analyzer-table.component.html',
+    styleUrls: ['./analyzer-table.component.scss'],
+    imports: [
+        NgIf,
+        AgGridModule,
+        NgFor,
+    ]
 })
 export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;

@@ -31,7 +31,6 @@ type CustomSeriesOptions = Highcharts.SeriesOptionsType & {frequencyShort: strin
     templateUrl: './analyzer-highstock.component.html',
     styleUrls: ['./analyzer-highstock.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [HighchartsChartModule, NgFor, NgIf]
 })
 export class AnalyzerHighstockComponent implements OnInit, OnChanges, OnDestroy {

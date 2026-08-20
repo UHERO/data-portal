@@ -9,7 +9,6 @@ import { NgIf } from '@angular/common';
     selector: 'lib-summary-statistics',
     templateUrl: './summary-statistics.component.html',
     styleUrls: ['./summary-statistics.component.scss'],
-    standalone: true,
     imports: [NgIf]
 })
 export class SummaryStatisticsComponent implements OnInit, OnDestroy {

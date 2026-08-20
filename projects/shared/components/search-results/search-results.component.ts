@@ -8,7 +8,6 @@ import { TableModule } from 'primeng/table';
     selector: 'lib-search-results',
     templateUrl: './search-results.component.html',
     styleUrls: ['./search-results.component.scss'],
-    standalone: true,
     imports: [TableModule, SharedModule, NgFor, NgIf, RouterLink]
 })
 export class SearchResultsComponent implements OnInit {

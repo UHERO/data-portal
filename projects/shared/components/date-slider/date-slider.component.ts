@@ -12,7 +12,6 @@ import { CalendarModule } from 'primeng/calendar';
     templateUrl: './date-slider.component.html',
     styleUrls: ['./date-slider.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [CalendarModule, FormsModule, SliderModule]
 })
 export class DateSliderComponent implements OnChanges {

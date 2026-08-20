@@ -21,25 +21,24 @@ import { DialogModule } from "primeng/dialog";
 import { NgFor, NgIf, AsyncPipe } from "@angular/common";
 
 @Component({
-  selector: "lib-landing-page",
-  templateUrl: "./landing-page.component.html",
-  styleUrls: ["./landing-page.component.scss"],
-  standalone: true,
-  imports: [
-    NgFor,
-    NgIf,
-    DialogModule,
-    TabViewModule,
-    GeoSelectorComponent,
-    FreqSelectorComponent,
-    ForecastSelectorComponent,
-    MeasurementSelectorComponent,
-    DateSliderComponent,
-    CategoryTableViewComponent,
-    CategoryChartsComponent,
-    SearchResultsComponent,
-    AsyncPipe,
-  ],
+    selector: "lib-landing-page",
+    templateUrl: "./landing-page.component.html",
+    styleUrls: ["./landing-page.component.scss"],
+    imports: [
+        NgFor,
+        NgIf,
+        DialogModule,
+        TabViewModule,
+        GeoSelectorComponent,
+        FreqSelectorComponent,
+        ForecastSelectorComponent,
+        MeasurementSelectorComponent,
+        DateSliderComponent,
+        CategoryTableViewComponent,
+        CategoryChartsComponent,
+        SearchResultsComponent,
+        AsyncPipe,
+    ]
 })
 export class LandingPageComponent implements OnChanges, OnDestroy {
   @Input() m: string; // measurement param for NTA portal

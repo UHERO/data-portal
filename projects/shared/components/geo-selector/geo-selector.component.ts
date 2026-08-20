@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
     selector: 'lib-geo-selector',
     templateUrl: './geo-selector.component.html',
     styleUrls: ['./geo-selector.component.scss'],
-    standalone: true,
     imports: [FormsModule, NgFor]
 })
 export class GeoSelectorComponent implements OnDestroy {

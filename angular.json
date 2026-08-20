@@ -15,12 +15,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/uhero",
+            "outputPath": {
+              "base": "dist/uhero"
+            },
             "index": "projects/uhero/src/index.html",
-            "main": "projects/uhero/src/main.ts",
-            "polyfills": "projects/uhero/src/polyfills.ts",
+            "polyfills": [
+              "projects/uhero/src/polyfills.ts"
+            ],
             "tsConfig": "projects/uhero/tsconfig.app.json",
             "assets": [
               "projects/uhero/src/manoa.jpg",
@@ -48,12 +51,11 @@
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/uhero/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -68,15 +70,13 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/uhero/src/environments/environment.ts",
                   "with": "projects/uhero/src/environments/environment.staging.ts"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/uhero/ngsw-config.json"
+              "serviceWorker": "projects/uhero/ngsw-config.json"
             },
             "production": {
               "fileReplacements": [
@@ -90,8 +90,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -104,8 +102,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/uhero/ngsw-config.json"
+              "serviceWorker": "projects/uhero/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -194,12 +191,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/nta",
+            "outputPath": {
+              "base": "dist/nta"
+            },
             "index": "projects/nta/src/index.html",
-            "main": "projects/nta/src/main.ts",
-            "polyfills": "projects/nta/src/polyfills.ts",
+            "polyfills": [
+              "projects/nta/src/polyfills.ts"
+            ],
             "tsConfig": "projects/nta/tsconfig.app.json",
             "assets": [
               "projects/nta/src/nta-logo.png",
@@ -227,12 +227,11 @@
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/nta/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -247,7 +246,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/nta/src/environments/environment.ts",
@@ -269,8 +267,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -283,8 +279,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/nta/ngsw-config.json"
+              "serviceWorker": "projects/nta/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -365,12 +360,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/ccom",
+            "outputPath": {
+              "base": "dist/ccom"
+            },
             "index": "projects/ccom/src/index.html",
-            "main": "projects/ccom/src/main.ts",
-            "polyfills": "projects/ccom/src/polyfills.ts",
+            "polyfills": [
+              "projects/ccom/src/polyfills.ts"
+            ],
             "tsConfig": "projects/ccom/tsconfig.app.json",
             "assets": [
               "projects/ccom/src/favicon.ico",
@@ -398,12 +396,11 @@
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/ccom/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -418,7 +415,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/ccom/src/environments/environment.ts",
@@ -440,8 +436,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -454,8 +448,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/ccom/ngsw-config.json"
+              "serviceWorker": "projects/ccom/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -535,12 +528,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/forecast",
+            "outputPath": {
+              "base": "dist/forecast"
+            },
             "index": "projects/forecast/src/index.html",
-            "main": "projects/forecast/src/main.ts",
-            "polyfills": "projects/forecast/src/polyfills.ts",
+            "polyfills": [
+              "projects/forecast/src/polyfills.ts"
+            ],
             "tsConfig": "projects/forecast/tsconfig.app.json",
             "assets": [
               "projects/forecast/src/favicon.ico",
@@ -566,12 +562,11 @@
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/forecast/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -587,8 +582,6 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/forecast/src/environments/environment.ts",
@@ -609,8 +602,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -624,8 +615,7 @@
                 }
               ],
               "baseHref": "/fc/",
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/forecast/ngsw-config.json"
+              "serviceWorker": "projects/forecast/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [

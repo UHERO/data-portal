@@ -8,7 +8,6 @@ import { FormsModule } from '@angular/forms';
     selector: 'lib-forecast-selector',
     templateUrl: './forecast-selector.component.html',
     styleUrls: ['./forecast-selector.component.scss'],
-    standalone: true,
     imports: [FormsModule, NgFor]
 })
 export class ForecastSelectorComponent implements OnDestroy {

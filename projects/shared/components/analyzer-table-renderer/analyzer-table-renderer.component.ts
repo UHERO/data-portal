@@ -8,7 +8,6 @@ import { NgIf } from '@angular/common';
     selector: 'lib-analyzer-table-renderer',
     templateUrl: './analyzer-table-renderer.component.html',
     styleUrls: ['./analyzer-table-renderer.component.scss'],
-    standalone: true,
     imports: [NgIf, RouterLink]
 })
 export class AnalyzerTableRendererComponent implements ICellRendererAngularComp {

@@ -12,14 +12,13 @@ import { NgIf, NgFor } from '@angular/common';
     selector: 'lib-primeng-menu-nav',
     templateUrl: './primeng-menu-nav.component.html',
     styleUrls: ['./primeng-menu-nav.component.scss'],
-    standalone: true,
     imports: [
         NgIf,
         RouterLink,
         SearchBarComponent,
         PanelMenuModule,
         NgFor,
-    ],
+    ]
 })
 export class PrimengMenuNavComponent implements OnInit {
   public categories;

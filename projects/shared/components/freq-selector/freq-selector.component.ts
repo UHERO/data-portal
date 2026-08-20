@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
     selector: 'lib-freq-selector',
     templateUrl: './freq-selector.component.html',
     styleUrls: ['./freq-selector.component.scss'],
-    standalone: true,
     imports: [FormsModule, NgIf, NgFor]
 })
 export class FreqSelectorComponent implements OnDestroy {

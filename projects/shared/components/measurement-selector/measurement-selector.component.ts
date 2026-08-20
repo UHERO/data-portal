@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
     selector: 'lib-measurement-selector',
     templateUrl: './measurement-selector.component.html',
     styleUrls: ['./measurement-selector.component.scss'],
-    standalone: true,
     imports: [FormsModule, NgFor]
 })
 export class MeasurementSelectorComponent {

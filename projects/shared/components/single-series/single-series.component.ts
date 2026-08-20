@@ -24,21 +24,20 @@ import { DialogModule } from 'primeng/dialog';
     selector: 'lib-single-series',
     templateUrl: './single-series.component.html',
     styleUrls: ['./single-series.component.scss'],
-    standalone: true,
     imports: [
-      NgFor,
-      NgIf,
-      DialogModule,
-      GeoSelectorComponent,
-      FreqSelectorComponent,
-      ForecastSelectorComponent,
-      ShareLinkComponent,
-      FormsModule,
-      DateSliderComponent,
-      HighstockComponent,
-      SummaryStatisticsComponent,
-      SingleSeriesTableComponent,
-      AsyncPipe
+        NgFor,
+        NgIf,
+        DialogModule,
+        GeoSelectorComponent,
+        FreqSelectorComponent,
+        ForecastSelectorComponent,
+        ShareLinkComponent,
+        FormsModule,
+        DateSliderComponent,
+        HighstockComponent,
+        SummaryStatisticsComponent,
+        SingleSeriesTableComponent,
+        AsyncPipe
     ]
 })
 export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, AfterContentChecked {

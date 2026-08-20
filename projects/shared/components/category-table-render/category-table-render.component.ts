@@ -9,7 +9,6 @@ import { NgIf } from '@angular/common';
     selector: 'lib-category-table-render',
     templateUrl: './category-table-render.component.html',
     styleUrls: ['./category-table-render.component.scss'],
-    standalone: true,
     imports: [NgIf, RouterLink]
 })
 export class CategoryTableRenderComponent implements ICellRendererAngularComp {

@@ -9,7 +9,6 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: true,
     imports: [NgIf, ToolsModule, RouterOutlet]
 })
 export class AppComponent implements AfterViewInit {

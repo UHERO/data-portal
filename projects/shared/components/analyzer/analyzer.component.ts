@@ -25,23 +25,22 @@ import { TabViewModule } from "primeng/tabview";
 import { DialogModule } from "primeng/dialog";
 
 @Component({
-  selector: "lib-analyzer",
-  templateUrl: "./analyzer.component.html",
-  styleUrls: ["./analyzer.component.scss"],
-  standalone: true,
-  imports: [
-    DialogModule,
-    TabViewModule,
-    NgIf,
-    NgFor,
-    ShareLinkComponent,
-    FreqSelectorComponent,
-    DateSliderComponent,
-    CategoryChartsComponent,
-    AnalyzerHighstockComponent,
-    AnalyzerTableComponent,
-    AsyncPipe,
-  ],
+    selector: "lib-analyzer",
+    templateUrl: "./analyzer.component.html",
+    styleUrls: ["./analyzer.component.scss"],
+    imports: [
+        DialogModule,
+        TabViewModule,
+        NgIf,
+        NgFor,
+        ShareLinkComponent,
+        FreqSelectorComponent,
+        DateSliderComponent,
+        CategoryChartsComponent,
+        AnalyzerHighstockComponent,
+        AnalyzerTableComponent,
+        AsyncPipe,
+    ]
 })
 export class AnalyzerComponent
   implements OnChanges, OnDestroy

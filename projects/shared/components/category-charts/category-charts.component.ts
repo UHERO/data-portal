@@ -10,7 +10,6 @@ import { RouterLink } from '@angular/router';
     selector: 'lib-category-charts',
     templateUrl: './category-charts.component.html',
     styleUrls: ['./category-charts.component.scss'],
-    standalone: true,
     imports: [NgFor, NgIf, RouterLink, HighchartComponent, KeyValuePipe]
 })
 export class CategoryChartsComponent implements OnChanges {
