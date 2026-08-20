@@ -3,7 +3,7 @@ import { HelperService } from 'projects/shared/services/helper.service';
 import { DateRange } from 'projects/shared/models/DateRange';
 import { Subscription } from 'rxjs';
 import { DataPortalSettingsService } from 'projects/shared/services/data-portal-settings.service';
-import { NgFor, NgIf } from '@angular/common';
+
 import { SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 
@@ -11,7 +11,7 @@ import { TableModule } from 'primeng/table';
     selector: 'lib-single-series-table',
     templateUrl: './single-series-table.component.html',
     styleUrls: ['./single-series-table.component.scss'],
-    imports: [TableModule, SharedModule, NgFor, NgIf]
+    imports: [TableModule, SharedModule]
 })
 export class SingleSeriesTableComponent implements OnInit, OnDestroy {
   @Input() seriesData;

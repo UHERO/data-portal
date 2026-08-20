@@ -7,7 +7,7 @@ import {
   SimpleChanges,
   computed,
 } from "@angular/core";
-import { Location, NgIf, NgFor, AsyncPipe } from "@angular/common";
+import { Location, AsyncPipe } from "@angular/common";
 import { AnalyzerService } from "projects/shared/services/analyzer.service";
 import { DateRange } from "projects/shared/models/DateRange";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -29,18 +29,16 @@ import { DialogModule } from "primeng/dialog";
     templateUrl: "./analyzer.component.html",
     styleUrls: ["./analyzer.component.scss"],
     imports: [
-        DialogModule,
-        TabViewModule,
-        NgIf,
-        NgFor,
-        ShareLinkComponent,
-        FreqSelectorComponent,
-        DateSliderComponent,
-        CategoryChartsComponent,
-        AnalyzerHighstockComponent,
-        AnalyzerTableComponent,
-        AsyncPipe,
-    ]
+    DialogModule,
+    TabViewModule,
+    ShareLinkComponent,
+    FreqSelectorComponent,
+    DateSliderComponent,
+    CategoryChartsComponent,
+    AnalyzerHighstockComponent,
+    AnalyzerTableComponent,
+    AsyncPipe
+]
 })
 export class AnalyzerComponent
   implements OnChanges, OnDestroy

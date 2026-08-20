@@ -40,6 +40,9 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "projects/uhero/src/styles.scss"
             ],
             "stylePreprocessorOptions": {
@@ -48,7 +51,7 @@
               ]
             },
             "scripts": [
-              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
             "extractLicenses": false,
@@ -146,7 +149,7 @@
             "tsConfig": "projects/uhero/tsconfig.spec.json",
             "karmaConfig": "projects/uhero/karma.conf.js",
             "scripts": [
-              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
             "assets": [
@@ -161,6 +164,9 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "projects/uhero/src/styles.scss"
             ]
           }

@@ -6,19 +6,17 @@ import { MenuItem } from 'primeng/api';
 import { DataPortalSettingsService } from 'projects/shared/services/data-portal-settings.service';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
-import { NgIf, NgFor } from '@angular/common';
+
 
 @Component({
     selector: 'lib-primeng-menu-nav',
     templateUrl: './primeng-menu-nav.component.html',
     styleUrls: ['./primeng-menu-nav.component.scss'],
     imports: [
-        NgIf,
-        RouterLink,
-        SearchBarComponent,
-        PanelMenuModule,
-        NgFor,
-    ]
+    RouterLink,
+    SearchBarComponent,
+    PanelMenuModule
+]
 })
 export class PrimengMenuNavComponent implements OnInit {
   public categories;

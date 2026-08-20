@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgFor, NgIf } from '@angular/common';
+
 import { SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 
@@ -8,7 +8,7 @@ import { TableModule } from 'primeng/table';
     selector: 'lib-search-results',
     templateUrl: './search-results.component.html',
     styleUrls: ['./search-results.component.scss'],
-    imports: [TableModule, SharedModule, NgFor, NgIf, RouterLink]
+    imports: [TableModule, SharedModule, RouterLink]
 })
 export class SearchResultsComponent implements OnInit {
   @Input() searchData;
