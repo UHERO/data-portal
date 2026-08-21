@@ -1,0 +1,258 @@
+.navbar {
+  @media (max-width: 767px) {
+    background-color: #FFF;
+    padding: 0;
+    box-shadow: 0 4px 6px -6px #000;
+    -moz-box-shadow: 0 4px 6px -6px #000;
+    -webkit-box-shadow: 0 4px 6px -6px #000;
+  }
+}
+
+#sidebar-nav {
+  lib-search-bar {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  #about-link {
+    @media (min-width:768px) {
+      display: none;
+    }
+  }
+
+  .navbar-brand {
+    @media (min-width:768px) {
+      display: none;
+    }
+
+    @media (max-width: 767px) {
+      float: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    img {
+      height: 38px;
+      padding: 5px;
+    }
+
+    p {
+      @media (max-width: 767px) {
+        margin-bottom: 0;
+        padding: 0.3125rem 0;
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    position: relative;
+    padding: 0;
+  }
+
+  button {
+    background-color: #FFF;
+    border: none;
+    float: left;
+    font-size: 1.5em;
+    color: #505050;
+  }
+
+  #navbarSideButton {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  .navbar-side {
+    padding-left: 0px;
+
+    .submenu {
+      background-color: #E5E5E5;
+    }
+
+    #built-by {
+      color: #505050;
+      display: inline-block;
+      font-size: 0.8em;
+      margin-bottom: 0;
+      padding-left: 0.5em;
+      vertical-align: bottom;
+    }
+
+    .analytics-logo {
+      padding-left: 0.5em;
+      width: 60%;
+    }
+
+    .mobile-logo {
+      display: block;
+      max-height: 55px;
+      max-width: 200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 543px) {
+      height: 100%;
+      width: 85%;
+      -webkit-transform: translateX(-100%);
+      -ms-transform: translateX(-100%);
+      transform: translateX(-100%);
+      -webkit-transition: 300ms ease;
+      transition: 300ms ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 0;
+      list-style: none;
+      background-color: #FAFAFB;
+      overflow-y: scroll;
+      z-index: 100;
+    }
+
+    @media (min-width:544px) and (max-width: 767px) {
+      width: 50%;
+      height: 100%;
+      -webkit-transform: translateX(-100%);
+      -ms-transform: translateX(-100%);
+      transform: translateX(-100%);
+      -webkit-transition: 300ms ease;
+      transition: 300ms ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 0;
+      list-style: none;
+      border-left: 2px solid #E5E5E5;
+      background-color: #FAFAFB;
+      overflow-y: scroll;
+      z-index: 100;
+    }
+
+    @media (min-width: 768px) {
+      width: 230px;
+
+      .mobile-divider, .mobile-logo {
+        display: none;
+      }
+    }
+  }
+
+  .reveal {
+    @media (max-width: 767px) {
+      -webkit-transform: translateX(0%);
+      -ms-transform: translateX(0%);
+      transform: translateX(0%);
+      -webkit-transition: 300ms ease;
+      transition: 300ms ease;
+    }
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+    background-color: #E5E5E5;
+    opacity: 0.6;
+    z-index: 99;
+  }
+
+  .sidebar-list, .list-item {
+    display: block;
+    list-style-type: none;
+    -webkit-padding-start: 1em;
+    color: #505050;
+    font-size: 0.9em;
+    cursor: pointer;
+    padding: 0.5em;
+    text-decoration: none;
+
+    &:hover {
+      background-color: #DBDBDB;
+      text-decoration: none;
+    }
+  }
+
+  .selectedCategory {
+    color: #FFF;
+  }
+
+  .selectedCategory {
+    a, a:hover, a:active {
+      color: #FFF;
+    }
+  }
+}
+
+.nav-tree {
+  font-size: 0.9em;
+
+  mat-tree-node {
+    border-bottom: 1px solid #E5E5E5;
+    min-height: unset;
+
+    a {
+      display: block;
+      width: 100%;
+      padding: .6em;
+      font-size: 0.9em;
+      color: #333;
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #DBDBDB;
+        text-decoration: none;
+      }
+    }
+
+    &.active-link a {
+      color: #FFF;
+      background-color: #333;
+    }
+  }
+
+  .tree-node-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  /*padding: .75em;*/
+  cursor: pointer;
+  font-size: .9em;
+  font-weight: normal;
+  border-bottom: 1px solid transparent;
+
+  &:hover {
+    background-color: transparent;
+  }
+
+  &.expanded {
+    border-color: #E5E5E5;
+    background-color: transparent;
+
+    .tree-node-label {
+      font-weight: 600;
+    }
+  }
+
+  button {
+    background-color: transparent;
+    float: none;
+    display: inline-flex;
+    color: #505050;
+    font-size: 0.9em;
+    margin-right: unset;
+  }
+
+  .tree-node-label {
+    flex: 1;
+  }
+}
+
+  mat-tree-node[matTreeNodePadding] {
+    padding-left: 10px;
+  }
+}
