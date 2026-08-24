@@ -1,4 +1,23 @@
+@use '@angular/material' as mat;
+
 @import './assets/app_colors';
+
+@include mat.core();
+
+html {
+  @include mat.theme((
+    color: mat.$blue-palette,
+    typography: Roboto,
+    density: 0
+  ));
+
+  @include mat.slider-overrides ((
+    active-track-color: #1D667F,
+    handle-color: #FAFAFB,
+    focus-handle-color: #1D667F,
+    ripple-color: transparent
+  ));  
+}
 /* You can add global styles to this file, and also import other style files */
 body {
   position: relative;
