@@ -1,0 +1,27 @@
+.striped-table {
+  background-color: #FFF;
+
+  tr.mat-mdc-row:nth-child(even) {
+    background-color: #f5f5f5;
+  }
+
+  .mat-mdc-row, .mat-mdc-header-row {
+    height: 2rem;
+  }
+
+  .mat-mdc-row {
+    background: #FFF;
+  }
+
+  .mat-mdc-header-row {
+    background-color: #F4F4F4 !important;
+  }
+
+  .mat-mdc-cell {
+    border: 0;
+
+    a {
+      color: #505050;
+    }
+  }
+}
