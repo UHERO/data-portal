@@ -3,7 +3,7 @@
 		<h2 *ngIf="data.requestComplete && !data.invalid" class="selected-category" [class.search-term]="isSearch"
 			id="id_top">
 			{{data.selectedCategory.name}}</h2><i (click)="showHelp()" class="bi bi-question-circle display-help-icon"></i>
-		<p-dialog header="Category View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
+		<!-- <p-dialog header="Category View Help" [(visible)]="displayHelp" [style]="{width: '60vw'}" [modal]="true"
 			[dismissableMask]="true">
 			<p-tabView>
 				<p-tabPanel header="Category View">
@@ -56,7 +56,7 @@
 						star, located to the right of the name of each indicator.</p>
 				</p-tabPanel>
 			</p-tabView>
-		</p-dialog>
+		</p-dialog> -->
 		<ng-template ngIf [ngIf]="data.invalid">
 			<p>{{data.invalid}}</p>
 		</ng-template>

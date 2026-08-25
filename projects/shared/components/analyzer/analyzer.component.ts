@@ -21,16 +21,18 @@ import { CategoryChartsComponent } from "../category-charts/category-charts.comp
 import { DateSliderComponent } from "../date-slider/date-slider.component";
 import { FreqSelectorComponent } from "../freq-selector/freq-selector.component";
 import { ShareLinkComponent } from "../share-link/share-link.component";
-import { TabViewModule } from "primeng/tabview";
-import { DialogModule } from "primeng/dialog";
+import { MatDialog } from '@angular/material/dialog';
+import { AnalyzerHelpDialogComponent } from '../analyzer-help-dialog/analyzer-help-dialog.component';
+// import { TabViewModule } from "primeng/tabview";
+// import { DialogModule } from "primeng/dialog";
 
 @Component({
     selector: "lib-analyzer",
     templateUrl: "./analyzer.component.html",
     styleUrls: ["./analyzer.component.scss"],
     imports: [
-    DialogModule,
-    TabViewModule,
+    // DialogModule,
+    // TabViewModule,
     ShareLinkComponent,
     FreqSelectorComponent,
     DateSliderComponent,
@@ -79,7 +81,7 @@ export class AnalyzerComponent
   queryParams: any = {};
   displayCompare: boolean = false;
   urlParams;
-  displayHelp: boolean = false;
+  // displayHelp: boolean = false;
   displaySelectionNA: boolean = false;
   routeStart: string;
   routeEnd: string;
@@ -96,7 +98,8 @@ export class AnalyzerComponent
     private apiService: ApiService,
     private router: Router,
     private location: Location,
-    private helperService: HelperService
+    private helperService: HelperService,
+    private dialog: MatDialog
   ) {
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
       (dateRange) => {
@@ -271,7 +274,11 @@ export class AnalyzerComponent
   }
 
   showHelp() {
-    this.displayHelp = true;
+    // this.displayHelp = true;
+    this.dialog.open(AnalyzerHelpDialogComponent, {
+      width: '70vw',
+      hasBackdrop: true,
+    });
   }
 
   removeAllAnalyzerSeries() {

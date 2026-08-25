@@ -16,8 +16,10 @@ import { MeasurementSelectorComponent } from "../measurement-selector/measuremen
 import { ForecastSelectorComponent } from "../forecast-selector/forecast-selector.component";
 import { FreqSelectorComponent } from "../freq-selector/freq-selector.component";
 import { GeoSelectorComponent } from "../geo-selector/geo-selector.component";
-import { TabViewModule } from "primeng/tabview";
-import { DialogModule } from "primeng/dialog";
+// import { TabViewModule } from "primeng/tabview";
+// import { DialogModule } from "primeng/dialog";
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { CategoryHelpDialogComponent } from '../category-help-dialog/category-help-dialog.component';
 import { NgFor, NgIf, AsyncPipe } from "@angular/common";
 
 @Component({
@@ -27,8 +29,9 @@ import { NgFor, NgIf, AsyncPipe } from "@angular/common";
     imports: [
         NgFor,
         NgIf,
-        DialogModule,
-        TabViewModule,
+        // DialogModule,
+        // TabViewModule,
+        MatDialogModule,
         GeoSelectorComponent,
         FreqSelectorComponent,
         ForecastSelectorComponent,
@@ -59,7 +62,7 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
   isSearch: boolean;
   queryParams: any = {};
   portalSettings;
-  displayHelp: boolean = false;
+  // displayHelp: boolean = false;
   previousFreq: string = "";
 
   // Variables for geo and freq selectors
@@ -77,7 +80,8 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
     private dataPortalSettingsServ: DataPortalSettingsService,
     private catHelper: CategoryHelperService,
     private helperService: HelperService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
       this.selectedFreq = freq;
@@ -185,7 +189,11 @@ export class LandingPageComponent implements OnChanges, OnDestroy {
   }
 
   showHelp() {
-    this.displayHelp = true;
+    //this.displayHelp = true;
+    this.dialog.open(CategoryHelpDialogComponent, {
+      width: '70vw',
+      hasBackdrop: true
+    })
   }
 
   changeRange(e) {
