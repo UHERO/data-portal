@@ -227,6 +227,7 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "projects/nta/src/styles.scss"
             ],
             "scripts": [
@@ -391,6 +392,7 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "projects/ccom/src/styles.scss"
             ],
             "stylePreprocessorOptions": {
@@ -673,6 +675,7 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "src/styles.scss"
             ],
             "scripts": [

@@ -11,6 +11,11 @@ import { GridOptions } from 'ag-grid-community';
 import { AgGridModule } from 'ag-grid-angular';
 import { NgIf, NgFor } from '@angular/common';
 
+export interface TransformToggleEvent {
+  label: 'yoy' | 'ytd' | 'c5ma' | 'mom';
+  value: boolean;
+}
+
 @Component({
     selector: 'lib-analyzer-table',
     templateUrl: './analyzer-table.component.html',
@@ -24,7 +29,7 @@ import { NgIf, NgFor } from '@angular/common';
 export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;
   @Input() dates: Array<any>;
-  @Output() tableTransform = new EventEmitter();
+  @Output() tableTransform = new EventEmitter<TransformToggleEvent>();
   @Input() yoyChecked;
   @Input() ytdChecked;
   @Input() c5maChecked;

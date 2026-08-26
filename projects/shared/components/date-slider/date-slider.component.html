@@ -1,25 +1,3 @@
-<!-- <p-calendar #calendarStart [class.annual-calendar]="freq === 'A'" inputId="calendar-start" [view]="calendarView"
-  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarStartDate" [placeholder]="placeholderStr"
-  [dateFormat]="calendarStartDateFormat" [disabledDates]="invalidStartDates"
-  (onSelect)="onCalendarSelect($event, calendarStart.inputId, freq)"
-  (onYearChange)="onYearChange($event, calendarStart.inputId, freq)"
-  (onMonthChange)="onMonthChange($event, calendarStart.inputId, freq)"
-  (onInput)="onCalendarInput($event, calendarStart.inputId, freq)"
-  (onClose)="onCalendarClose(calendarStart.inputId, calendarStartDate)"
-  (onBlur)="onCalendarBlur(calendarStart.inputId, calendarStartDate)">
-</p-calendar>
-<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true"
-  (onChange)="onChange($event)" (onSlideEnd)="slideChange($event)"></p-slider>
-<p-calendar #calendarEnd [class.annual-calendar]="freq === 'A'" inputId="calendar-end" [view]="calendarView"
-  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarEndDate" [placeholder]="placeholderStr"
-  [dateFormat]="calendarEndDateFormat" [disabledDates]="invalidEndDates"
-  (onSelect)="onCalendarSelect($event, calendarEnd.inputId, freq)"
-  (onYearChange)="onYearChange($event, calendarEnd.inputId, freq)"
-  (onMonthChange)="onMonthChange($event, calendarEnd.inputId, freq)"
-  (onInput)="onCalendarInput($event, calendarEnd.inputId, freq)"
-  (onClose)="onCalendarClose(calendarEnd.inputId, calendarEndDate)"
-  (onBlur)="onCalendarBlur(calendarEnd.inputId, calendarEndDate)">
-</p-calendar> -->
 <div class="date-slider-row">
   <mat-form-field appearance="outline" class="date-input">
     <input matInput [(ngModel)]="calendarDisplayStart" (input)="onTypedInputChange(calendarDisplayStart, 'start')"
@@ -38,8 +16,8 @@
   </mat-datepicker>
 
   <mat-slider [min]="0" [max]="sliderDates.length - 1">
-    <input matSliderStartThumb [(ngModel)]="start" (valueChange)="onSlideChange()">
-    <input matSliderEndThumb [(ngModel)]="end" (valueChange)="onSlideChange()">
+    <input matSliderStartThumb [(ngModel)]="start" (change)="onSlideChange()">
+    <input matSliderEndThumb [(ngModel)]="end" (change)="onSlideChange()">
   </mat-slider>
 
   <mat-form-field appearance="outline" class="date-input">

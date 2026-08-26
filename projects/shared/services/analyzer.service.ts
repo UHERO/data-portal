@@ -4,18 +4,50 @@ import { HelperService } from './helper.service';
 import { DataPortalSettingsService } from './data-portal-settings.service';
 import { DateWrapper } from '../models/DateWrapper';
 import { AnalyzerDataInterface } from '../models/AnalyzerDataInterface';
+import { Portal } from '../models/DataPortalSettings';
 
 class AnalyzerData implements AnalyzerDataInterface {
   analyzerTableDates = [];
   analyzerMeasurements = {};
   sliderDates = [];
   analyzerDateWrapper = { firstDate: '', endDate: '' };
-  analyzerSeries = [];
+  analyzerSeries: FormattedAnalyzerSeries[] = [];
   displayFreqSelector = false;
   siblingFreqs = [];
   analyzerFrequency = null;
   requestComplete = false;
 }
+
+export interface FormattedAnalyzerSeries {
+  id: number;
+  title: string;
+  currentGeo: { handle: string; [key: string]: any };
+  seasonalAdjustment: string;
+  frequencyShort: string;
+  visible?: boolean;
+  className?: string | number;
+  displayName?: string;
+  indexDisplayName?: string;
+  saParam?: boolean;
+  currentFreq?: { freq: string; label: string };
+  chartData?: any;
+  noData?: string;
+  yAxisText?: string;
+  data?: any;
+  levelData?: any;
+  yAxis?: string;
+  type?: string;
+  selectedChartType?: string;
+  chartType?: string[];
+  yAxisSides?: string[];
+  chartValues?: string[];
+  selectedChartTransformation?: string;
+  gridDisplay?: any;
+  measurementName?: string;
+  observations?: any;
+  [key: string]: any;  // escape hatch while the full shape is still being mapped out
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -33,13 +65,13 @@ export class AnalyzerService {
   chartMom = signal<number[]>([]);
   chartC5ma = signal<number[]>([]);
 
-  leftMin = signal<number>(null);
-  leftMax = signal<number>(null);
-  rightMin = signal<number>(null);
-  rightMax = signal<number>(null);
+  leftMin = signal<number | null>(null);
+  leftMax = signal<number | null>(null);
+  rightMin = signal<number | null>(null);
+  rightMax = signal<number | null>(null);
   urlChartSeries = signal<number[]>([]);
   indexed = signal<boolean>(false);
-  baseYear = signal<string>(null);
+  baseYear = signal<string | null>(null);
 
   analyzerData = signal<AnalyzerData>(new AnalyzerData());
   public embedData = {
@@ -53,7 +85,7 @@ export class AnalyzerService {
   constructor(
     private apiService: ApiService,
     private helperService: HelperService,
-    @Inject('portal') public portal,
+    @Inject('portal') public portal: Portal,
     private dataPortalSettingsServ: DataPortalSettingsService,
   ) { }
 
@@ -372,9 +404,9 @@ export class AnalyzerService {
           }
         }
       });
-      analyzerSeries = series;
-      const siblingFreqs = this.getSiblingFrequencies(series);
-      const displayFreqSelector = this.singleFrequencyAnalyzer(series);
+      // analyzerSeries = series;
+      const siblingFreqs = this.getSiblingFrequencies(analyzerSeries);
+      const displayFreqSelector = this.singleFrequencyAnalyzer(analyzerSeries);
       const analyzerFrequency = displayFreqSelector ? this.getCurrentAnalyzerFrequency(series, siblingFreqs) :
         this.getHighestFrequency(analyzerSeries);
       if (this.allowMoMTransformation(analyzerFrequency.freq)) {

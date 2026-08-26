@@ -1,7 +1,7 @@
 .date-slider-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 .date-input {
@@ -19,12 +19,6 @@
     min-height: unset;
   }
 
-  // mat-form-field adds its own internal padding/wrapper chrome by default —
-  // strip it down to match the old compact p-inputtext look.
-  ::ng-deep .mat-mdc-form-field-flex {
-    padding: 0 4px;
-  }
-
   ::ng-deep .mat-mdc-text-field-wrapper {
     padding: 0;
   }
@@ -35,8 +29,6 @@
     width: 100%;
   }
 
-  // Material reserves space below the input for hint/error text by default;
-  // the original compact layout had none of that, so collapse it.
 .mat-mdc-form-field-subscript-wrapper {
   display: none;
 }
@@ -58,7 +50,8 @@ mat-slider {
   }
 
   .mdc-slider__thumb-knob,
-  .mdc-slider__thumb:hover .mdc-slider__thumb-knob {
+  .mdc-slider__thumb:hover .mdc-slider__thumb-knob,
+  .mdc-slider__thumb--top .mdc-slider__thumb-knob {
     border-color: #505050;
     border-width: 1px;
   }
@@ -66,14 +59,6 @@ mat-slider {
   .mdc-slider__track--inactive {
     background-color: #515151;
   }
-}
-
-// Annual frequency uses startView="multi-year" directly in the component,
-// so there's no month-grid to hide the way the old .annual-calendar class
-// suppressed PrimeNG's .p-monthpicker. Kept as a marker class in case a
-// future tweak needs annual-specific popup styling.
-.annual-calendar {
-  // intentionally empty — see comment above
 }
 
 // The datepicker popup itself renders in a CDK overlay, outside this
@@ -91,5 +76,5 @@ mat-slider {
   margin: 0;
   border: none;
   opacity: 0;
-  pointer-events: none; // user can never accidentally click/focus it directly
+  pointer-events: none;
 }

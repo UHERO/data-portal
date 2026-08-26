@@ -1,6 +1,6 @@
 import { Provider } from "@angular/core";
 import { HeaderComponent } from "./header/header.component";
-import { PrimengMenuNavComponent } from "./primeng-menu-nav/primeng-menu-nav.component";
+// import { PrimengMenuNavComponent } from "./primeng-menu-nav/primeng-menu-nav.component";
 import { MaterialMenuNavComponent } from "./material-menu-nav/material-menu-nav.component";
 import { LandingPageComponent } from "./landing-page/landing-page.component";
 import { CategoryChartsComponent } from "./category-charts/category-charts.component";
@@ -29,7 +29,7 @@ import { SingleSeriesTableComponent } from "./single-series-table/single-series-
 
 export const COMMON_COMPONENTS: Provider[] = [
   HeaderComponent,
-  PrimengMenuNavComponent,
+  // PrimengMenuNavComponent,
   MaterialMenuNavComponent,
   LandingPageComponent,
   CategoryChartsComponent,

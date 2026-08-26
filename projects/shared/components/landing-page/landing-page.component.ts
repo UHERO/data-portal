@@ -16,8 +16,6 @@ import { MeasurementSelectorComponent } from "../measurement-selector/measuremen
 import { ForecastSelectorComponent } from "../forecast-selector/forecast-selector.component";
 import { FreqSelectorComponent } from "../freq-selector/freq-selector.component";
 import { GeoSelectorComponent } from "../geo-selector/geo-selector.component";
-// import { TabViewModule } from "primeng/tabview";
-// import { DialogModule } from "primeng/dialog";
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CategoryHelpDialogComponent } from '../category-help-dialog/category-help-dialog.component';
 import { NgFor, NgIf, AsyncPipe } from "@angular/common";
@@ -29,8 +27,6 @@ import { NgFor, NgIf, AsyncPipe } from "@angular/common";
     imports: [
         NgFor,
         NgIf,
-        // DialogModule,
-        // TabViewModule,
         MatDialogModule,
         GeoSelectorComponent,
         FreqSelectorComponent,

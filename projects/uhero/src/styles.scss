@@ -1,13 +1,12 @@
 @use '@angular/material' as mat;
 
-@import './assets/app_colors';
+@use './assets/app_colors' as *;
 
 @include mat.core();
 
 html {
   @include mat.theme((
     color: mat.$blue-palette,
-    typography: Roboto,
     density: 0
   ));
 
