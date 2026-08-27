@@ -2,7 +2,8 @@ import { Component, Inject, PLATFORM_ID, ViewChild, OnInit } from '@angular/core
 import { isPlatformBrowser, NgIf } from '@angular/common';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from 'projects/shared/components/header/header.component';
-import { PrimengMenuNavComponent } from 'projects/shared/components/primeng-menu-nav/primeng-menu-nav.component';
+import { MaterialMenuNavComponent } from 'projects/shared/components/material-menu-nav/material-menu-nav.component';
+import { Portal } from 'projects/shared/models/DataPortalSettings';
 
 declare var gtag: (str: string, gaId: string, path: object) => void;
 
@@ -10,8 +11,7 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: true,
-    imports: [NgIf, RouterOutlet, HeaderComponent, PrimengMenuNavComponent]
+    imports: [NgIf, RouterOutlet, HeaderComponent, MaterialMenuNavComponent]
 })
 export class AppComponent implements OnInit {
   private isBrowser;
@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: object,
-    @Inject('portal') public portal,
+    @Inject('portal') public portal: Portal,
     @Inject('GoogleAnalyticsId') private gaId,
     public router: Router,
   ) {

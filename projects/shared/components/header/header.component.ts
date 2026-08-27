@@ -1,14 +1,13 @@
 import { Inject, Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
-import { NgIf } from '@angular/common';
+
 
 @Component({
     selector: 'lib-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
-    standalone: true,
-    imports: [NgIf, RouterLink, SearchBarComponent]
+    imports: [RouterLink, SearchBarComponent]
 })
 export class HeaderComponent implements OnInit {
   public headerLogo;

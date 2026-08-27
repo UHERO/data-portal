@@ -1,18 +1,33 @@
-<p-table styleClass="p-datatable-striped" [columns]="resultsTableCols" [value]="resultsTableData">
-  <ng-template pTemplate="header" let-columns>
-    <tr>
-      <th [pSortableColumn]="col.field" *ngFor="let col of columns">
-        {{col.header}} <p-sortIcon [field]="col.field"></p-sortIcon>
-      </th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-rowData let-columns="columns">
-    <tr>
-      <td *ngFor="let col of columns">
-        <span *ngIf="col.header === 'Series'"><a routerLink="/series" [queryParams]="{id: rowData.id, sa: rowData.seasonality === 'seasonally adjusted'}"
-            queryParamsHandling="merge">{{rowData[col.field]}}</a></span>
-        <span *ngIf="col.header !== 'Series'">{{rowData[col.field]}}</span>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+<table mat-table matSort [dataSource]="dataSource" class="mat-elevation-z0 striped-table">
+
+  <!-- Series column: custom cell content (router link) -->
+  <ng-container matColumnDef="series">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Series</th>
+    <td mat-cell *matCellDef="let row">
+      <a routerLink="/series"
+         [queryParams]="{ id: row.id, sa: row.seasonality === 'seasonally adjusted' }"
+         queryParamsHandling="merge">
+        {{ row.series }}
+      </a>
+    </td>
+  </ng-container>
+
+  <!-- Region, Frequency, Seasonality: plain text cells -->
+  <ng-container matColumnDef="region">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Region</th>
+    <td mat-cell *matCellDef="let row">{{ row.region }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="frequency">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Frequency</th>
+    <td mat-cell *matCellDef="let row">{{ row.frequency }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="seasonality">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Seasonally Adjusted</th>
+    <td mat-cell *matCellDef="let row">{{ row.seasonality }}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

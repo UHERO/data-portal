@@ -15,12 +15,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/uhero",
+            "outputPath": {
+              "base": "dist/uhero"
+            },
             "index": "projects/uhero/src/index.html",
-            "main": "projects/uhero/src/main.ts",
-            "polyfills": "projects/uhero/src/polyfills.ts",
+            "polyfills": [
+              "projects/uhero/src/polyfills.ts"
+            ],
             "tsConfig": "projects/uhero/tsconfig.app.json",
             "assets": [
               "projects/uhero/src/manoa.jpg",
@@ -33,10 +36,10 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "projects/uhero/src/styles.scss"
             ],
             "stylePreprocessorOptions": {
@@ -45,15 +48,14 @@
               ]
             },
             "scripts": [
-              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/uhero/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -68,15 +70,13 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/uhero/src/environments/environment.ts",
                   "with": "projects/uhero/src/environments/environment.staging.ts"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/uhero/ngsw-config.json"
+              "serviceWorker": "projects/uhero/ngsw-config.json"
             },
             "production": {
               "fileReplacements": [
@@ -90,8 +90,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -104,8 +102,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/uhero/ngsw-config.json"
+              "serviceWorker": "projects/uhero/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -119,7 +116,7 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "uhero:build"
           },
@@ -136,48 +133,15 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "uhero:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/uhero/src/test.ts",
-            "polyfills": "projects/uhero/src/polyfills.ts",
-            "tsConfig": "projects/uhero/tsconfig.spec.json",
-            "karmaConfig": "projects/uhero/karma.conf.js",
-            "scripts": [
-              "./node_modules/@popperjs/core/dist/umd/popper.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ],
-            "assets": [
-              "projects/uhero/src/manoa.jpg",
-              "projects/uhero/src/assets",
-              "projects/uhero/src/outage.html",
-              "projects/uhero/src/manifest.webmanifest"
-            ],
-            "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/highcharts/css/highcharts.css",
-              "projects/uhero/src/styles.scss"
-            ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/uhero/e2e/protractor.conf.js",
-            "devServerTarget": "uhero:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "uhero:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
@@ -194,12 +158,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/nta",
+            "outputPath": {
+              "base": "dist/nta"
+            },
             "index": "projects/nta/src/index.html",
-            "main": "projects/nta/src/main.ts",
-            "polyfills": "projects/nta/src/polyfills.ts",
+            "polyfills": [
+              "projects/nta/src/polyfills.ts"
+            ],
             "tsConfig": "projects/nta/tsconfig.app.json",
             "assets": [
               "projects/nta/src/nta-logo.png",
@@ -217,22 +184,21 @@
             },
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "projects/nta/src/styles.scss"
             ],
             "scripts": [
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/nta/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -247,7 +213,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/nta/src/environments/environment.ts",
@@ -269,8 +234,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -283,8 +246,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/nta/ngsw-config.json"
+              "serviceWorker": "projects/nta/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -298,7 +260,7 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "nta:build"
           },
@@ -315,40 +277,15 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "nta:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/nta/src/test.ts",
-            "polyfills": "projects/nta/src/polyfills.ts",
-            "tsConfig": "projects/nta/tsconfig.spec.json",
-            "karmaConfig": "projects/nta/karma.conf.js",
-            "assets": [
-              "projects/nta/src/nta-logo.png",
-              "projects/nta/src/assets",
-              "projects/nta/src/outage.html",
-              "projects/nta/src/manifest.webmanifest"
-            ],
-            "styles": [
-              "projects/nta/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/nta/e2e/protractor.conf.js",
-            "devServerTarget": "nta:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "nta:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
@@ -365,12 +302,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/ccom",
+            "outputPath": {
+              "base": "dist/ccom"
+            },
             "index": "projects/ccom/src/index.html",
-            "main": "projects/ccom/src/main.ts",
-            "polyfills": "projects/ccom/src/polyfills.ts",
+            "polyfills": [
+              "projects/ccom/src/polyfills.ts"
+            ],
             "tsConfig": "projects/ccom/tsconfig.app.json",
             "assets": [
               "projects/ccom/src/favicon.ico",
@@ -383,10 +323,10 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "projects/ccom/src/styles.scss"
             ],
             "stylePreprocessorOptions": {
@@ -398,12 +338,11 @@
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/ccom/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -418,7 +357,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/ccom/src/environments/environment.ts",
@@ -440,8 +378,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -454,8 +390,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/ccom/ngsw-config.json"
+              "serviceWorker": "projects/ccom/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -469,7 +404,7 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "ccom:build"
           },
@@ -486,39 +421,15 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "ccom:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ccom/src/test.ts",
-            "polyfills": "projects/ccom/src/polyfills.ts",
-            "tsConfig": "projects/ccom/tsconfig.spec.json",
-            "karmaConfig": "projects/ccom/karma.conf.js",
-            "assets": [
-              "projects/ccom/src/favicon.ico",
-              "projects/ccom/src/assets",
-              "projects/ccom/src/manifest.webmanifest"
-            ],
-            "styles": [
-              "projects/ccom/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/ccom/e2e/protractor.conf.js",
-            "devServerTarget": "ccom:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "ccom:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
@@ -535,12 +446,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/forecast",
+            "outputPath": {
+              "base": "dist/forecast"
+            },
             "index": "projects/forecast/src/index.html",
-            "main": "projects/forecast/src/main.ts",
-            "polyfills": "projects/forecast/src/polyfills.ts",
+            "polyfills": [
+              "projects/forecast/src/polyfills.ts"
+            ],
             "tsConfig": "projects/forecast/tsconfig.app.json",
             "assets": [
               "projects/forecast/src/favicon.ico",
@@ -551,11 +465,11 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
-              "projects/forecast/src/styles.scss"
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
+              "projects/uhero/src/styles.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
@@ -566,12 +480,11 @@
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "projects/forecast/src/main.ts"
           },
           "configurations": {
             "staging": {
@@ -587,8 +500,6 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "projects/forecast/src/environments/environment.ts",
@@ -609,8 +520,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -624,8 +533,7 @@
                 }
               ],
               "baseHref": "/fc/",
-              "serviceWorker": true,
-              "ngswConfigPath": "projects/forecast/ngsw-config.json"
+              "serviceWorker": "projects/forecast/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -638,7 +546,7 @@
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "forecast:build"
           },
@@ -655,45 +563,15 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "forecast:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/forecast/src/test.ts",
-            "polyfills": "projects/forecast/src/polyfills.ts",
-            "tsConfig": "projects/forecast/tsconfig.spec.json",
-            "karmaConfig": "projects/forecast/karma.conf.js",
-            "assets": [
-              "projects/forecast/src/favicon.ico",
-              "projects/forecast/src/assets"
-            ],
-            "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
-            ],
-            "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/forecast/e2e/protractor.conf.js",
-            "devServerTarget": "forecast:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "forecast:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
@@ -704,5 +582,31 @@
       "@angular-eslint/schematics"
     ],
     "analytics": false
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
   }
 }

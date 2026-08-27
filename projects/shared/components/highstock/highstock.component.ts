@@ -22,12 +22,11 @@ interface CustomChart extends Highcharts.Chart {
 }
 
 @Component({
-  selector: 'lib-highstock',
-  templateUrl: './highstock.component.html',
-  styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  standalone: true,
-  imports: [HighchartsChartModule]
+    selector: 'lib-highstock',
+    templateUrl: './highstock.component.html',
+    styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    imports: [HighchartsChartModule]
 })
 export class HighstockComponent implements OnInit, OnDestroy {
   @Input() portalSettings;

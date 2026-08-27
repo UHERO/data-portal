@@ -6,21 +6,21 @@ import { AnalyzerService } from 'projects/shared/services/analyzer.service';
 import { AnalyzerHighstockComponent } from '../analyzer-highstock/analyzer-highstock.component';
 import { HighstockComponent } from '../highstock/highstock.component';
 import { DateSliderComponent } from '../date-slider/date-slider.component';
-import { NgFor, NgIf, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'lib-embed-graph',
     templateUrl: './embed-graph.component.html',
     styleUrls: ['./embed-graph.component.scss'],
-    standalone: true,
-    imports: [NgFor, NgIf, DateSliderComponent, HighstockComponent, AnalyzerHighstockComponent, AsyncPipe]
+    imports: [DateSliderComponent, HighstockComponent, AnalyzerHighstockComponent, AsyncPipe]
 })
 export class EmbedGraphComponent /* implements OnInit, OnDestroy */{
   private seriesId: number;
   private analyzerIds: Array<any>;
   startDate: string;
   endDate: string;
-  seriesData: any;
+  seriesData: Observable<any[]>;
   //analyzerData: any;
   portalSettings: any;
   yLeftSeries: string;

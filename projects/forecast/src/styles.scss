@@ -1,14 +1,15 @@
 @import './assets/app_colors';
-@import '~ag-grid-community/styles/ag-grid.css';
-@import '~ag-grid-community/styles/ag-theme-balham.css';
-@import "~bootstrap-icons/font/bootstrap-icons.css";
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-balham.css';
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
 /* You can add global styles to this file, and also import other style files */
 body {
   position: relative;
-   padding: 0;
-   box-sizing: border-box;
-   font-family: 'Lucida Sans', sans-serif;
-   font-size: 16px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Lucida Sans', sans-serif;
+  font-size: 16px;
 
   .form-select {
     color: $primary;
@@ -39,7 +40,7 @@ body {
   .selected-data-list {
     color: $primary;
   }
-  
+
   .sublist {
     color: $primary;
   }
@@ -98,15 +99,15 @@ body {
             font-size: 0.9em;
             font-weight: 400;
             text-decoration: none;
-            
+
             &:hover {
               color: $primary;
-  
+
               .p-panelmenu-icon {
                 color: $primary;
               }
             }
-  
+
             .p-submenu-icon {
               color: #333;
               margin-right: 0;
@@ -118,8 +119,12 @@ body {
   }
 
   lib-search-bar {
-    .btn {
+    .btn.search-btn {
       background-color: $primary;
+
+      &:hover {
+        background-color: $primary;
+      }
     }
   }
 
@@ -162,12 +167,14 @@ body {
     }
   }
 
-  lib-header a#uhero-link, lib-primeng-menu-nav a#uhero-link {
+  lib-header a#uhero-link,
+  lib-primeng-menu-nav a#uhero-link {
     display: inline-block;
     width: 31% !important;
   }
 
-  lib-header a#data-portal-link, lib-primeng-menu-nav a#data-portal-link {
+  lib-header a#data-portal-link,
+  lib-primeng-menu-nav a#data-portal-link {
     display: inline-block;
 
     img {
@@ -193,7 +200,8 @@ body {
     }
   }
 
-  lib-landing-page, lib-analyzer {
+  lib-landing-page,
+  lib-analyzer {
     .content-links:before {
       display: block;
       content: ' ';
@@ -201,41 +209,41 @@ body {
       height: 100px;
       visibility: hidden;
     }
-  
+
     .content-links {
       padding-left: 0px;
       display: block;
       margin-top: 10px;
       margin-bottom: 0;
-  
+
       li {
         display: inline-block;
-  
-         a {
-           text-decoration: none;
-           font-size: 0.85em;
-           color: $primary-text;
-           padding: 5px;
-           border-radius: 3px;
-  
-           &:hover {
-             color: $primary;
-           }
-         }
-  
-         .current-sub {
-           background: $primary;
-           color: $white;
-  
-           &:hover {
-             color: $white;
-           }
-         }
-  
-         @media (max-width: 767px) {
-           min-width: 50%;
-           margin-right: 0px;
-         }
+
+        a {
+          text-decoration: none;
+          font-size: 0.85em;
+          color: $primary-text;
+          padding: 5px;
+          border-radius: 3px;
+
+          &:hover {
+            color: $primary;
+          }
+        }
+
+        .current-sub {
+          background: $primary;
+          color: $white;
+
+          &:hover {
+            color: $white;
+          }
+        }
+
+        @media (max-width: 767px) {
+          min-width: 50%;
+          margin-right: 0px;
+        }
       }
     }
 
@@ -245,7 +253,8 @@ body {
           background-color: $primary;
         }
 
-        .p-slider:not(.p-state-disabled) .p-slider-handle:hover, .p-slider .p-slider-handle {
+        .p-slider:not(.p-state-disabled) .p-slider-handle:hover,
+        .p-slider .p-slider-handle {
           border-color: $primary;
         }
       }
@@ -269,7 +278,7 @@ body {
         stroke: none;
       }
     }
-    
+
     .highcharts-markers.highcharts-series-1 {
       path {
         fill: $highcharts-series1;
@@ -281,13 +290,14 @@ body {
       color: $primary-text !important;
     }
 
-    .highcharts-title, .highcharts-subtitle {
-      fill: $primary-text;        
+    .highcharts-title,
+    .highcharts-subtitle {
+      fill: $primary-text;
     }
 
     .single-point {
       .highcharts-subtitle {
-        fill: $primary;    
+        fill: $primary;
       }
     }
   }
@@ -302,7 +312,8 @@ body {
     }
   }
 
-  .analyzer-chart, .single-series-chart {
+  .analyzer-chart,
+  .single-series-chart {
     .highcharts-series-1 {
       .highcharts-graph {
         stroke: unset;
@@ -312,126 +323,126 @@ body {
     .highcharts-background {
       fill: $chart-background;
     }
-      
+
     .highcharts-button.highcharts-button-pressed {
       fill: $highstock-series0;
-      
+
       text {
         fill: $white;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-0 {
       path {
         fill: $analyzer-series0;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-1 {
       path {
         fill: $analyzer-series1;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-2 {
       path {
         fill: $analyzer-series2;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-3 {
       path {
         fill: $analyzer-series3;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-4 {
       path {
         fill: $analyzer-series4;
       }
     }
-      
+
     .highcharts-color-0 {
       fill: $analyzer-series0;
       stroke: $analyzer-series0;
     }
-      
+
     .highcharts-color-1 {
       fill: $analyzer-series1;
       stroke: $analyzer-series1;
     }
-      
+
     .highcharts-color-2 {
       fill: $analyzer-series2;
       stroke: $analyzer-series2;
     }
-      
+
     .highcharts-color-3 {
       fill: $analyzer-series3;
       stroke: $analyzer-series3;
     }
-      
+
     .highcharts-color-4 {
       fill: $analyzer-series4;
       stroke: $analyzer-series4;
     }
-      
+
     .highcharts-navigator-series {
       .highcharts-area {
         fill: $highstock-series1;
       }
     }
-      
+
     .highcharts-tooltip {
       .series-0 {
         fill: $analyzer-series0;
       }
-              
+
       .series-1 {
         fill: $analyzer-series1;
       }
-              
+
       .series-2 {
         fill: $analyzer-series2;
       }
-      
+
       .series-3 {
         fill: $analyzer-series3;
       }
-      
+
       .series-4 {
         fill: $analyzer-series4;
       }
     }
-      
+
     .highcharts-xaxis-labels {
       text {
         color: $highstock-series0;
         fill: $highstock-series0;
       }
     }
-      
+
     .highcharts-yaxis-labels.series1 {
       text {
         color: $highstock-series0;
         fill: $highstock-series0;
       }
     }
-      
+
     .highcharts-yaxis-labels.series2 {
       text {
         color: $highstock-series1;
         fill: $highstock-series1;
       }
     }
-      
+
     .highcharts-yaxis.series1 {
       .highcharts-axis-title {
         color: $highstock-series0;
         fill: $highstock-series0;
       }
     }
-      
+
     .highcharts-yaxis.series2 {
       .highcharts-axis-title {
         color: $highstock-series1;
@@ -460,13 +471,13 @@ body {
       }
     }
   }
-  
+
   .form-check-inline {
     padding-left: 0;
     vertical-align: middle;
     font-size: 0.85em;
     margin-bottom: 0;
-  
+
     input {
       margin-right: 0.25rem;
       margin-left: 0rem;
@@ -475,7 +486,8 @@ body {
   }
 }
 
-lib-search-results, lib-single-series {
+lib-search-results,
+lib-single-series {
   .p-datatable {
     background-color: transparent;
     text-align: right;
@@ -507,7 +519,7 @@ lib-search-results, lib-single-series {
       }
     }
 
-    .p-datatable-thead tr th{
+    .p-datatable-thead tr th {
       padding: .25em .5em;
     }
 
@@ -523,21 +535,21 @@ lib-search-results, lib-single-series {
     .p-widget-overlay {
       background-color: transparent;
     }
-  
+
     tr.p-widget-content {
       border-top-color: transparent;
       border-bottom-color: transparent;
       border-left: 1px solid #E5E5E5;
       border-right: 1px solid #E5E5E5;
     }
-  
+
     tr:last-child {
       border-bottom: 1px solid #E5E5E5;
     }
   }
 }
 
-lib-single-series .p-datatable .p-datatable-thead tr th, 
+lib-single-series .p-datatable .p-datatable-thead tr th,
 lib-single-series .p-datatable .p-datatable-tbody tr td {
   text-align: right;
 }

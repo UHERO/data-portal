@@ -7,99 +7,93 @@ import {
   SimpleChanges,
   computed,
 } from "@angular/core";
-import { Location, NgIf, NgFor, AsyncPipe } from "@angular/common";
-import { AnalyzerService } from "projects/shared/services/analyzer.service";
+import { Location } from "@angular/common";
+import { AnalyzerService, FormattedAnalyzerSeries } from "projects/shared/services/analyzer.service";
 import { DateRange } from "projects/shared/models/DateRange";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DataPortalSettingsService } from "projects/shared/services/data-portal-settings.service";
 import { forkJoin, Subscription } from "rxjs";
 import { ApiService } from "projects/shared/services/api.service";
 import { HelperService } from "projects/shared/services/helper.service";
-import { AnalyzerTableComponent } from "../analyzer-table/analyzer-table.component";
+import { AnalyzerTableComponent, TransformToggleEvent } from "../analyzer-table/analyzer-table.component";
 import { AnalyzerHighstockComponent } from "../analyzer-highstock/analyzer-highstock.component";
 import { CategoryChartsComponent } from "../category-charts/category-charts.component";
 import { DateSliderComponent } from "../date-slider/date-slider.component";
 import { FreqSelectorComponent } from "../freq-selector/freq-selector.component";
 import { ShareLinkComponent } from "../share-link/share-link.component";
-import { TabViewModule } from "primeng/tabview";
-import { DialogModule } from "primeng/dialog";
+import { MatDialog } from '@angular/material/dialog';
+import { AnalyzerHelpDialogComponent } from '../analyzer-help-dialog/analyzer-help-dialog.component';
+import { Portal, PortalSettings } from "projects/shared/models/DataPortalSettings";
 
 @Component({
   selector: "lib-analyzer",
   templateUrl: "./analyzer.component.html",
   styleUrls: ["./analyzer.component.scss"],
-  standalone: true,
   imports: [
-    DialogModule,
-    TabViewModule,
-    NgIf,
-    NgFor,
     ShareLinkComponent,
     FreqSelectorComponent,
     DateSliderComponent,
     CategoryChartsComponent,
     AnalyzerHighstockComponent,
-    AnalyzerTableComponent,
-    AsyncPipe,
-  ],
+    AnalyzerTableComponent
+  ]
 })
 export class AnalyzerComponent
-  implements OnChanges, OnDestroy
-{
-  @Input() analyzerSeries: string;
-  @Input() chartSeries: string;
-  @Input() start: string;
-  @Input() end: string;
-  @Input() index: string;
-  @Input() leftMin: string;
-  @Input() leftMax: string;
-  @Input() rightMin: string;
-  @Input() rightMax: string;
-  @Input() compare: string;
-  @Input() yoy: string;
-  @Input() ytd: string;
-  @Input() c5ma: string;
-  @Input() mom: string;
-  @Input() yright: string;
-  @Input() yleft: string;
-  @Input() column: string;
-  @Input() area: string;
-  @Input() chartYoy: string;
-  @Input() chartYtd: string;
-  @Input() chartMom: string;
-  @Input() chartC5ma: string;
-  @Input() nocache: string;
+  implements OnChanges, OnDestroy {
+  @Input() analyzerSeries?: string;
+  @Input() chartSeries?: string;
+  @Input() start?: string;
+  @Input() end?: string;
+  @Input() index?: string;
+  @Input() leftMin?: string;
+  @Input() leftMax?: string;
+  @Input() rightMin?: string;
+  @Input() rightMax?: string;
+  @Input() compare?: string;
+  @Input() yoy?: string;
+  @Input() ytd?: string;
+  @Input() c5ma?: string;
+  @Input() mom?: string;
+  @Input() yright?: string;
+  @Input() yleft?: string;
+  @Input() column?: string;
+  @Input() area?: string;
+  @Input() chartYoy?: string;
+  @Input() chartYtd?: string;
+  @Input() chartMom?: string;
+  @Input() chartC5ma?: string;
+  @Input() nocache?: string;
 
-  portalSettings;
+  portalSettings: PortalSettings;
   tableYoy: boolean;
   tableYtd: boolean;
   tableC5ma: boolean;
   tableMom: boolean;
-  private noCache: boolean;
+  private noCache?: boolean;
   analyzerShareLink: string;
   seriesInAnalyzer;
   routeView: string;
   queryParams: any = {};
   displayCompare: boolean = false;
-  urlParams;
-  displayHelp: boolean = false;
+  // urlParams;
   displaySelectionNA: boolean = false;
-  routeStart: string;
-  routeEnd: string;
+  routeStart: string | undefined;
+  routeEnd: string | undefined;
   dateRangeSubscription: Subscription;
   selectedDateRange: DateRange;
   previousFreq: string = "";
-  
+
   constructor(
     @Inject("environment") private environment,
-    @Inject("portal") private portal,
+    @Inject("portal") private portal: Portal,
     public analyzerService: AnalyzerService,
     private dataPortalSettingsServ: DataPortalSettingsService,
     private route: ActivatedRoute,
     private apiService: ApiService,
     private router: Router,
     private location: Location,
-    private helperService: HelperService
+    private helperService: HelperService,
+    private dialog: MatDialog
   ) {
     this.dateRangeSubscription = this.helperService.currentDateRange.subscribe(
       (dateRange) => {
@@ -112,7 +106,7 @@ export class AnalyzerComponent
   }
 
   analyzerData = computed(() => this.analyzerService.analyzerData());
-  
+
   ngOnChanges(simpleChanges: SimpleChanges) {
     this.routeStart = this.start;
     this.routeEnd = this.end;
@@ -138,42 +132,63 @@ export class AnalyzerComponent
     if (this.mom) {
       this.tableMom = this.evalParamAsTrue(this.mom);
     }
-    if (this.yright) {
-      this.analyzerService.yRightSeries.update(right => right = this.mapIds(this.yright));
-    }
-    if (this.yleft) {
-      this.analyzerService.yLeftSeries.update(left => left = this.mapIds(this.yleft));
-    }
-    if (this.column) {
-      this.analyzerService.column.update(col => col = this.mapIds(this.column));
-    }
-    if (this.area) {
-      this.analyzerService.area.update(area => area = this.mapIds(this.area));
+    const yright = this.yright;
+    if (yright) {
+      this.analyzerService.yRightSeries.set(this.mapIds(yright));
     }
 
-    if (this.chartYoy) {
-      this.analyzerService.chartYoy.update(yoy => yoy = this.mapIds(this.chartYoy));
+    const yleft = this.yleft;
+    if (yleft) {
+      this.analyzerService.yLeftSeries.set(this.mapIds(yleft));
     }
-    if (this.chartYtd) {
-      this.analyzerService.chartYtd.update(ytd => ytd = this.mapIds(this.chartYtd));
+
+    const column = this.column;
+    if (column) {
+      this.analyzerService.column.set(this.mapIds(column));
     }
-    if (this.chartMom) {
-      this.analyzerService.chartMom.update(mom => mom = this.mapIds(this.chartMom));
+
+    const area = this.area;
+    if (area) {
+      this.analyzerService.area.set(this.mapIds(area));
     }
-    if (this.chartC5ma) {
-      this.analyzerService.chartC5ma.update(c5ma => c5ma = this.mapIds(this.chartC5ma));
+
+    const chartYoy = this.chartYoy;
+    if (chartYoy) {
+      this.analyzerService.chartYoy.set(this.mapIds(chartYoy));
     }
-    if (this.leftMin) {
-      this.analyzerService.leftMin.set(+this.leftMin);
+
+    const chartYtd = this.chartYtd;
+    if (chartYtd) {
+      this.analyzerService.chartYtd.set(this.mapIds(chartYtd));
     }
-    if (this.leftMax) {
-      this.analyzerService.leftMax.set(+this.leftMax);
+
+    const chartMom = this.chartMom;
+    if (chartMom) {
+      this.analyzerService.chartMom.set(this.mapIds(chartMom));
     }
-    if (this.rightMin) {
-      this.analyzerService.rightMin.set(+this.rightMin);
+
+    const chartC5ma = this.chartC5ma;
+    if (chartC5ma) {
+      this.analyzerService.chartC5ma.set(this.mapIds(chartC5ma));
     }
-    if (this.rightMax) {
-      this.analyzerService.rightMax.set(+this.rightMax);
+    const leftMin = this.leftMin;
+    if (leftMin && !isNaN(+leftMin)) {
+      this.analyzerService.leftMin.set(+leftMin);
+    }
+
+    const leftMax = this.leftMax;
+    if (leftMax && !isNaN(+leftMax)) {
+      this.analyzerService.leftMax.set(+leftMax);
+    }
+
+    const rightMin = this.rightMin;
+    if (rightMin && !isNaN(+rightMin)) {
+      this.analyzerService.rightMin.set(+rightMin);
+    }
+
+    const rightMax = this.rightMax;
+    if (rightMax && !isNaN(+rightMax)) {
+      this.analyzerService.rightMax.set(+rightMax);
     }
     this.noCache = this.evalParamAsTrue(this.nocache);
     this.seriesInAnalyzer = this.analyzerService.analyzerSeriesStore();
@@ -183,16 +198,16 @@ export class AnalyzerComponent
       this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
-  mapIds = (paramString: string) => paramString.split('-').map(Number);
+  mapIds = (paramString: string): number[] => paramString.split('-').map(Number);
 
-  evalParamAsTrue = (param: string) => param === "true";
+  evalParamAsTrue = (param: string | undefined) => param === "true";
 
   updateAnalyzer(analyzerSeries: Array<any>) {
     if (analyzerSeries.length && this.selectedDateRange) {
       this.analyzerService.getAnalyzerData(
         analyzerSeries,
         this.selectedDateRange.startDate,
-        this.noCache
+        this.noCache as boolean
       );
       this.analyzerService.indexed.set(this.index === 'true');
     }
@@ -208,16 +223,17 @@ export class AnalyzerComponent
     this.analyzerService.updateAnalyzerSeries(urlASeries);
   }
 
-  indexActive(e) {
+  indexActive(e: Event): void {
+    const checked = (e.target as HTMLInputElement).checked;
     this.analyzerService.toggleIndexValues(
-      e.target.checked,
+      checked,
       this.selectedDateRange.startDate
     )
-    this.analyzerService.indexed.set(e.target.checked);
+    this.analyzerService.indexed.set(checked);
     this.updateUrlLocation({ index: this.analyzerService.indexed() || null });
   }
 
-  checkTransforms(e) {
+  checkTransforms(e: TransformToggleEvent): void {
     if (e.label === "yoy") {
       this.tableYoy = e.value;
     }
@@ -230,14 +246,14 @@ export class AnalyzerComponent
     if (e.label === "mom") {
       this.tableMom = e.value;
     }
-    const param = {};
+    const param: Record<string, boolean | null> = {};
     param[e.label] = e.value || null;
     this.updateUrlLocation(param);
   }
 
-  changeAnalyzerFrequency(freq, previousFreq: string, analyzerSeries) {
+  changeAnalyzerFrequency(freq: string, previousFreq: string, analyzerSeries: FormattedAnalyzerSeries[]) {
     this.previousFreq = previousFreq === freq ? "" : previousFreq;
-    const siblingIds = [];
+    const siblingIds: Record<string, any> = [];
     this.analyzerService.urlChartSeries.update(series => series = []);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(
@@ -255,7 +271,7 @@ export class AnalyzerComponent
             sib.frequencyShort === freq
           ) {
             const drawInCompare =
-              analyzerSeries.find((s) => s.title === sib.title).visible ===
+              analyzerSeries.find((s) => s.title === sib.title)?.visible ===
               true;
             siblingIds.push({ id: sib.id, compare: drawInCompare });
           }
@@ -274,7 +290,10 @@ export class AnalyzerComponent
   }
 
   showHelp() {
-    this.displayHelp = true;
+    this.dialog.open(AnalyzerHelpDialogComponent, {
+      width: '70vw',
+      hasBackdrop: true,
+    });
   }
 
   removeAllAnalyzerSeries() {
@@ -287,7 +306,7 @@ export class AnalyzerComponent
 
   toggleAnalyzerDisplay() {
     this.displayCompare = !this.displayCompare;
-    this.updateUrlLocation({ compare: `${this.displayCompare}`|| null });
+    this.updateUrlLocation({ compare: `${this.displayCompare}` || null });
   }
 
   changeRange(e) {
@@ -296,10 +315,10 @@ export class AnalyzerComponent
     if (this.analyzerService.indexed()) {
       this.analyzerService.updateBaseYear(e.startDate);
     }
-    this.updateUrlLocation({start: e.startDate, end: e.endDate});
+    this.updateUrlLocation({ start: e.startDate, end: e.endDate });
   }
 
-  updateUrlLocation(param) {
+  updateUrlLocation(param: Record<string, any>) {
     const paramIncludesAnalyzerSeries = Object.keys(param).includes('analyzerSeries');
     const paramIncludesChartSeries = Object.keys(param).includes('chartSeries');
     const { analyzerSeries } = this.analyzerService.analyzerData();

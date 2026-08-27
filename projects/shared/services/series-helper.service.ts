@@ -20,7 +20,7 @@ export class SeriesHelperService {
     private helperService: HelperService
   ) { }
 
-  getSeriesData(id: number, noCache: boolean, catId?: number): Observable<any> {
+  getSeriesData(id: number, noCache: boolean, catId?: number): Observable<any[]> {
     let currentFreq;
     let currentGeo;
     let currentForecast;

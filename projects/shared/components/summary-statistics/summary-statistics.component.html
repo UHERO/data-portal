@@ -1,16 +1,18 @@
 <div class="summary-stats">
   <div class="stat">
     <p>Min {{summaryStats.minValueDate}}:<br><b>{{summaryStats.minValue}}</b>
-      ({{seriesData.seriesDetail.unitsLabelShort}})</p>
-  </div>
+  ({{seriesData.seriesDetail.unitsLabelShort}})</p>
+</div>
+<div class="stat">
+  <p>Max {{summaryStats.maxValueDate}}:<br><b>{{summaryStats.maxValue}}</b>
+({{seriesData.seriesDetail.unitsLabelShort}})</p>
+</div>
+@if (!seriesData.seriesDetail.percent) {
   <div class="stat">
-    <p>Max {{summaryStats.maxValueDate}}:<br><b>{{summaryStats.maxValue}}</b>
-      ({{seriesData.seriesDetail.unitsLabelShort}})</p>
-  </div>
-  <div class="stat" *ngIf="!seriesData.seriesDetail.percent">
     <p>% Change over Selected Range:<br><b>{{summaryStats.percChange}}</b></p>
   </div>
-  <div class="stat">
-    <p>Change over Selected Range:<br><b>{{summaryStats.levelChange}}</b></p>
-  </div>
+}
+<div class="stat">
+  <p>Change over Selected Range:<br><b>{{summaryStats.levelChange}}</b></p>
+</div>
 </div>

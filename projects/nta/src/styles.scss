@@ -1,14 +1,35 @@
-@import './assets/app_colors';
-@import '~ag-grid-community/styles/ag-grid.css';
-@import '~ag-grid-community/styles/ag-theme-balham.css';
-@import "~bootstrap-icons/font/bootstrap-icons.css";
+@use '@angular/material' as mat;
+
+@use './assets/app_colors' as *;
+
+@include mat.core();
+
+html {
+  @include mat.theme((
+    color: mat.$blue-palette,
+    density: 0
+  ));
+
+  @include mat.slider-overrides ((
+    active-track-color: $primary,
+    handle-color: #FAFAFB,
+    focus-handle-color: $primary,
+    ripple-color: transparent
+  ));
+
+  @include mat.tabs-overrides((
+    active-focus-indicator-color: $primary,
+    active-indicator-color: $primary
+  ));
+}
+
 /* You can add global styles to this file, and also import other style files */
 body {
   position: relative;
-   padding: 0;
-   box-sizing: border-box;
-   font-family: 'Lucida Sans', sans-serif;
-   font-size: 16px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Lucida Sans', sans-serif;
+  font-size: 16px;
 
   .form-select {
     color: $primary;
@@ -45,7 +66,7 @@ body {
   .selected-data-list {
     color: $primary;
   }
-  
+
   .sublist {
     color: $primary;
   }
@@ -107,12 +128,12 @@ body {
 
             &:hover {
               color: $primary;
-  
+
               .p-panelmenu-icon {
                 color: $primary;
               }
             }
-  
+
             .p-submenu-icon {
               color: #333;
               margin-right: 0;
@@ -128,8 +149,12 @@ body {
   }
 
   lib-search-bar {
-    .btn {
+    .btn.search-btn {
       background-color: $primary;
+
+      &:hover {
+        background-color: $primary;
+      }
     }
   }
 
@@ -185,12 +210,15 @@ body {
     }
   }
 
-  lib-landing-page, lib-analyzer, lib-single-series {
+  lib-landing-page,
+  lib-analyzer,
+  lib-single-series {
     .p-tabview .p-tabview-panels {
       border: none;
     }
-    
-    .p-tabview-nav-container, .p-tabview-panels {
+
+    .p-tabview-nav-container,
+    .p-tabview-panels {
       font-size: 0.9em;
     }
 
@@ -221,7 +249,8 @@ body {
           background-color: $primary;
         }
 
-        .ui-slider:not(.ui-state-disabled) .ui-slider-handle:hover, .ui-slider .ui-slider-handle {
+        .ui-slider:not(.ui-state-disabled) .ui-slider-handle:hover,
+        .ui-slider .ui-slider-handle {
           border-color: $primary;
         }
       }
@@ -241,10 +270,11 @@ body {
       }
     }
 
-    .highcharts-series-1, .highcharts-color-1 {
+    .highcharts-series-1,
+    .highcharts-color-1 {
       fill: $highcharts-series1;
       stroke: $highcharts-series1;
-      
+
       .highcharts-graph {
         stroke: $highcharts-series1;
       }
@@ -256,7 +286,7 @@ body {
         stroke: none;
       }
     }
-    
+
     .highcharts-markers.highcharts-series-1 {
       path {
         fill: $highcharts-series1;
@@ -268,15 +298,16 @@ body {
       color: $primary-text !important;
     }
 
-    .highcharts-title, .highcharts-subtitle {
+    .highcharts-title,
+    .highcharts-subtitle {
       fill: $primary-text;
-      font-size: 0.9em;   
-      top: -0px;  
+      font-size: 0.9em;
+      top: -0px;
     }
 
     .single-point {
       .highcharts-subtitle {
-        fill: $primary;    
+        fill: $primary;
       }
     }
   }
@@ -291,7 +322,8 @@ body {
     }
   }
 
-  .analyzer-chart, .single-series-chart {
+  .analyzer-chart,
+  .single-series-chart {
     .highcharts-series-1 {
       .highcharts-graph {
         stroke: unset;
@@ -301,126 +333,126 @@ body {
     .highcharts-background {
       fill: $chart-background;
     }
-      
+
     .highcharts-button.highcharts-button-pressed {
       fill: $highstock-series0;
-      
+
       text {
         fill: $white;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-0 {
       path {
         fill: $analyzer-series0;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-1 {
       path {
         fill: $analyzer-series1;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-2 {
       path {
         fill: $analyzer-series2;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-3 {
       path {
         fill: $analyzer-series3;
       }
     }
-      
+
     .highcharts-markers.highcharts-color-4 {
       path {
         fill: $analyzer-series4;
       }
     }
-      
+
     .highcharts-color-0 {
       fill: $analyzer-series0;
       stroke: $analyzer-series0;
     }
-      
+
     .highcharts-color-1 {
       fill: $analyzer-series1;
       stroke: $analyzer-series1;
     }
-      
+
     .highcharts-color-2 {
       fill: $analyzer-series2;
       stroke: $analyzer-series2;
     }
-      
+
     .highcharts-color-3 {
       fill: $analyzer-series3;
       stroke: $analyzer-series3;
     }
-      
+
     .highcharts-color-4 {
       fill: $analyzer-series4;
       stroke: $analyzer-series4;
     }
-      
+
     .highcharts-navigator-series {
       .highcharts-area {
         fill: $highstock-series1;
       }
     }
-      
+
     .highcharts-tooltip {
       .series-0 {
         fill: $analyzer-series0;
       }
-              
+
       .series-1 {
         fill: $analyzer-series1;
       }
-              
+
       .series-2 {
         fill: $analyzer-series2;
       }
-      
+
       .series-3 {
         fill: $analyzer-series3;
       }
-      
+
       .series-4 {
         fill: $analyzer-series4;
       }
     }
-      
+
     .highcharts-xaxis-labels {
       text {
         color: $highstock-series0;
         fill: $highstock-series0;
       }
     }
-      
+
     .highcharts-yaxis-labels.series1 {
       text {
         color: $highstock-series0;
         fill: $highstock-series0;
       }
     }
-      
+
     .highcharts-yaxis-labels.series2 {
       text {
         color: $highstock-series1;
         fill: $highstock-series1;
       }
     }
-      
+
     .highcharts-yaxis.series1 {
       .highcharts-axis-title {
         color: $highstock-series0;
         fill: $highstock-series0;
       }
     }
-      
+
     .highcharts-yaxis.series2 {
       .highcharts-axis-title {
         color: $highstock-series1;
@@ -449,14 +481,14 @@ body {
       }
     }
   }
-  
+
   .form-check-inline {
     padding-left: 0;
     vertical-align: middle;
     font-size: 0.85em;
     margin-bottom: 0;
     margin-left: 1rem;
-  
+
     input {
       margin-right: 0.25rem;
       margin-left: 0rem;
@@ -465,7 +497,8 @@ body {
   }
 }
 
-lib-search-results, lib-single-series {
+lib-search-results,
+lib-single-series {
   .p-datatable {
     background-color: transparent;
     text-align: right;
@@ -497,7 +530,7 @@ lib-search-results, lib-single-series {
       }
     }
 
-    .p-datatable-thead tr th{
+    .p-datatable-thead tr th {
       padding: .25em .5em;
     }
 
@@ -509,21 +542,21 @@ lib-search-results, lib-single-series {
     .p-widget-overlay {
       background-color: transparent;
     }
-  
+
     tr.p-widget-content {
       border-top-color: transparent;
       border-bottom-color: transparent;
       border-left: 1px solid #E5E5E5;
       border-right: 1px solid #E5E5E5;
     }
-  
+
     tr:last-child {
       border-bottom: 1px solid #E5E5E5;
     }
   }
 }
 
-lib-single-series .p-datatable .p-datatable-thead tr th, 
+lib-single-series .p-datatable .p-datatable-thead tr th,
 lib-single-series .p-datatable .p-datatable-tbody tr td {
   text-align: right;
 }

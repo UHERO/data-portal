@@ -1,15 +1,14 @@
 import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { HelperService } from 'projects/shared/services/helper.service';
 import { Subscription } from 'rxjs';
-import { NgFor } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'lib-forecast-selector',
     templateUrl: './forecast-selector.component.html',
     styleUrls: ['./forecast-selector.component.scss'],
-    standalone: true,
-    imports: [FormsModule, NgFor]
+    imports: [FormsModule]
 })
 export class ForecastSelectorComponent implements OnDestroy {
   @Input() forecasts: Array<string>;
