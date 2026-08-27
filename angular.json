@@ -36,9 +36,6 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
               "ag-grid-community/styles/ag-grid.css",
               "ag-grid-community/styles/ag-theme-balham.css",
@@ -142,45 +139,9 @@
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/uhero/src/test.ts",
-            "polyfills": "projects/uhero/src/polyfills.ts",
-            "tsConfig": "projects/uhero/tsconfig.spec.json",
-            "karmaConfig": "projects/uhero/karma.conf.js",
-            "scripts": [
-              "@popperjs/core/dist/umd/popper.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ],
-            "assets": [
-              "projects/uhero/src/manoa.jpg",
-              "projects/uhero/src/assets",
-              "projects/uhero/src/outage.html",
-              "projects/uhero/src/manifest.webmanifest"
-            ],
-            "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/highcharts/css/highcharts.css",
-              "ag-grid-community/styles/ag-grid.css",
-              "ag-grid-community/styles/ag-theme-balham.css",
-              "bootstrap-icons/font/bootstrap-icons.css",
-              "projects/uhero/src/styles.scss"
-            ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/uhero/e2e/protractor.conf.js",
-            "devServerTarget": "uhero:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "uhero:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
@@ -223,9 +184,6 @@
             },
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
               "bootstrap-icons/font/bootstrap-icons.css",
               "projects/nta/src/styles.scss"
@@ -323,34 +281,9 @@
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/nta/src/test.ts",
-            "polyfills": "projects/nta/src/polyfills.ts",
-            "tsConfig": "projects/nta/tsconfig.spec.json",
-            "karmaConfig": "projects/nta/karma.conf.js",
-            "assets": [
-              "projects/nta/src/nta-logo.png",
-              "projects/nta/src/assets",
-              "projects/nta/src/outage.html",
-              "projects/nta/src/manifest.webmanifest"
-            ],
-            "styles": [
-              "projects/nta/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/nta/e2e/protractor.conf.js",
-            "devServerTarget": "nta:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "nta:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
@@ -388,9 +321,6 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
               "bootstrap-icons/font/bootstrap-icons.css",
               "projects/ccom/src/styles.scss"
@@ -493,33 +423,9 @@
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ccom/src/test.ts",
-            "polyfills": "projects/ccom/src/polyfills.ts",
-            "tsConfig": "projects/ccom/tsconfig.spec.json",
-            "karmaConfig": "projects/ccom/karma.conf.js",
-            "assets": [
-              "projects/ccom/src/favicon.ico",
-              "projects/ccom/src/assets",
-              "projects/ccom/src/manifest.webmanifest"
-            ],
-            "styles": [
-              "projects/ccom/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/ccom/e2e/protractor.conf.js",
-            "devServerTarget": "ccom:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "ccom:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
@@ -555,9 +461,6 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/highcharts/css/highcharts.css",
               "projects/forecast/src/styles.scss"
             ],
@@ -659,40 +562,9 @@
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/forecast/src/test.ts",
-            "polyfills": "projects/forecast/src/polyfills.ts",
-            "tsConfig": "projects/forecast/tsconfig.spec.json",
-            "karmaConfig": "projects/forecast/karma.conf.js",
-            "assets": [
-              "projects/forecast/src/favicon.ico",
-              "projects/forecast/src/assets"
-            ],
-            "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/highcharts/css/highcharts.css",
-              "bootstrap-icons/font/bootstrap-icons.css",
-              "src/styles.scss"
-            ],
-            "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/forecast/e2e/protractor.conf.js",
-            "devServerTarget": "forecast:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "forecast:serve:production"
-            }
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
