@@ -256,7 +256,6 @@ export class AnalyzerComponent
 
   changeAnalyzerGeography(geo, previousGeo: string, analyzerSeries: FormattedAnalyzerSeries[], freq: string) {
     this.previousGeo = previousGeo === geo ? "" : previousGeo;
-    const siblingIds = [];
     this.analyzerService.urlChartSeries.update(series => series = []);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(
@@ -270,7 +269,6 @@ export class AnalyzerComponent
 
   changeAnalyzerFrequency(freq: string, previousFreq: string, analyzerSeries: FormattedAnalyzerSeries[]) {
     this.previousFreq = previousFreq === freq ? "" : previousFreq;
-    const siblingIds: Record<string, any> = [];
     this.analyzerService.urlChartSeries.update(series => series = []);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(
@@ -284,7 +282,7 @@ export class AnalyzerComponent
   }
 
   switchToSiblingSeries(siblingsList, analyzerSeries, freq) {
-    const siblingIds = [];
+    const siblingIds: Record<string, any> = [];
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
         siblings.forEach((sib) => {
