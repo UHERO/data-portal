@@ -2,7 +2,8 @@ import { Observable } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Category } from './category';
+// import { Category } from './category';
+import { Category, CategoryApiResponse, RawCategory } from '../models/Category';
 
 @Injectable({
   providedIn: 'root'
@@ -23,12 +24,15 @@ export class ApiService {
   // Get data from API
   // Gets all available categories. Used for navigation & displaying sublists
   fetchCategories(): Observable<Category[]> {
-    let categories$ = this.http.get(`${this.baseUrl}/category?u=${this.portal.universe}`).pipe(
+    /* let categories$ = this.http.get<CategoryApiResponse>(`${this.baseUrl}/category?u=${this.portal.universe}`).pipe(
       map(mapCategories, this),
       tap(val => {
         categories$ = null;
       }), );
-    return categories$;
+    return categories$;*/
+    return this.http.get<CategoryApiResponse>(`${this.baseUrl}/category?u=${this.portal.universe}`).pipe(
+      map((response) => mapCategories(response, this.rootCategory))
+    )
   }
 
   retrieveAPIData = (apiEndpoint: string): Observable<any> => {
@@ -119,7 +123,7 @@ export class ApiService {
 // Create a nested JSON of parent and child categories
 // Used for landing-page.component
 // And side bar navigation on single-series & table views
-function mapCategories(response): Array<Category> {
+/* function mapCategories(response): Array<Category> {
   const categories = response.data;
   const dataMap = categories.reduce((m, value) => (m[value.id] = value, m), {});
   const categoryTree = [];
@@ -135,6 +139,32 @@ function mapCategories(response): Array<Category> {
   categoryTree.forEach((category) => {
     if (category.id === this.rootCategory) {
       result = category.children;
+    }
+  });
+  return result;
+} */
+
+  function mapCategories(response: CategoryApiResponse, rootCategory: number): Category[] {
+  const categories = response.data;
+  const dataMap: Record<number, Category> = categories.reduce(
+    (m, value) => ((m[value.id] = value), m),
+    {} as Record<number, Category>
+  );
+
+  const categoryTree: Category[] = [];
+  categories.forEach((value) => {
+    const parent = dataMap[value.parentId];
+    if (parent) {
+      (parent.children || (parent.children = [])).push(dataMap[value.id]);
+    } else {
+      categoryTree.push(dataMap[value.id]);
+    }
+  });
+
+  let result = categoryTree;
+  categoryTree.forEach((category) => {
+    if (category.id === rootCategory) {
+      result = category.children ?? [];
     }
   });
   return result;

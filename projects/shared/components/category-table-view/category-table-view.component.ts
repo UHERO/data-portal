@@ -11,11 +11,10 @@ import { AgGridModule } from 'ag-grid-angular';
 import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'lib-category-table-view',
-  templateUrl: './category-table-view.component.html',
-  styleUrls: ['./category-table-view.component.scss'],
-  standalone: true,
-  imports: [NgIf, AgGridModule]
+    selector: 'lib-category-table-view',
+    templateUrl: './category-table-view.component.html',
+    styleUrls: ['./category-table-view.component.scss'],
+    imports: [NgIf, AgGridModule]
 })
 export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() displayedMeasurements;

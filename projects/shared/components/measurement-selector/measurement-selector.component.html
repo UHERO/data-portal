@@ -1,5 +1,7 @@
 <select [ngModel]="selectedMeasurement?.name" (ngModelChange)="onChange($event)" class="form-select">
-  <option [ngValue]="measurement?.name" *ngFor="let measurement of measurements">
+  @for (measurement of measurements; track measurement) {
+    <option [ngValue]="measurement?.name">
       {{measurement.indent ? '- ' + measurement.name : measurement.name}}
-  </option>
+    </option>
+  }
 </select>

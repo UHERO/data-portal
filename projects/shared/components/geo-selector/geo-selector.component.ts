@@ -3,15 +3,14 @@ import { Subscription } from 'rxjs';
 import { HelperService } from 'projects/shared/services/helper.service';
 
 import { Geography } from 'projects/shared/models/Geography';
-import { NgFor } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'lib-geo-selector',
     templateUrl: './geo-selector.component.html',
     styleUrls: ['./geo-selector.component.scss'],
-    standalone: true,
-    imports: [FormsModule, NgFor]
+    imports: [FormsModule]
 })
 export class GeoSelectorComponent implements OnDestroy {
   @Input() regions: Array<Geography>;

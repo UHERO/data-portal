@@ -1,22 +1,36 @@
-<p-calendar #calendarStart [class.annual-calendar]="freq === 'A'" inputId="calendar-start" [view]="calendarView"
-  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarStartDate" [placeholder]="placeholderStr"
-  [dateFormat]="calendarStartDateFormat" [disabledDates]="invalidStartDates"
-  (onSelect)="onCalendarSelect($event, calendarStart.inputId, freq)"
-  (onYearChange)="onYearChange($event, calendarStart.inputId, freq)"
-  (onMonthChange)="onMonthChange($event, calendarStart.inputId, freq)"
-  (onInput)="onCalendarInput($event, calendarStart.inputId, freq)"
-  (onClose)="onCalendarClose(calendarStart.inputId, calendarStartDate)"
-  (onBlur)="onCalendarBlur(calendarStart.inputId, calendarStartDate)">
-</p-calendar>
-<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true"
-  (onChange)="onChange($event)" (onSlideEnd)="slideChange($event)"></p-slider>
-<p-calendar #calendarEnd [class.annual-calendar]="freq === 'A'" inputId="calendar-end" [view]="calendarView"
-  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarEndDate" [placeholder]="placeholderStr"
-  [dateFormat]="calendarEndDateFormat" [disabledDates]="invalidEndDates"
-  (onSelect)="onCalendarSelect($event, calendarEnd.inputId, freq)"
-  (onYearChange)="onYearChange($event, calendarEnd.inputId, freq)"
-  (onMonthChange)="onMonthChange($event, calendarEnd.inputId, freq)"
-  (onInput)="onCalendarInput($event, calendarEnd.inputId, freq)"
-  (onClose)="onCalendarClose(calendarEnd.inputId, calendarEndDate)"
-  (onBlur)="onCalendarBlur(calendarEnd.inputId, calendarEndDate)">
-</p-calendar>
+<div class="date-slider-row">
+  <mat-form-field appearance="outline" class="date-input">
+    <input matInput [(ngModel)]="calendarDisplayStart" (input)="onTypedInputChange(calendarDisplayStart, 'start')"
+      (blur)="onInputBlur('start')" (click)="pickerStartProxy.open()">
+    <!-- <mat-datepicker-toggle matSuffix [for]="pickerStartProxy"></mat-datepicker-toggle> -->
+  </mat-form-field>
+
+  <!-- Proxy input: invisible, exists only to give MatDatepicker a valid
+     Date-typed control to attach to. Never shown to the user. -->
+  <input #proxyStart [matDatepicker]="pickerStartProxy" [matDatepickerFilter]="dateFilter" [min]="minDateValue"
+    [max]="maxDateValue" class="datepicker-proxy">
+  <mat-datepicker #pickerStartProxy [startView]="datePickerStartView"
+    (yearSelected)="freq === 'A' ? onYearSelected($event, 'start', pickerStartProxy) : null"
+    (monthSelected)="isMonthGrid() ? onMonthSelected($event, 'start', pickerStartProxy) : null"
+    (dateChange)="isDayGrid() ? onDaySelected($event.value, 'start') : null">
+  </mat-datepicker>
+
+  <mat-slider [min]="0" [max]="sliderDates.length - 1">
+    <input matSliderStartThumb [(ngModel)]="start" (change)="onSlideChange()">
+    <input matSliderEndThumb [(ngModel)]="end" (change)="onSlideChange()">
+  </mat-slider>
+
+  <mat-form-field appearance="outline" class="date-input">
+    <input matInput [(ngModel)]="calendarDisplayEnd" (input)="onTypedInputChange(calendarDisplayEnd, 'end')"
+      (blur)="onInputBlur('end')" (click)="pickerEndProxy.open()">
+    <!-- <mat-datepicker-toggle matSuffix [for]="pickerEndProxy"></mat-datepicker-toggle> -->
+  </mat-form-field>
+
+  <input #proxyEnd [matDatepicker]="pickerEndProxy" [matDatepickerFilter]="dateFilter" [min]="minDateValue"
+    [max]="maxDateValue" class="datepicker-proxy">
+  <mat-datepicker #pickerEndProxy [startView]="datePickerStartView"
+    (yearSelected)="freq === 'A' ? onYearSelected($event, 'end', pickerEndProxy) : null"
+    (monthSelected)="isMonthGrid() ? onMonthSelected($event, 'end', pickerEndProxy) : null"
+    (dateChange)="isDayGrid() ? onDaySelected($event.value, 'end') : null">
+  </mat-datepicker>
+</div>

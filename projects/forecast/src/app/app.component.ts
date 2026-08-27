@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID, AfterViewInit, ViewChild } from
 import { isPlatformBrowser, NgIf } from '@angular/common';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { ToolsModule } from 'tools';
+import { MaterialMenuNavComponent } from 'projects/shared/components/material-menu-nav/material-menu-nav.component';
 
 declare var gtag: (str: string, gaId: string, path: object) => void;
 
@@ -9,8 +10,7 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: true,
-    imports: [NgIf, ToolsModule, RouterOutlet]
+    imports: [NgIf, ToolsModule, RouterOutlet, MaterialMenuNavComponent]
 })
 export class AppComponent implements AfterViewInit {
   private isBrowser;

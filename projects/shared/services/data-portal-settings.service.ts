@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
+import { PortalSettings, PortalUniverse } from '../models/DataPortalSettings';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataPortalSettingsService {
-  public dataPortalSettings = {
+  public dataPortalSettings: Record<PortalUniverse, PortalSettings> = {
     nta: {
       catTable: {
         portalSource: 'National Transfer Accounts (NTA) Dataportal: https://data.uhero.hawaii.edu/nta \n ',

@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom } from "@angular/core";
+import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from "@angular/core";
 import { provideRouter, withComponentInputBinding, withHashLocation, withRouterConfig } from "@angular/router";
 import { environment } from "./environments/environment";
 import { AppComponent } from "./app/app.component";
@@ -15,7 +15,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideAnimations(),
+    provideZoneChangeDetection(),provideAnimations(),
     provideNoopAnimations(),
     provideHttpClient(
       withInterceptorsFromDi()

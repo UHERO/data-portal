@@ -1,28 +1,40 @@
-import { Component, Input, OnInit, OnDestroy, Inject } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, Inject, ViewChild, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { HelperService } from 'projects/shared/services/helper.service';
 import { DateRange } from 'projects/shared/models/DateRange';
 import { Subscription } from 'rxjs';
 import { DataPortalSettingsService } from 'projects/shared/services/data-portal-settings.service';
-import { NgFor, NgIf } from '@angular/common';
-import { SharedModule } from 'primeng/api';
-import { TableModule } from 'primeng/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+
+interface TableColumn {
+  field: string;
+  header: string;
+}
+
+interface TableRow {
+  tableDate: string;
+  [key: string]: any;
+}
 
 @Component({
-    selector: 'lib-single-series-table',
-    templateUrl: './single-series-table.component.html',
-    styleUrls: ['./single-series-table.component.scss'],
-    standalone: true,
-    imports: [TableModule, SharedModule, NgFor, NgIf]
+  selector: 'lib-single-series-table',
+  templateUrl: './single-series-table.component.html',
+  styleUrls: ['./single-series-table.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  imports: [MatTableModule, MatSortModule]
 })
-export class SingleSeriesTableComponent implements OnInit, OnDestroy {
-  @Input() seriesData;
+export class SingleSeriesTableComponent implements OnInit, OnDestroy, AfterViewInit {
+  @Input() seriesData: any;
+  @ViewChild(MatSort) sort: MatSort;
+
   dateRangeSub: Subscription;
-  tableHeaders: Array<any>;
-  tableData: Array<any>;
-  portalSettings;
+  tableHeaders: TableColumn[];
+  displayedColumns: string[];
+  dataSource = new MatTableDataSource<TableRow>([]);
+  portalSettings: any;
 
   constructor(
-    @Inject('portal') public portal,
+    @Inject('portal') public portal: any,
     private dataPortalSettings: DataPortalSettingsService,
     private helperService: HelperService,
   ) {}
@@ -31,15 +43,27 @@ export class SingleSeriesTableComponent implements OnInit, OnDestroy {
     this.portalSettings = this.dataPortalSettings.dataPortalSettings[this.portal.universe];
     this.dateRangeSub = this.helperService.currentDateRange.subscribe((dateRange) => {
       const { seriesDetail, seriesTableData } = this.seriesData;
-      this.drawTable(dateRange, seriesDetail, seriesTableData)
-    }); 
+      this.drawTable(dateRange, seriesDetail, seriesTableData);
+    });
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+    // Custom sort: only the date column is sortable, and it's a string
+    // date field, not a number — default MatTableDataSource sorting
+    // compares values directly, which works fine for ISO-format date
+    // strings, but we override sortingDataAccessor for clarity/safety.
+    this.dataSource.sortingDataAccessor = (row: TableRow, field: string) => {
+      if (field === 'tableDate') return row.tableDate;
+      return (row as any)[field];
+    };
   }
 
   ngOnDestroy() {
-    this.dateRangeSub.unsubscribe()
+    this.dateRangeSub.unsubscribe();
   }
 
-  drawTable = (selectedDateRange: DateRange, seriesDetail, seriesTableData) => {
+  drawTable = (selectedDateRange: DateRange, seriesDetail: any, seriesTableData: any[]) => {
     let tableStart: number;
     let tableEnd: number;
     const { startDate, endDate } = selectedDateRange;
@@ -51,11 +75,13 @@ export class SingleSeriesTableComponent implements OnInit, OnDestroy {
         tableEnd = i;
       }
     }
-    this.tableData = seriesTableData.slice(tableStart, tableEnd + 1).reverse();
+    const tableData = seriesTableData.slice(tableStart, tableEnd + 1).reverse();
+    this.dataSource.data = tableData;
     this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
-  }
+    this.displayedColumns = this.tableHeaders.map(col => col.field);
+  };
 
-  createTableColumns = (portalSettings, seriesDetail) => {
+  createTableColumns = (portalSettings: any, seriesDetail: any): TableColumn[] => {
     const { frequencyShort, percent } = seriesDetail;
     const {
       series1,
@@ -67,18 +93,17 @@ export class SingleSeriesTableComponent implements OnInit, OnDestroy {
       series3PercLabel,
       series3Label
     } = portalSettings.seriesTable;
-    const cols = [
+
+    const cols: TableColumn[] = [
       { field: 'tableDate', header: 'Date' },
       { field: series1, header: 'Level' },
-      {
-        field: series2, header: percent ? series2PercLabel : series2Label
-      }
+      { field: series2, header: percent ? series2PercLabel : series2Label }
     ];
+
     if (frequencyShort !== 'A' && columns === 4) {
-      cols.push({
-        field: series3, header: percent ? series3PercLabel : series3Label
-      });
+      cols.push({ field: series3, header: percent ? series3PercLabel : series3Label });
     }
+
     return cols;
-  }
+  };
 }

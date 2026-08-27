@@ -7,7 +7,6 @@ import { NgIf } from '@angular/common';
     selector: 'lib-analyzer-stats-renderer',
     templateUrl: './analyzer-stats-renderer.component.html',
     styleUrls: ['./analyzer-stats-renderer.component.scss'],
-    standalone: true,
     imports: [NgIf, RouterLink]
 })
 export class AnalyzerStatsRendererComponent implements ICellRendererAngularComp {

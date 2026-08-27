@@ -1,13 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgFor } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'lib-measurement-selector',
     templateUrl: './measurement-selector.component.html',
     styleUrls: ['./measurement-selector.component.scss'],
-    standalone: true,
-    imports: [FormsModule, NgFor]
+    imports: [FormsModule]
 })
 export class MeasurementSelectorComponent {
   @Input() measurements;

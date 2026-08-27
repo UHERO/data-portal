@@ -1,4 +1,4 @@
-.navbar{
+.navbar {
   @media (max-width: 767px) {
     background-color: #FFF;
     padding: 0;
@@ -13,6 +13,10 @@
     @media (min-width: 768px) {
       display: none;
     }
+  }
+
+  .mat-tree {
+    background-color: #FFF;
   }
 
   #about-link {
@@ -44,9 +48,8 @@
       }
     }
   }
-  
+
   @media (min-width: 768px) {
-    // margin-top: 65px;
     position: relative;
     padding: 0;
   }
@@ -57,7 +60,9 @@
     float: left;
     font-size: 1.5em;
     color: #505050;
+  }
 
+  #navbarSideButton {
     @media (min-width: 768px) {
       display: none;
     }
@@ -127,7 +132,7 @@
       overflow-y: scroll;
       z-index: 100;
     }
-    
+
     @media (min-width: 768px) {
       width: 230px;
 
@@ -186,72 +191,72 @@
   }
 }
 
-:host {
-  ::ng-deep {
-    .p-panelmenu {
+.nav-tree {
+  font-size: 0.9em;
+
+  mat-tree-node {
+    border-bottom: 1px solid #E5E5E5;
+    min-height: unset;
+
+    a {
+      display: block;
+      width: 100%;
+      padding: .6em;
       font-size: 0.9em;
+      color: #333;
+      text-decoration: none;
+      cursor: pointer;
 
-      .p-panelmenu-header {
-        border: 0;
-        border-bottom: 1px solid #E5E5E5;
-        background: transparent;
-  
-        a.p-panelmenu-header-link {
-          border: 0;
-          background-color: transparent;
-          padding: .75em;
-          font-size: .9em;
-          font-weight: normal;
-
-          .p-panelmenu-icon {
-            color: #505050;
-            font-size: 0.9em;
-            margin-right: unset;
-          }
-        }
-
-        a:focus {
-          outline-width: thin;
-        }
-      }
-
-      .p-panelmenu-header.p-highlight {
-        a {
-          border: 0;
-          background: transparent;
-          border-color: #E5E5E5;
-
-          &:hover {
-            border: 0;
-            background-color: transparent;
-          }
-        }
-      }
-
-      .p-panelmenu-header:not(.p-highlight) {
-        a {
-          &:hover {
-            border: 0;
-          }
-        }
-      }
-
-      .p-panelmenu-content {
-        border: 0;
-        background: transparent;
-
-        .p-menuitem {
-          .p-menuitem-link {
-            color: #505050;
-            padding: .6em;
-            text-decoration: none;
-          }  
-        }
+      &:hover {
+        background-color: #DBDBDB;
+        text-decoration: none;
       }
     }
 
-    .p-submenu-list {
-      padding-left: 10px;
+    &.active-link a {
+      color: #FFF;
+      background-color: #333;
     }
+  }
+
+  .tree-node-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  /*padding: .75em;*/
+  cursor: pointer;
+  font-size: .9em;
+  font-weight: normal;
+  border-bottom: 1px solid transparent;
+
+  &:hover {
+    background-color: transparent;
+  }
+
+  &.expanded {
+    border-color: #E5E5E5;
+    background-color: transparent;
+
+    .tree-node-label {
+      font-weight: 600;
+    }
+  }
+
+  button {
+    background-color: transparent;
+    float: none;
+    display: inline-flex;
+    color: #505050;
+    font-size: 0.9em;
+    margin-right: unset;
+  }
+
+  .tree-node-label {
+    flex: 1;
+  }
+}
+
+  mat-tree-node[matTreeNodePadding] {
+    padding-left: 10px;
   }
 }

@@ -1,20 +1,26 @@
 <header id="header" class="navbar navbar-fixed-top navbar-light">
-  <ng-template [ngIf]="uheroLogo">
+  @if (uheroLogo) {
     <div>
-    <a id="uhero-link" href="https://uhero.hawaii.edu">
-      <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
-    </a>
-    <a id="data-portal-link" routerLink="/">
-      <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
-    </a>
+      <a id="uhero-link" href="https://uhero.hawaii.edu">
+        @if (headerLogo.displayImg) {
+          <img [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+        }
+      </a>
+      <a id="data-portal-link" routerLink="/">
+        @if (headerLogo.displayImg) {
+          <img [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+        }
+      </a>
     </div>
-  </ng-template>
-  <ng-template [ngIf]="!uheroLogo">
+  }
+  @if (!uheroLogo) {
     <a class="navbar-brand" id="uhero-header" routerLink="/">
-      <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+      @if (headerLogo.displayImg) {
+        <img [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+      }
       <p>{{headerLogo.headerText}}</p>
     </a>
-  </ng-template>
+  }
   <div class="d-flex align-items-center mr-4">
     <lib-search-bar (search)="onSearch($event)"></lib-search-bar>
   </div>

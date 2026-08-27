@@ -3,14 +3,13 @@ import { HelperService } from 'projects/shared/services/helper.service';
 import { SeriesHelperService } from 'projects/shared/services/series-helper.service';
 import { DateRange } from 'projects/shared/models/DateRange';
 import { Subscription } from 'rxjs';
-import { NgIf } from '@angular/common';
+
 
 @Component({
     selector: 'lib-summary-statistics',
     templateUrl: './summary-statistics.component.html',
     styleUrls: ['./summary-statistics.component.scss'],
-    standalone: true,
-    imports: [NgIf]
+    imports: []
 })
 export class SummaryStatisticsComponent implements OnInit, OnDestroy {
   @Input() seriesData;

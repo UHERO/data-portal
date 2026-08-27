@@ -1,7 +1,27 @@
-@import './assets/app_colors';
-@import '~ag-grid-community/styles/ag-grid.css';
-@import '~ag-grid-community/styles/ag-theme-balham.css';
-@import "~bootstrap-icons/font/bootstrap-icons.css";
+@use '@angular/material' as mat;
+
+@use './assets/app_colors' as *;
+
+@include mat.core();
+
+html {
+  @include mat.theme((
+    color: mat.$blue-palette,
+    density: 0
+  ));
+
+  @include mat.slider-overrides ((
+    active-track-color: $primary,
+    handle-color: #FAFAFB,
+    focus-handle-color: $primary,
+    ripple-color: transparent
+  ));
+
+  @include mat.tabs-overrides((
+    active-focus-indicator-color: $primary,
+    active-indicator-color: $primary
+  ));
+}
 /* You can add global styles to this file, and also import other style files */
 body {
   position: relative;
@@ -128,8 +148,12 @@ body {
   }
 
   lib-search-bar {
-    .btn {
+    .btn.search-btn {
       background-color: $primary;
+
+      &:hover {
+        background-color: $primary;
+      }
     }
   }
 

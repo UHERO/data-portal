@@ -18,27 +18,27 @@ import { ShareLinkComponent } from '../share-link/share-link.component';
 import { ForecastSelectorComponent } from '../forecast-selector/forecast-selector.component';
 import { FreqSelectorComponent } from '../freq-selector/freq-selector.component';
 import { GeoSelectorComponent } from '../geo-selector/geo-selector.component';
-import { DialogModule } from 'primeng/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { SeriesHelpDialogComponent } from '../series-help-dialog/series-help-dialog.component';
 
 @Component({
     selector: 'lib-single-series',
     templateUrl: './single-series.component.html',
     styleUrls: ['./single-series.component.scss'],
-    standalone: true,
     imports: [
-      NgFor,
-      NgIf,
-      DialogModule,
-      GeoSelectorComponent,
-      FreqSelectorComponent,
-      ForecastSelectorComponent,
-      ShareLinkComponent,
-      FormsModule,
-      DateSliderComponent,
-      HighstockComponent,
-      SummaryStatisticsComponent,
-      SingleSeriesTableComponent,
-      AsyncPipe
+        NgFor,
+        NgIf,
+        MatDialogModule,
+        GeoSelectorComponent,
+        FreqSelectorComponent,
+        ForecastSelectorComponent,
+        ShareLinkComponent,
+        FormsModule,
+        DateSliderComponent,
+        HighstockComponent,
+        SummaryStatisticsComponent,
+        SingleSeriesTableComponent,
+        AsyncPipe
     ]
 })
 export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, AfterContentChecked {
@@ -68,7 +68,7 @@ export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, Afte
   selectedForecast;
   selectedFreq: Frequency;
   displayFcSelector: boolean;
-  displayHelp: boolean = false;
+  // displayHelp: boolean = false;
   routeStart: string;
   routeEnd: string;
   public seriesData;
@@ -85,7 +85,8 @@ export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, Afte
     private route: ActivatedRoute,
     private router: Router,
     private cdRef: ChangeDetectorRef,
-    private location: Location
+    private location: Location,
+    private dialog: MatDialog
   ) {
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
       this.selectedFreq = freq;
@@ -169,7 +170,11 @@ export class SingleSeriesComponent implements OnInit, OnChanges, OnDestroy, Afte
   }
 
   showHelp() {
-    this.displayHelp = true;
+    // this.displayHelp = true;
+    this.dialog.open(SeriesHelpDialogComponent, {
+      width: '70vw',
+      hasBackdrop: true,
+    });
   }
 
   addToAnalyzer(series) {
