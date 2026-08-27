@@ -7,7 +7,7 @@ import {
   SimpleChanges,
   computed,
 } from "@angular/core";
-import { Location, AsyncPipe } from "@angular/common";
+import { Location } from "@angular/common";
 import { AnalyzerService, FormattedAnalyzerSeries } from "projects/shared/services/analyzer.service";
 import { DateRange } from "projects/shared/models/DateRange";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -35,8 +35,7 @@ import { Portal, PortalSettings } from "projects/shared/models/DataPortalSetting
     DateSliderComponent,
     CategoryChartsComponent,
     AnalyzerHighstockComponent,
-    AnalyzerTableComponent,
-    AsyncPipe
+    AnalyzerTableComponent
   ]
 })
 export class AnalyzerComponent

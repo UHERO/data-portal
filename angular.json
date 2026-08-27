@@ -185,6 +185,8 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/highcharts/css/highcharts.css",
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
               "bootstrap-icons/font/bootstrap-icons.css",
               "projects/nta/src/styles.scss"
             ],
@@ -322,6 +324,8 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/highcharts/css/highcharts.css",
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
               "bootstrap-icons/font/bootstrap-icons.css",
               "projects/ccom/src/styles.scss"
             ],
@@ -462,7 +466,10 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/highcharts/css/highcharts.css",
-              "projects/forecast/src/styles.scss"
+              "ag-grid-community/styles/ag-grid.css",
+              "ag-grid-community/styles/ag-theme-balham.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
+              "projects/uhero/src/styles.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [

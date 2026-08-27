@@ -12,6 +12,8 @@ div#view-toggle-share {
 
 div#analyzer-customizations {
   //display: block;
+  display: flex;
+  align-items: center;
   flex-basis: 100%;
   padding-top: .5em;
 }
