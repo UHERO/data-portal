@@ -58,7 +58,7 @@ bootstrapApplication(AppComponent, {
                 altText: 'NTA Data Portal Logo',
                 displayImg: true,
                 headerText: '',
-                imgSrc: '../../assets/nta-logo.svg',
+                imgSrc: 'assets/nta-logo.svg',
                 mobileLogo: true,
             }
         },
