@@ -2,7 +2,6 @@ import { Component, Inject, PLATFORM_ID, ViewChild, OnInit } from '@angular/core
 import { isPlatformBrowser, NgIf } from '@angular/common';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from 'projects/shared/components/header/header.component';
-// import { PrimengMenuNavComponent } from 'projects/shared/components/primeng-menu-nav/primeng-menu-nav.component';
 import { MaterialMenuNavComponent } from 'projects/shared/components/material-menu-nav/material-menu-nav.component';
 import { Portal } from 'projects/shared/models/DataPortalSettings';
 

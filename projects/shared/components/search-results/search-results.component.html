@@ -1,29 +1,3 @@
-<!-- <p-table styleClass="p-datatable-striped" [columns]="resultsTableCols" [value]="resultsTableData">
-  <ng-template pTemplate="header" let-columns>
-    <tr>
-      @for (col of columns; track col) {
-        <th [pSortableColumn]="col.field">
-          {{col.header}} <p-sortIcon [field]="col.field"></p-sortIcon>
-        </th>
-      }
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-rowData let-columns="columns">
-    <tr>
-      @for (col of columns; track col) {
-        <td>
-          @if (col.header === 'Series') {
-            <span><a routerLink="/series" [queryParams]="{id: rowData.id, sa: rowData.seasonality === 'seasonally adjusted'}"
-            queryParamsHandling="merge">{{rowData[col.field]}}</a></span>
-          }
-          @if (col.header !== 'Series') {
-            <span>{{rowData[col.field]}}</span>
-          }
-        </td>
-      }
-    </tr>
-  </ng-template>
-</p-table> -->
 <table mat-table matSort [dataSource]="dataSource" class="mat-elevation-z0 striped-table">
 
   <!-- Series column: custom cell content (router link) -->

@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Series View Help</h2>
+
+<mat-dialog-content>
+  <p>The series view plots a single indicator using a line measured on the right axis and the year-over-year percent
+    change (or absolute change) displayed as bars measured on the left axis.</p>
+  <p>At the top of the chart, in addition to the familiar selector boxes, you can also toggle whether the chart
+    displays seasonally-adjusted indicators or the non-seasonally-adjusted indicator if both are available. The
+    share button next to the frequency selector opens a dialog box containing a static URL to this series which can
+    be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen, as well as, an embed
+    code. As in each of the other views, to add an indicator to the Analyzer, toggle the star, located at the bottom
+    left corner of the chart.
+  </p>
+  <p>To control the selected sample of data, use the slider located above the chart. The dates can be selected by
+    either clicking and dragging the handles of the slider or by clicking the input boxes and entering a date
+    manually. There is also a set of buttons at the top left-hand corner of the chart to set the range of data to 1
+    Year (for non-annual series), 5 Years, or 10 Years from the selected starting date. The 'All' button will
+    display all available data.
+  </p>
+  <p>Below the chart is the source of the data, a link to the source agency, and any relevant notes followed by a
+    row of summary statistics measured over the currently selected range and a table displaying the data with the
+    option of sorting by date either ascending or descending.</p>
+  <p>In the top-right corner of the chart area, click Download to choose from PNG, JPEG, SVG, PDF or CSV exports of
+    the selected data.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

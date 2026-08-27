@@ -148,8 +148,12 @@ body {
   }
 
   lib-search-bar {
-    .btn {
+    .btn.search-btn {
       background-color: $primary;
+
+      &:hover {
+        background-color: $primary;
+      }
     }
   }
 
