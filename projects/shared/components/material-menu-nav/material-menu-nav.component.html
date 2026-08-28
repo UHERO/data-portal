@@ -6,19 +6,14 @@
       &#9776;
     </button>
     @if (uheroLogo) {
-    <div>
-      <a class="navbar-brand" id="uhero-link" href="https://uhero.hawaii.edu">
-        @if (headerLogo.mobileLogo) {
-        <img [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
-        }
-      </a>
-      <a class="navbar-brand" id="data-portal-link" routerLink="/">
-        @if (headerLogo.mobileLogo) {
-        <img [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
-        }
-      </a>
-    </div>
+  <div class="dual-logo-mobile">
+    @if (headerLogo.mobileLogo) {
+      <img [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
     }
+    <a id="uhero-link" href="https://uhero.hawaii.edu" class="logo-hit-left"></a>
+    <a id="data-portal-link" routerLink="/" class="logo-hit-right"></a>
+  </div>
+}
     @if (!uheroLogo) {
     <a class="navbar-brand" id="uhero-header" routerLink="/">
       @if (headerLogo.mobileLogo) {
