@@ -13,8 +13,11 @@ class AnalyzerData implements AnalyzerDataInterface {
   analyzerDateWrapper = { firstDate: '', endDate: '' };
   analyzerSeries: FormattedAnalyzerSeries[] = [];
   displayFreqSelector = false;
+  displayGeoSelector = false;
   siblingFreqs = [];
+  siblingGeos = [];
   analyzerFrequency = null;
+  analyzerGeography = null;
   requestComplete = false;
 }
 
@@ -404,18 +407,24 @@ export class AnalyzerService {
           }
         }
       });
-      // analyzerSeries = series;
+      //analyzerSeries = series;
       const siblingFreqs = this.getSiblingFrequencies(analyzerSeries);
+      const siblingGeos = this.getSiblingGeographies(analyzerSeries);
       const displayFreqSelector = this.singleFrequencyAnalyzer(analyzerSeries);
+      const displayGeoSelector = this.singleGeographyAnalyzer(analyzerSeries);
       const analyzerFrequency = displayFreqSelector ? this.getCurrentAnalyzerFrequency(series, siblingFreqs) :
         this.getHighestFrequency(analyzerSeries);
+      const analyzerGeography = displayGeoSelector ? this.getCurrentAnalyzerGeography(series) : null;
       if (this.allowMoMTransformation(analyzerFrequency.freq)) {
         this.analyzerData.set({
           analyzerTableDates: [],
           sliderDates: [],
           displayFreqSelector,
+          displayGeoSelector,
           siblingFreqs,
+          siblingGeos,
           analyzerFrequency,
+          analyzerGeography,
           analyzerSeries,
           analyzerMeasurements,
           analyzerDateWrapper,
@@ -428,8 +437,11 @@ export class AnalyzerService {
           analyzerTableDates: tableDates,
           sliderDates,
           displayFreqSelector,
+          displayGeoSelector,
           siblingFreqs,
+          siblingGeos,
           analyzerFrequency,
+          analyzerGeography,
           analyzerSeries,
           analyzerMeasurements,
           analyzerDateWrapper,
@@ -587,9 +599,24 @@ export class AnalyzerService {
     return freqs.filter((freq, index, self) => self.findIndex((f) => (f.freq === freq.freq)) === index).length === 1;
   }
 
+  singleGeographyAnalyzer = (series: Array<any>) => {
+    return new Set(series.map(s => s.geography.handle)).size === 1;
+  }
+
   getSiblingFrequencies = (series: Array<any>) => {
     const freqs  = series.map(s => s.freqs.map((f) => { return { freq: f.freq, label: f.label } }));
     return freqs.reduce((prev, curr) => prev.filter(f => curr.some(freq => freq.freq === f.freq)));
+  }
+
+  getSiblingGeographies = (series: Array<any>) => {
+    const geos = series.map(s => s.geos.map((g) =>  g));
+    return geos.reduce((prev, curr) => prev.filter(g => curr.some(geo => geo.handle === g.handle)))
+  }
+  
+  getCurrentAnalyzerGeography = (series: Array<any>) => {
+    const currentGeo = series[0].geography;
+    this.helperService.updateCurrentGeography(currentGeo)
+    return currentGeo;
   }
 
   getCurrentAnalyzerFrequency = (series: Array<any>, freqList: Array<any>) => {

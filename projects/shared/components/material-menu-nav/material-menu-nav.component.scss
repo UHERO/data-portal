@@ -25,6 +25,37 @@
     }
   }
 
+  .dual-logo-mobile {
+    position: relative;
+    display: inline-block;
+
+    @media (min-width: 768px) {
+      display: none;
+    }
+
+    img {
+      height: 38px;
+    }
+
+    .logo-hit-left,
+    .logo-hit-right {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      //width: 50%;
+    }
+
+    .logo-hit-left {
+      left: 0;
+      width: 62%;
+    }
+
+    .logo-hit-right {
+      right: 0;
+      width: 38%;
+    }
+  }
+
   .navbar-brand {
     @media (min-width:768px) {
       display: none;
@@ -136,7 +167,8 @@
     @media (min-width: 768px) {
       width: 230px;
 
-      .mobile-divider, .mobile-logo {
+      .mobile-divider,
+      .mobile-logo {
         display: none;
       }
     }
@@ -164,7 +196,8 @@
     z-index: 99;
   }
 
-  .sidebar-list, .list-item {
+  .sidebar-list,
+  .list-item {
     display: block;
     list-style-type: none;
     -webkit-padding-start: 1em;
@@ -185,7 +218,10 @@
   }
 
   .selectedCategory {
-    a, a:hover, a:active {
+
+    a,
+    a:hover,
+    a:active {
       color: #FFF;
     }
   }
@@ -220,41 +256,41 @@
   }
 
   .tree-node-row {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  /*padding: .75em;*/
-  cursor: pointer;
-  font-size: .9em;
-  font-weight: normal;
-  border-bottom: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    /*padding: .75em;*/
+    cursor: pointer;
+    font-size: .9em;
+    font-weight: normal;
+    border-bottom: 1px solid transparent;
 
-  &:hover {
-    background-color: transparent;
-  }
+    &:hover {
+      background-color: transparent;
+    }
 
-  &.expanded {
-    border-color: #E5E5E5;
-    background-color: transparent;
+    &.expanded {
+      border-color: #E5E5E5;
+      background-color: transparent;
+
+      .tree-node-label {
+        font-weight: 600;
+      }
+    }
+
+    button {
+      background-color: transparent;
+      float: none;
+      display: inline-flex;
+      color: #505050;
+      font-size: 0.9em;
+      margin-right: unset;
+    }
 
     .tree-node-label {
-      font-weight: 600;
+      flex: 1;
     }
   }
-
-  button {
-    background-color: transparent;
-    float: none;
-    display: inline-flex;
-    color: #505050;
-    font-size: 0.9em;
-    margin-right: unset;
-  }
-
-  .tree-node-label {
-    flex: 1;
-  }
-}
 
   mat-tree-node[matTreeNodePadding] {
     padding-left: 10px;

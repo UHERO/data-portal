@@ -8,6 +8,7 @@ export interface AnalyzerDataInterface {
   analyzerSeries: Array<any>;
   displayFreqSelector: boolean;
   siblingFreqs: Array<any>;
+  siblingGeos: Array<any>;
   analyzerFrequency: null;
   //yRightSeries: Array<any>;
   //yLeftSeries: Array<any>;

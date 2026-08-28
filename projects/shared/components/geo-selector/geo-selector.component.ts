@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class GeoSelectorComponent implements OnDestroy {
   @Input() regions: Array<Geography>;
+  @Input() analyzerView: boolean;
   selectedGeo: Geography;
   geoSubscription: Subscription;
   @Output() selectedGeoChange = new EventEmitter();

@@ -20,6 +20,7 @@ import { AnalyzerHighstockComponent } from "../analyzer-highstock/analyzer-highs
 import { CategoryChartsComponent } from "../category-charts/category-charts.component";
 import { DateSliderComponent } from "../date-slider/date-slider.component";
 import { FreqSelectorComponent } from "../freq-selector/freq-selector.component";
+import { GeoSelectorComponent } from "../geo-selector/geo-selector.component";
 import { ShareLinkComponent } from "../share-link/share-link.component";
 import { MatDialog } from '@angular/material/dialog';
 import { AnalyzerHelpDialogComponent } from '../analyzer-help-dialog/analyzer-help-dialog.component';
@@ -32,6 +33,7 @@ import { Portal, PortalSettings } from "projects/shared/models/DataPortalSetting
   imports: [
     ShareLinkComponent,
     FreqSelectorComponent,
+    GeoSelectorComponent,
     DateSliderComponent,
     CategoryChartsComponent,
     AnalyzerHighstockComponent,
@@ -82,7 +84,8 @@ export class AnalyzerComponent
   dateRangeSubscription: Subscription;
   selectedDateRange: DateRange;
   previousFreq: string = "";
-
+  previousGeo: string = "";
+  
   constructor(
     @Inject("environment") private environment,
     @Inject("portal") private portal: Portal,
@@ -251,9 +254,21 @@ export class AnalyzerComponent
     this.updateUrlLocation(param);
   }
 
+  changeAnalyzerGeography(geo, previousGeo: string, analyzerSeries: FormattedAnalyzerSeries[], freq: string) {
+    this.previousGeo = previousGeo === geo ? "" : previousGeo;
+    this.analyzerService.urlChartSeries.update(series => series = []);
+    const siblingsList = analyzerSeries.map((serie) => {
+      return this.apiService.fetchSiblingSeriesByIdAndGeo(
+        serie.id,
+        geo.handle,
+        serie.seasonalAdjustment
+      );
+    });
+    this.switchToSiblingSeries(siblingsList, analyzerSeries, freq)
+  }
+
   changeAnalyzerFrequency(freq: string, previousFreq: string, analyzerSeries: FormattedAnalyzerSeries[]) {
     this.previousFreq = previousFreq === freq ? "" : previousFreq;
-    const siblingIds: Record<string, any> = [];
     this.analyzerService.urlChartSeries.update(series => series = []);
     const siblingsList = analyzerSeries.map((serie) => {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(
@@ -263,6 +278,11 @@ export class AnalyzerComponent
         freq
       );
     });
+    this.switchToSiblingSeries(siblingsList, analyzerSeries, freq);
+  }
+
+  switchToSiblingSeries(siblingsList, analyzerSeries, freq) {
+    const siblingIds: Record<string, any> = [];
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
         siblings.forEach((sib) => {

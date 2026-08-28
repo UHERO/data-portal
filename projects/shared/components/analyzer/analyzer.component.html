@@ -18,6 +18,12 @@
       (selectedFreqChange)="changeAnalyzerFrequency($event.freq, analyzerData().analyzerFrequency.freq, analyzerData().analyzerSeries)"
       class="selector">
     </lib-freq-selector>
+    @if (analyzerData().displayGeoSelector && analyzerData().displayFreqSelector) {
+    <lib-geo-selector [regions]="analyzerData().siblingGeos" [analyzerView]="true"
+      (selectedGeoChange)="changeAnalyzerGeography($event, analyzerData().analyzerGeography.handle, analyzerData().analyzerSeries, analyzerData().analyzerFrequency.freq)"
+      class="selector">
+    </lib-geo-selector>
+    }
     @if (analyzerData().displayFreqSelector) {
     <label class="mx-2 form-check-inline">
       <input type="checkbox" (change)="indexActive($event)"
