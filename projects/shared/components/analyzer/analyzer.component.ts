@@ -278,7 +278,7 @@ export class AnalyzerComponent
         freq
       );
     });
-    this.switchToSiblingSeries(siblingsList, analyzerSeries, freq);
+    this.switchToSiblingSeries(siblingsList, analyzerSeries, freq,);
   }
 
   switchToSiblingSeries(siblingsList, analyzerSeries, freq) {
@@ -287,8 +287,7 @@ export class AnalyzerComponent
       res.forEach((siblings) => {
         siblings.forEach((sib) => {
           if (
-            !siblingIds.some((s) => s.id === sib.id) &&
-            sib.frequencyShort === freq
+            this.displaySibling(analyzerSeries, sib, freq, siblingIds)
           ) {
             const drawInCompare =
               analyzerSeries.find((s) => s.title === sib.title)?.visible ===
@@ -307,6 +306,23 @@ export class AnalyzerComponent
       const queryParams = this.analyzerService.analyzerParams();
       this.router.navigate([`/analyzer`], { queryParams: queryParams, queryParamsHandling: 'merge' })
     });
+  }
+
+  displaySibling = (currentSeries, siblingSeries, freq, siblingIds) => {
+    if (!siblingIds.some((s) => s.id === siblingSeries.id)) {
+      return freq === 'A' ?
+        siblingSeries.frequencyShort === freq :
+        siblingSeries.frequencyShort === freq && 
+        this.checkSeasonality(currentSeries, siblingSeries)
+    }
+  }
+
+  checkSeasonality = (currentSeries, siblingSeries) => {
+    const currentDisplayedSeries = currentSeries.find(s => s.title === siblingSeries.title);
+    if (currentDisplayedSeries.frequencyShort === 'A') {
+      return siblingSeries.seasonallyAdjusted === true;
+    }
+    return currentDisplayedSeries.seasonallyAdjusted === siblingSeries.seasonallyAdjusted;
   }
 
   showHelp() {
