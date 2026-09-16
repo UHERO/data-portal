@@ -317,12 +317,33 @@ export class AnalyzerComponent
     }
   }
 
-  checkSeasonality = (currentSeries, siblingSeries) => {
-    const currentDisplayedSeries = currentSeries.find(s => s.title === siblingSeries.title);
-    if (currentDisplayedSeries.frequencyShort === 'A') {
+  checkSeasonality = (currentSeries: FormattedAnalyzerSeries[], siblingSeries: FormattedAnalyzerSeries): boolean => {
+    // Every current series sharing this sibling's title — could be 1 (only one
+    // seasonality variant was in the analyzer) or 2 (both SA and non-SA were shown).
+    const matchingCurrentSeries = currentSeries.filter(s => s.title === siblingSeries.title);
+
+    if (matchingCurrentSeries.length === 0) {
+      return false;
+    }
+
+    // Case: switching FROM annual (seasonality wasn't applicable there) TO a
+    // higher frequency — default to showing only the seasonally adjusted version.
+    const wasAnnual = matchingCurrentSeries.some(s => s.frequencyShort === 'A');
+    if (wasAnnual) {
       return siblingSeries.seasonallyAdjusted === true;
     }
-    return currentDisplayedSeries.seasonallyAdjusted === siblingSeries.seasonallyAdjusted;
+
+    // Case: both SA and non-SA pairs were visible for this title — keep both,
+    // regardless of which specific seasonality the sibling is.
+    const bothSeasonalitiesPresent =
+      matchingCurrentSeries.some(s => s.seasonallyAdjusted === true) &&
+      matchingCurrentSeries.some(s => s.seasonallyAdjusted === false);
+    if (bothSeasonalitiesPresent) {
+      return true;
+    }
+
+    // Case: exactly one seasonality variant was shown — only show the matching one.
+    return matchingCurrentSeries[0].seasonallyAdjusted === siblingSeries.seasonallyAdjusted;
   }
 
   showHelp() {
